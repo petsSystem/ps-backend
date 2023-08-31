@@ -5,20 +5,20 @@ metadata:
   labels:
     app: ps-backend
 spec:
-  replicas: 2
+  replicas: 20
   selector:
     matchLabels:
       app: ps-backend
-    template:
-      metadata:
-        labels:
-          app: ps-backend
-      spec:
-        containers:
-          - name: ps-backend
-            image: acrpssystem.azurecr.io/ps-backend:latest
-            ports:
-              - containerPort: 8080
+  template:
+    metadata:
+      labels:
+        app: ps-backend
+    spec:
+      containers:
+      - name: ps-backend
+        image: acrpssystem.azurecr.io/ps-backend:latest
+        ports:
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
