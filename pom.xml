@@ -12,7 +12,7 @@
 
 	<groupId>br.com.petshop</groupId>
 	<artifactId>ps-backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>ps-backend</name>
 	<description>Pet Shop Backend System</description>
 
