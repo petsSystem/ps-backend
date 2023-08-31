@@ -23,12 +23,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  bane: ps-backend
+  name: ps-backend
 spec:
   selector:
     app: ps-backend
   ports:
     - port: 8080
       targetPort: 8080
-  type: LoadBanlancer
+  type: LoadBalancer
 
