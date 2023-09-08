@@ -13,10 +13,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,8 +29,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-@Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -44,19 +49,17 @@ public class AppUserEntity implements UserDetails {
     private String email;
     @Column(name = "app_user_password")
     private String password;
+    @Column(name = "app_user_change_password")
+    private Boolean changePassword;
     @Column(name = "app_user_phone")
     private String phone;
     @Column(name = "app_user_date_birth")
     private String dateBirth;
-    @Column(name = "app_user_address")
-    private String address;
-    @Column(name = "app_user_pet")
-    private String pets;
     @Enumerated(EnumType.STRING)
     @Column(name = "app_user_role")
     private Role role;
 
-    @ManyToMany(cascade= CascadeType.PERSIST)
+    @ManyToMany(cascade= CascadeType.ALL)
     @JoinTable(
             name = "app_user_address",
             joinColumns = @JoinColumn(name = "app_user_id"),

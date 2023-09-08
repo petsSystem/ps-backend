@@ -4,7 +4,7 @@ import br.com.petshop.authentication.service.JwtService;
 import br.com.petshop.dao.entity.AppUserEntity;
 import br.com.petshop.dao.repository.AppUserRepository;
 import br.com.petshop.dao.repository.WebUserRepository;
-import br.com.petshop.model.dto.request.AppUserRequest;
+import br.com.petshop.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.model.dto.response.JwtAuthenticationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +21,7 @@ public class WebEmployeeService {
     @Autowired private JwtService jwtService;
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private ConvertService convert;
-    public JwtAuthenticationResponse create(AppUserRequest request) {
+    public JwtAuthenticationResponse create(AppUserCreateRequest request) {
         request.setPassword(passwordEncoder.encode(request.getPassword()));
 //        UserDetails user = null;
 //        if (channel == Channel.APP) {

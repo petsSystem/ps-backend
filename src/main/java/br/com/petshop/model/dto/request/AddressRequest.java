@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressRequest {
+public class AddressRequest implements Serializable {
+    private String postalCode;
     private String street;
     private String number;
-    private String postalCode;
     private String neighborhood;
     private String city;
     private String state;

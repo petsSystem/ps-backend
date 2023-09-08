@@ -1,7 +1,7 @@
 package br.com.petshop.user.controller.web;
 
-import br.com.petshop.model.dto.request.AppUserRequest;
-import br.com.petshop.model.dto.response.JwtAuthenticationResponse;
+import br.com.petshop.model.dto.request.AppUserCreateRequest;
+import br.com.petshop.model.dto.response.AppUserResponse;
 import br.com.petshop.user.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ public class WebPetShopRegisterController {
     private final AppUserService registerService;
 
     @PostMapping("/signup")
-    public ResponseEntity<JwtAuthenticationResponse> signup(
-            @RequestBody AppUserRequest request) {
+    public ResponseEntity<AppUserResponse> signup(
+            @RequestBody AppUserCreateRequest request) {
         return ResponseEntity.ok(registerService.create(request));
     }
 }

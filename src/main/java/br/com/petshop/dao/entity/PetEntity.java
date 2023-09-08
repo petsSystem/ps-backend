@@ -1,5 +1,6 @@
 package br.com.petshop.dao.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,13 +11,16 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Set;
 
-@Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -24,6 +28,8 @@ import java.util.Set;
 public class PetEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "pet_id")
+    private String id;
     @Column(name = "pet_name")
     private String name;
     @Column(name = "pet_gender")
@@ -45,6 +51,7 @@ public class PetEntity implements Serializable {
     @Column(name = "pet_breed")
     private String breed;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "appUserPets")
     Set<AppUserEntity> appUsers;
 }

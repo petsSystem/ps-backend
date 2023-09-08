@@ -1,5 +1,6 @@
 package br.com.petshop.dao.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,13 +11,17 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Set;
 
-@Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -45,6 +50,7 @@ public class AddressEntity implements Serializable {
     @Column(name = "address_lon")
     private String lon;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "appUserAddresses")
     Set<AppUserEntity> appUsers;
 }
