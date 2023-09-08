@@ -19,7 +19,7 @@ public class UserService {
                 String prefix = username.substring(0,3);
                 username = username.substring(4);
                 if (prefix.equals("app"))
-                    return appUserRepository.findByEmail(username)
+                    return appUserRepository.findByEmailAndActiveIsTrue(username)
                         .orElseThrow(() -> new UsernameNotFoundException("User app not found"));
                 else
                     return webUserRepository.findByEmail(username)

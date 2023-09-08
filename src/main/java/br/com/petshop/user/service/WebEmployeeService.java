@@ -43,7 +43,7 @@ public class WebEmployeeService {
     }
 
     public AppUserEntity get (String email) {
-        Optional<AppUserEntity> op = appUserRepository.findByEmail(email);
+        Optional<AppUserEntity> op = appUserRepository.findByEmailAndActiveIsTrue(email);
         return op.get();
     }
 }

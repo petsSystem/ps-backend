@@ -20,4 +20,6 @@ public class AppUserCreateRequest implements Serializable {
     private Role role = Role.USER;
     @Builder.Default
     private Boolean changePassword = false;
+    @Builder.Default
+    private Boolean active = true;
 }

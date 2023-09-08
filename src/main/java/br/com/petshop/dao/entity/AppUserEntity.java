@@ -59,6 +59,9 @@ public class AppUserEntity implements UserDetails {
     @Column(name = "app_user_role")
     private Role role;
 
+    @Column(name = "app_user_active")
+    private Boolean active;
+
     @ManyToMany(cascade= CascadeType.ALL)
     @JoinTable(
             name = "app_user_address",

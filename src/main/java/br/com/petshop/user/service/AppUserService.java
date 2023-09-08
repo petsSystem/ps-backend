@@ -11,12 +11,10 @@ import br.com.petshop.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.model.dto.request.ChangePasswordRequest;
 import br.com.petshop.model.dto.response.AppUserResponse;
-import br.com.petshop.notification.MailNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class AppUserService {
@@ -35,10 +32,12 @@ public class AppUserService {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtService jwtService;
     @Autowired private ConvertService convert;
-    @Autowired private MailNotificationService mailNotificationService;
+
+    @Autowired private AsyncService asyncService;
+
     public AppUserResponse create(AppUserCreateRequest request) {
         try {
-            AppUserEntity userEntity = appUserRepository.findByEmail(request.getEmail()).orElse(null);
+            AppUserEntity userEntity = appUserRepository.findByEmailAndActiveIsTrue(request.getEmail()).orElse(null);
 
             if (userEntity != null)
                 throw new GenericAlreadyRegisteredException("Email já cadastrado.");
@@ -66,7 +65,7 @@ public class AppUserService {
     public void checkForget(String email) {
         try {
             AppUserEntity userEntity = findByEmail(email);
-            forget(userEntity);
+            asyncService.forget(userEntity);
             return;
         } catch (GenericNotFoundException ex) {
             log.error("Email not found: " + email);
@@ -77,22 +76,6 @@ public class AppUserService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Erro ao enviar email. Tente novamente mais tarde.", ex);
         }
-    }
-
-    @Async
-    public void forget(AppUserEntity userEntity) {
-        String newPassword = generatePassword();
-        userEntity.setPassword(passwordEncoder.encode(newPassword));
-        userEntity.setChangePassword(true);
-
-        save(userEntity);
-
-        mailNotificationService.send(userEntity.getEmail(), newPassword);
-    }
-
-    private String generatePassword() {
-        String newPassword = UUID.randomUUID().toString();
-        return newPassword.substring(0,5);
     }
 
     public void changePassword(Principal authentication, ChangePasswordRequest request) {
@@ -139,12 +122,35 @@ public class AppUserService {
                     HttpStatus.BAD_REQUEST, "Erro ao atualizar dados do endereço do usuário. Tente novamente mais tarde.", ex);
         }
     }
-    public AppUserEntity findByEmail(String mail) {
-        return appUserRepository.findByEmail(mail)
+    public AppUserEntity findByEmail(String email) {
+        return appUserRepository.findByEmailAndActiveIsTrue(email)
                 .orElseThrow(GenericNotFoundException::new);
+    }
+
+    public AppUserResponse getByEmail(String email) {
+        try {
+            AppUserEntity userEntity = findByEmail(email);
+            return convert.convertAppUserEntityIntoResponse(userEntity);
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao retornar dados do usuário. Tente novamente mais tarde.", ex);
+        }
     }
 
     public AppUserEntity save (AppUserEntity entity) {
         return appUserRepository.save(entity);
+    }
+
+    public void deactivate(String email) {
+        try {
+            AppUserEntity userEntity = findByEmail(email);
+            userEntity.setActive(false);
+            save(userEntity);
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao retornar dados do usuário. Tente novamente mais tarde.", ex);
+        }
     }
 }

@@ -1,6 +1,5 @@
 package br.com.petshop.user.controller.app;
 
-import br.com.petshop.dao.entity.AppUserEntity;
 import br.com.petshop.model.dto.request.AddressRequest;
 import br.com.petshop.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.model.dto.request.AppUserUpdateRequest;
@@ -67,7 +66,15 @@ public class AppUserController {
 
     @GetMapping("/get/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public AppUserEntity get(@PathVariable ("email") String email) {
-        return userService.findByEmail(email);
+    public AppUserResponse get(
+            @PathVariable ("email") String email) {
+        return userService.getByEmail(email);
+    }
+
+    @GetMapping("/deactivate/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deactivate(
+            @PathVariable ("email") String email) {
+        userService.deactivate(email);
     }
 }
