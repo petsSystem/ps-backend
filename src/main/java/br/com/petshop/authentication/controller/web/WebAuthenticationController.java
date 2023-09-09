@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/web/token/auth")
+@RequestMapping("/api/v1/web/auth")
 @RequiredArgsConstructor
 public class WebAuthenticationController {
     private final AuthenticationService authenticationService;
