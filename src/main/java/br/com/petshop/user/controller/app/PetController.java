@@ -22,7 +22,7 @@ public class PetController {
 
     private final PetService petService;
 
-    @PostMapping("/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public void create(@AuthenticationPrincipal UserDetails user,
             @RequestBody PetRequest request) {

@@ -1,7 +1,6 @@
 package br.com.petshop.user.controller.app;
 
 import br.com.petshop.model.dto.request.AddressRequest;
-import br.com.petshop.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.model.dto.request.ChangePasswordRequest;
 import br.com.petshop.model.dto.response.AppUserResponse;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,21 +24,7 @@ import java.security.Principal;
 public class AppUserController {
     @Autowired private AppUserService userService;
 
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse signup(
-            @RequestBody AppUserCreateRequest request) {
-        return userService.create(request);
-    }
-
-    @GetMapping("/forget/{mail}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void forget (
-            @PathVariable("mail") String email) {
-        userService.checkForget(email);
-    }
-
-    @PatchMapping("/change/password")
+    @PatchMapping("/password")
     @ResponseStatus(HttpStatus.OK)
     public void changePassword(
             Principal authentication,
@@ -48,7 +32,7 @@ public class AppUserController {
         userService.changePassword(authentication, request);
     }
 
-    @PatchMapping("/update")
+    @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     public AppUserResponse update(
             Principal authentication,
@@ -64,14 +48,14 @@ public class AppUserController {
         return userService.address(authentication, request);
     }
 
-    @GetMapping("/get/{email}")
+    @GetMapping("/{email}")
     @ResponseStatus(HttpStatus.OK)
     public AppUserResponse get(
             @PathVariable ("email") String email) {
         return userService.getByEmail(email);
     }
 
-    @GetMapping("/deactivate/{email}")
+    @GetMapping("/{email}/deactivate")
     @ResponseStatus(HttpStatus.OK)
     public void deactivate(
             @PathVariable ("email") String email) {

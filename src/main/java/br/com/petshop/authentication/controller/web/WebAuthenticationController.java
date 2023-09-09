@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/web/auth")
+@RequestMapping("/api/v1/web/token/auth")
 @RequiredArgsConstructor
 public class WebAuthenticationController {
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/login")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
     public JwtAuthenticationResponse login(
             @RequestBody SigninRequest request) {
