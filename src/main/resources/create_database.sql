@@ -1,1 +1,0 @@
-CREATE DATABASE ps-backend-database

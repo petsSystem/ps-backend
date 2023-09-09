@@ -1,0 +1,12 @@
+Local
+spring.datasource.url=jdbc:sqlserver://localhost:1433;encrypt=true;trustServerCertificate=true;databaseName=db_ps_backend
+spring.datasource.username=sa
+spring.datasource.password=1q2w3e4r@#$
+
+
+Azure
+spring.datasource.url=jdbc:sqlserver://ps-backend-server.database.windows.net:1433;databaseName=ps-backend-database
+spring.datasource.username=ps-backend-server-admin
+spring.datasource.password=QP1LGLJQK6564667$
+
+CREATE DATABASE ps-backend-database
