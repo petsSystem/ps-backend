@@ -10,13 +10,12 @@ public class MailNotificationService {
 
     @Autowired
     private JavaMailSender emailSender;
-    public void send(String mail, String newPassword) {
+    public void send(String mail, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("noreply@petsystem.com");
         message.setTo(mail);
-        message.setSubject("Nova senha - APP Pet System");
-        message.setText("Sua nova senha é: " + newPassword);
+        message.setSubject(subject);
+        message.setText(body);
         emailSender.send(message);
     }
-
 }

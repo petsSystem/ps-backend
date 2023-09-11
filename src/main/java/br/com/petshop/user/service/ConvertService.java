@@ -28,6 +28,7 @@ public class ConvertService {
     }
     public AppUserResponse convertAppUserEntityIntoResponse(AppUserEntity entity) {
         AppUserResponse response = mapper.map(entity, AppUserResponse.class);
+        response.setToken(null);
         if (response.getAddresses() != null) {
             Set<AddressResponse> addressResponses = entity.getAppUserAddresses().stream()
                     .map(a -> convertAddressEntityIntoResponse(a))

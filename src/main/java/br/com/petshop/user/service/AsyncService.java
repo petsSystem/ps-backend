@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Service
 public class AsyncService {
@@ -16,19 +16,21 @@ public class AsyncService {
     @Autowired private MailNotificationService mailNotificationService;
 
     @Async
-    public void forget(AppUserEntity userEntity) {
-        String newPassword = generatePassword();
-        userEntity.setPassword(passwordEncoder.encode(newPassword));
-        userEntity.setChangePassword(true);
+    public void forget(AppUserEntity userEntity, String newPassword) {
 
-        appUserService.save(userEntity);
+        String subject = "Nova senha - APP Pet System";
+        String body = "Sua nova senha é: " + newPassword;
 
-        mailNotificationService.send(userEntity.getEmail(), newPassword);
+        mailNotificationService.send(userEntity.getEmail(), subject, body);
     }
 
-    private String generatePassword() {
-        String newPassword = UUID.randomUUID().toString();
-        return newPassword.substring(0,6);
+    @Async
+    public void emailValidate(AppUserEntity userEntity) {
+
+        String subject = "Validação de email - APP Pet System";
+        String body = "Seu token de validação é: " + userEntity.getEmailToken();
+
+        mailNotificationService.send(userEntity.getEmail(), subject, body);
     }
 
 

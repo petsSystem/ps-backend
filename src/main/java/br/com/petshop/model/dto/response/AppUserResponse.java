@@ -2,6 +2,7 @@ package br.com.petshop.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +25,11 @@ public class AppUserResponse implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String dateBirth;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean changePassword;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<AddressResponse> addresses;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String token;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean emailValidated;
 }

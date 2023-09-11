@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/app/noauth/user")
+@RequestMapping("/api/v1/app/noauth/users")
 @RequiredArgsConstructor
+
 public class AppUserNoAuthController {
     @Autowired private AppUserService userService;
 
@@ -31,6 +32,6 @@ public class AppUserNoAuthController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void forget (
             @PathVariable("email") String email) {
-        userService.checkForget(email);
+        userService.forget(email);
     }
 }

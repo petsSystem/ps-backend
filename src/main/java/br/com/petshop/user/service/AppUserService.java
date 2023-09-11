@@ -4,25 +4,30 @@ import br.com.petshop.authentication.service.JwtService;
 import br.com.petshop.dao.entity.AddressEntity;
 import br.com.petshop.dao.entity.AppUserEntity;
 import br.com.petshop.dao.repository.AppUserRepository;
+import br.com.petshop.exception.EmailTokenException;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.model.dto.request.AddressRequest;
 import br.com.petshop.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.model.dto.request.ChangePasswordRequest;
+import br.com.petshop.model.dto.request.EmailValidateRequest;
 import br.com.petshop.model.dto.response.AppUserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class AppUserService {
@@ -45,7 +50,9 @@ public class AppUserService {
             request.setPassword(passwordEncoder.encode(request.getPassword()));
             UserDetails user = convert.convertAppUserCreateRequestIntoEntity(request);
             userEntity = (AppUserEntity) user;
-            save(userEntity);
+            userEntity.setEmailValidated(false);
+
+            sendEmailToken(userEntity);
 
             AppUserResponse response = convert.convertAppUserEntityIntoResponse(userEntity);
             response.setToken(jwtService.generateToken(user));
@@ -55,18 +62,84 @@ public class AppUserService {
             log.error("Already Registered: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             log.error("Bad Request: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Erro ao cadastrar usuário. Tente novamente mais tarde.", ex);
         }
     }
 
-    public void checkForget(String email) {
+    private void sendEmailToken(AppUserEntity userEntity) {
+        userEntity.setEmailToken(generateEmailTokenValidate());
+        userEntity.setEmailTokenTime(LocalDateTime.now());
+
+        asyncService.emailValidate(userEntity);
+
+        save(userEntity);
+    }
+
+    private String generateEmailTokenValidate() {
+        int number = (int) (1000 + Math.random() * (9999 - 1000 + 1));
+        return String.valueOf(number);
+    }
+
+    public AppUserResponse emailValidate(Principal authentication, EmailValidateRequest request) {
+        try {
+            AppUserEntity userEntity = findByEmail(authentication.getName());
+            if (request.emailToken().equalsIgnoreCase(userEntity.getEmailToken()) &&
+                    !emailTokenExpired(userEntity.getEmailTokenTime())) {
+                userEntity.setEmailValidated(true);
+
+                save(userEntity);
+
+                return convert.convertAppUserEntityIntoResponse(userEntity);
+            } else
+                throw new EmailTokenException("Token inválido.");
+
+        } catch (EmailTokenException ex) {
+            log.error("Token exception: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao validar email. Tente novamente mais tarde.", ex);
+        }
+    }
+
+    private Boolean emailTokenExpired(LocalDateTime emailTokenTime) {
+        if (LocalDateTime.now().isAfter(emailTokenTime.plusMinutes(1)))
+            throw new EmailTokenException("Token expirado. Solicite novo token.");
+        return false;
+    }
+
+    public AppUserResponse emailValidateResend(Principal authentication) {
+        try {
+            AppUserEntity userEntity = findByEmail(authentication.getName());
+
+            sendEmailToken(userEntity);
+
+            return convert.convertAppUserEntityIntoResponse(userEntity);
+
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao reenviar email de validação. Tente novamente mais tarde.", ex);
+        }
+    }
+
+    public void forget(String email) {
         try {
             AppUserEntity userEntity = findByEmail(email);
-            asyncService.forget(userEntity);
-            return;
+
+            String newPassword = generatePassword();
+            userEntity.setPassword(passwordEncoder.encode(newPassword));
+            userEntity.setChangePassword(true);
+
+            save(userEntity);
+
+            asyncService.forget(userEntity, newPassword);
+
         } catch (GenericNotFoundException ex) {
             log.error("Email not found: " + email);
             throw new ResponseStatusException(
@@ -78,11 +151,15 @@ public class AppUserService {
         }
     }
 
+    private String generatePassword() {
+        String newPassword = UUID.randomUUID().toString();
+        return newPassword.substring(0,6);
+    }
+
     public void changePassword(Principal authentication, ChangePasswordRequest request) {
         try {
             AppUserEntity userEntity = findByEmail(authentication.getName());
-            //AppUserEntity)((UsernamePasswordAuthenticationToken)authentication).getPrincipal();
-            userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+            userEntity.setPassword(passwordEncoder.encode(request.password()));
             userEntity.setChangePassword(false);
             save(userEntity);
         } catch (Exception ex) {
@@ -127,9 +204,9 @@ public class AppUserService {
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    public AppUserResponse getByEmail(String email) {
+    public AppUserResponse getByEmail(Principal authentication) {
         try {
-            AppUserEntity userEntity = findByEmail(email);
+            AppUserEntity userEntity = findByEmail(authentication.getName());
             return convert.convertAppUserEntityIntoResponse(userEntity);
         } catch (Exception ex) {
             log.error("Bad Request: " + ex.getMessage());
@@ -153,4 +230,6 @@ public class AppUserService {
                     HttpStatus.BAD_REQUEST, "Erro ao retornar dados do usuário. Tente novamente mais tarde.", ex);
         }
     }
+
+
 }

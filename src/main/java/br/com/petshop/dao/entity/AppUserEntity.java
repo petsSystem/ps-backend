@@ -13,18 +13,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +59,16 @@ public class AppUserEntity implements UserDetails {
 
     @Column(name = "app_user_active")
     private Boolean active;
+
+    @Column(name = "app_user_email_validated")
+    private Boolean emailValidated;
+
+    @Column(name = "app_user_email_token")
+    private String emailToken;
+
+    @Column(name = "app_user_email_token_time")
+    private LocalDateTime emailTokenTime;
+
 
     @ManyToMany(cascade= CascadeType.ALL)
     @JoinTable(
