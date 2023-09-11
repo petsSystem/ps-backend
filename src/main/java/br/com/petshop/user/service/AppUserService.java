@@ -207,6 +207,9 @@ public class AppUserService {
     public AppUserResponse getByEmail(Principal authentication) {
         try {
             AppUserEntity userEntity = findByEmail(authentication.getName());
+            if (!userEntity.getEmailValidated())
+                sendEmailToken(userEntity);
+
             return convert.convertAppUserEntityIntoResponse(userEntity);
         } catch (Exception ex) {
             log.error("Bad Request: " + ex.getMessage());
