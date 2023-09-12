@@ -1,7 +1,7 @@
 package br.com.petshop.authentication.service;
 
-import br.com.petshop.dao.repository.AppUserRepository;
-import br.com.petshop.dao.repository.WebUserRepository;
+import br.com.petshop.user.app.repository.AppUserRepository;
+import br.com.petshop.user.web.repository.WebUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

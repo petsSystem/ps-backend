@@ -1,7 +1,7 @@
 package br.com.petshop.authentication.service;
 
-import br.com.petshop.model.dto.request.SigninRequest;
-import br.com.petshop.model.dto.response.JwtAuthenticationResponse;
+import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
+import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ public class AuthenticationService {
     @Autowired private JwtService jwtService;
     @Autowired private AuthenticationManager authenticationManager;
 
-    public JwtAuthenticationResponse login(SigninRequest request) {
+    public AuthenticationResponse login(AuthenticationRequest request) {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
             var jwt = jwtService.generateToken((UserDetails) auth.getPrincipal());
-            return JwtAuthenticationResponse.builder().token(jwt).build();
+            return AuthenticationResponse.builder().token(jwt).build();
         } catch (BadCredentialsException ex) {
             log.error("Bad Credentials: " + ex.getMessage());
             throw new ResponseStatusException(
