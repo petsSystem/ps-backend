@@ -22,4 +22,6 @@ public class AppUserCreateRequest implements Serializable {
     private Boolean changePassword = false;
     @Builder.Default
     private Boolean active = true;
+    @Builder.Default
+    private Boolean emailValidated = false;
 }

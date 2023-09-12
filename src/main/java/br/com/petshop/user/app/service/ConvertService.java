@@ -1,5 +1,7 @@
 package br.com.petshop.user.app.service;
 
+import br.com.petshop.pet.model.dto.request.PetCreateRequest;
+import br.com.petshop.pet.model.dto.response.PetResponse;
 import br.com.petshop.user.app.model.dto.response.AddressResponse;
 import br.com.petshop.user.app.model.dto.response.AppUserResponse;
 import br.com.petshop.user.app.model.AddressEntity;
@@ -8,7 +10,6 @@ import br.com.petshop.pet.model.entity.PetEntity;
 import br.com.petshop.user.app.model.dto.request.AddressRequest;
 import br.com.petshop.user.app.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.user.app.model.dto.request.AppUserUpdateRequest;
-import br.com.petshop.pet.model.dto.request.PetRequest;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +53,11 @@ public class ConvertService {
         return mapper.map(entity, AddressResponse.class);
     }
 
-    public PetEntity convertPetRequestIntoEntity(PetRequest request) {
+    public PetEntity convertPetCreateRequestIntoEntity(PetCreateRequest request) {
         return mapper.map(request, PetEntity.class);
     }
 
+    public PetResponse convertPetEntityIntoResponse(PetEntity entity) {
+        return mapper.map(entity, PetResponse.class);
+    }
 }
