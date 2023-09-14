@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class AppUserUpdateRequest implements Serializable {
     private String name;
     private String cpf;
+    private String password;
     private String phone;
     private String dateBirth;
 }

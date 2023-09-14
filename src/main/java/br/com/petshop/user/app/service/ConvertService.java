@@ -1,10 +1,11 @@
 package br.com.petshop.user.app.service;
 
 import br.com.petshop.pet.model.dto.request.PetCreateRequest;
+import br.com.petshop.pet.model.dto.request.PetUpdateRequest;
 import br.com.petshop.pet.model.dto.response.PetResponse;
 import br.com.petshop.user.app.model.dto.response.AddressResponse;
 import br.com.petshop.user.app.model.dto.response.AppUserResponse;
-import br.com.petshop.user.app.model.AddressEntity;
+import br.com.petshop.user.app.model.entity.AddressEntity;
 import br.com.petshop.user.app.model.entity.AppUserEntity;
 import br.com.petshop.pet.model.entity.PetEntity;
 import br.com.petshop.user.app.model.dto.request.AddressRequest;
@@ -36,6 +37,13 @@ public class ConvertService {
                     .collect(Collectors.toSet());
             response.setAddresses(addressResponses);
         }
+        if (response.getPets() != null) {
+            Set<PetResponse> petResponses = entity.getAppUserPets().stream()
+                    .filter(p -> p.getActive())
+                    .map(p -> convertPetEntityIntoResponse(p))
+                    .collect(Collectors.toSet());
+            response.setPets(petResponses);
+        }
         return response;
 
     }
@@ -55,6 +63,13 @@ public class ConvertService {
 
     public PetEntity convertPetCreateRequestIntoEntity(PetCreateRequest request) {
         return mapper.map(request, PetEntity.class);
+    }
+
+    public PetEntity convertPetUpdateRequestIntoEntity(PetUpdateRequest request, PetEntity entity) {
+        PetEntity newEntity = mapper.map(request, PetEntity.class);
+        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        mapper.map(newEntity, entity);
+        return entity;
     }
 
     public PetResponse convertPetEntityIntoResponse(PetEntity entity) {

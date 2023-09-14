@@ -53,6 +53,8 @@ public class PetEntity implements Serializable {
     private String weight;
     @Column(name = "pet_breed")
     private String breed;
+    @Column(name = "pet_active")
+    private Boolean active;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "appUserPets")

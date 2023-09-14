@@ -12,6 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PetResponse implements Serializable {
+    private String id;
     private String name; //nome
     private String gender; //sexo
     private String species; //especie
@@ -22,4 +23,5 @@ public class PetResponse implements Serializable {
     private String  coat; //pelagem
     private String  weight; //peso
     private String  breed; //raça
+    private Boolean active;
 }

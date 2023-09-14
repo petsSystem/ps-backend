@@ -1,8 +1,5 @@
 package br.com.petshop.pet.model.dto.request;
 
-import br.com.petshop.pet.model.enums.PetGender;
-import br.com.petshop.pet.model.enums.PetSize;
-import br.com.petshop.pet.model.enums.PetSpecie;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +13,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PetCreateRequest implements Serializable {
     private String name; //nome
-    private PetGender gender; //sexo
-    private PetSpecie species; //especie
-    private PetSize size; //porte
+    private String gender; //sexo
+    private String species; //especie
+    private String dateBirth; //data de nascimento
+    private String size; //porte
+    private Boolean neutered; //castrado
+    private String  weight; //peso
+    @Builder.Default
+    private Boolean active = true;
 }

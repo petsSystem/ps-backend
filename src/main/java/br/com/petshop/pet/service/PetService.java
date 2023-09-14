@@ -1,10 +1,12 @@
 package br.com.petshop.pet.service;
 
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.pet.model.dto.request.PetCreateRequest;
-import br.com.petshop.pet.model.dto.request.PetRequest;
+import br.com.petshop.pet.model.dto.request.PetUpdateRequest;
 import br.com.petshop.pet.model.dto.response.PetResponse;
 import br.com.petshop.pet.model.entity.PetEntity;
+import br.com.petshop.pet.repository.PetRepository;
 import br.com.petshop.user.app.model.entity.AppUserEntity;
 import br.com.petshop.user.app.service.AppUserService;
 import br.com.petshop.user.app.service.ConvertService;
@@ -23,26 +25,26 @@ public class PetService {
 
     Logger log = LoggerFactory.getLogger(PetService.class);
     @Autowired private AppUserService appUserService;
+    @Autowired private PetRepository petRepository;
     @Autowired private ConvertService convert;
 
     public PetResponse create(Principal authentication, PetCreateRequest request) {
         try {
             AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
-            Set<PetEntity> petEntities = userEntity.getAppUserPets();
+            final PetEntity[] petEntity = {null};
 
-            for(PetEntity pet : petEntities) {
-                if (pet.getName().equalsIgnoreCase(request.getName()))
-                    throw new GenericAlreadyRegisteredException("Pet " + request.getName() + " já cadastrado no sistema.");
-            }
+            userEntity.getAppUserPets().stream()
+                    .filter(p -> p.getName().equalsIgnoreCase(request.getName()))
+                    .findAny()
+                    .ifPresentOrElse((error) -> { throw new GenericAlreadyRegisteredException("Pet " + request.getName() + " já cadastrado(a) no sistema.");},
+                            () -> {
+                                PetEntity entity = convert.convertPetCreateRequestIntoEntity(request);
+                                userEntity.getAppUserPets().add(entity);
+                                entity.setAppUsers(Set.of(userEntity));
+                                petEntity[0] = petRepository.save(entity);
+                            });
 
-            PetEntity petEntity = convert.convertPetCreateRequestIntoEntity(request);
-            petEntities.add(petEntity);
-
-            userEntity.setAppUserPets(petEntities);
-
-            appUserService.save(userEntity);
-
-            return convert.convertPetEntityIntoResponse(petEntity);
+            return convert.convertPetEntityIntoResponse(petEntity[0]);
 
         } catch (GenericAlreadyRegisteredException ex) {
             log.error("Already registered: " + ex.getMessage());
@@ -52,6 +54,63 @@ public class PetService {
             log.error("Bad Request: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Erro ao cadastrar pet. Tente novamente mais tarde.", ex);
+        }
+    }
+
+    public PetResponse update(Principal authentication, String petId, PetUpdateRequest request) {
+        try {
+            PetEntity entity = petRepository.findByIdAndActiveIsTrue(petId)
+                    .orElseThrow(GenericNotFoundException::new);
+
+            entity = convert.convertPetUpdateRequestIntoEntity(request, entity);
+            petRepository.save(entity);
+
+            return convert.convertPetEntityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error("Pet not found: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao atualizar dados do pet. Tente novamente mais tarde.", ex);
+        }
+    }
+
+    public void deactivate(String petId) {
+        try {
+            PetEntity entity = petRepository.findByIdAndActiveIsTrue(petId)
+                    .orElseThrow(GenericNotFoundException::new);
+            entity.setActive(false);
+            petRepository.save(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error("Pet not found: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Cadastro de pet não encontrado.", ex);
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao excluir dados do pet. Tente novamente mais tarde.", ex);
+        }
+    }
+
+    public PetResponse getById(Principal authentication, String petId) {
+        try {
+            PetEntity entity = petRepository.findByIdAndActiveIsTrue(petId)
+                    .orElseThrow(GenericNotFoundException::new);
+
+            return convert.convertPetEntityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error("Pet not found: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Cadastro de pet não encontrado.", ex);
+        } catch (Exception ex) {
+            log.error("Bad Request: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Erro ao recuperar dados do pet. Tente novamente mais tarde.", ex);
         }
     }
 }

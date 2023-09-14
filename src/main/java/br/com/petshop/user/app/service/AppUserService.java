@@ -3,7 +3,7 @@ package br.com.petshop.user.app.service;
 import br.com.petshop.authentication.service.JwtService;
 import br.com.petshop.user.app.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.user.app.model.dto.response.AppUserResponse;
-import br.com.petshop.user.app.model.AddressEntity;
+import br.com.petshop.user.app.model.entity.AddressEntity;
 import br.com.petshop.user.app.model.entity.AppUserEntity;
 import br.com.petshop.user.app.repository.AppUserRepository;
 import br.com.petshop.exception.EmailTokenException;
@@ -171,6 +171,8 @@ public class AppUserService {
         try {
             AppUserEntity userEntity = findByEmail(authentication.getName());
             AppUserEntity newEntity = convert.convertAppUserUpdateRequestIntoEntity(request, userEntity);
+            if (request.getPassword() != null)
+                newEntity.setPassword(passwordEncoder.encode(request.getPassword()));
             save(newEntity);
             return convert.convertAppUserEntityIntoResponse(newEntity);
         } catch (Exception ex) {
@@ -249,6 +251,4 @@ public class AppUserService {
                     HttpStatus.BAD_REQUEST, "Erro ao retornar dados do usuário. Tente novamente mais tarde.", ex);
         }
     }
-
-
 }

@@ -2,7 +2,6 @@ package br.com.petshop.user.app.model.entity;
 
 import br.com.petshop.pet.model.entity.PetEntity;
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.user.app.model.AddressEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

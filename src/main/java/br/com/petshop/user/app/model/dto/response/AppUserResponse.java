@@ -1,5 +1,6 @@
 package br.com.petshop.user.app.model.dto.response;
 
+import br.com.petshop.pet.model.dto.response.PetResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,8 @@ public class AppUserResponse implements Serializable {
     private Boolean changePassword;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<AddressResponse> addresses;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Set<PetResponse> pets;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String token;
     @JsonInclude(JsonInclude.Include.NON_NULL)

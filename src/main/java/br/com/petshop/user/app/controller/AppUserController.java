@@ -219,7 +219,7 @@ public class AppUserController {
                             "}\n" +
                             "\n")})}),
     })
-    @GetMapping("/{email}/deactivate")
+    @DeleteMapping("/{email}")
     @ResponseStatus(HttpStatus.OK)
     public void deactivate(
             @PathVariable ("email") String email) {

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PetRequest implements Serializable {
+public class PetUpdateRequest implements Serializable {
     private String name; //nome
     private String gender; //sexo
     private String species; //especie

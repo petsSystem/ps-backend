@@ -1,4 +1,4 @@
-package br.com.petshop.user.app.model;
+package br.com.petshop.user.app.model.entity;
 
 import br.com.petshop.user.app.model.entity.AppUserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
