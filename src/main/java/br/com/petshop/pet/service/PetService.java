@@ -106,9 +106,6 @@ public class PetService {
         try {
             List<PetEntity> pets = petRepository.findByAppUser_EmailAndActiveIsTrue(authentication.getName());
 
-            if(pets.isEmpty())
-                throw new GenericNotFoundException("Cadastro de pet não encontrado.");
-
             return pets.stream()
                     .map(p -> convert.convertPetEntityIntoResponse(p))
                     .collect(Collectors.toSet());

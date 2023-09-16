@@ -61,16 +61,9 @@ public class AddressService {
         try {
             List<AddressEntity> address = addressRepository.findByAppUser_Email(authentication.getName());
 
-            if(address.isEmpty())
-                throw new GenericNotFoundException("Não há endereço(s) cadastrado(s).");
-
             return address.stream()
                     .map(a -> convert.convertAddressEntityIntoResponse(a))
                     .collect(Collectors.toSet());
-        } catch (GenericNotFoundException ex) {
-            log.error("Bad Request: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         } catch (Exception ex) {
             log.error("Bad Request: " + ex.getMessage());
             throw new ResponseStatusException(
