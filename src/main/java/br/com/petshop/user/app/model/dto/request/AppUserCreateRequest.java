@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -24,4 +25,6 @@ public class AppUserCreateRequest implements Serializable {
     private Boolean active = true;
     @Builder.Default
     private Boolean emailValidated = false;
+    @Builder.Default
+    private LocalDateTime created = LocalDateTime.now();
 }

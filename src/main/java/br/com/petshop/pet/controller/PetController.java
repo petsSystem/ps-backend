@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/app/pets")
@@ -101,7 +102,7 @@ public class PetController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
-                    description = "Cadasteo do Pet não encontrado.",
+                    description = "Cadastro do Pet não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
@@ -122,12 +123,11 @@ public class PetController {
                             "}\n" +
                             "\n")})})
     })
-    @GetMapping("/{pet_id}")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public PetResponse get(
-            Principal authentication,
-            @PathVariable("pet_id") String petId) {
-        return petService.getById(authentication, petId);
+    public Set<PetResponse> get(
+            Principal authentication) {
+        return petService.get(authentication);
     }
 
     @Operation(summary = "Serviço de exclusão do cadastro do Pet do usuário no APP.")

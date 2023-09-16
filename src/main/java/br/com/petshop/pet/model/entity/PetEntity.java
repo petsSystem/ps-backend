@@ -7,18 +7,24 @@ import br.com.petshop.user.app.model.entity.AppUserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
@@ -55,8 +61,19 @@ public class PetEntity implements Serializable {
     private String breed;
     @Column(name = "pet_active")
     private Boolean active;
+    @Column(name = "pet_created")
+    private LocalDateTime created;
+    @Column(name = "pet_updated")
+    private LocalDateTime updated;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "app_user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    @ManyToMany(mappedBy = "appUserPets")
-    Set<AppUserEntity> appUsers;
+    private AppUserEntity appUser;
+
+//
+//    @JsonIgnore
+//    @ManyToMany(mappedBy = "appUserPets")
+//    Set<AppUserEntity> appUsers;
 }

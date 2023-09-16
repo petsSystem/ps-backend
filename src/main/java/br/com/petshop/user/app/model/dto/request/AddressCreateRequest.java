@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressRequest implements Serializable {
+public class AddressCreateRequest implements Serializable {
     private String postalCode;
     private String street;
     private String number;
@@ -21,4 +22,6 @@ public class AddressRequest implements Serializable {
     private String country;
     private String lat;
     private String lon;
+    @Builder.Default
+    private LocalDateTime created = LocalDateTime.now();
 }

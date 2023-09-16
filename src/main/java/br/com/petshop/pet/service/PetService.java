@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PetService {
@@ -30,17 +32,21 @@ public class PetService {
 
     public PetResponse create(Principal authentication, PetCreateRequest request) {
         try {
-            AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
+            List<PetEntity> pets = petRepository.findByAppUser_EmailAndActiveIsTrue(authentication.getName());
+
             final PetEntity[] petEntity = {null};
 
-            userEntity.getAppUserPets().stream()
+            pets.stream()
                     .filter(p -> p.getName().equalsIgnoreCase(request.getName()))
                     .findAny()
-                    .ifPresentOrElse((error) -> { throw new GenericAlreadyRegisteredException("Pet " + request.getName() + " já cadastrado(a) no sistema.");},
+                    .ifPresentOrElse(
+                            (error) -> {
+                                throw new GenericAlreadyRegisteredException("Pet " + request.getName() + " já cadastrado(a) no sistema.");
+                            },
                             () -> {
                                 PetEntity entity = convert.convertPetCreateRequestIntoEntity(request);
-                                userEntity.getAppUserPets().add(entity);
-                                entity.setAppUsers(Set.of(userEntity));
+                                AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
+                                entity.setAppUser(userEntity);
                                 petEntity[0] = petRepository.save(entity);
                             });
 
@@ -96,17 +102,21 @@ public class PetService {
         }
     }
 
-    public PetResponse getById(Principal authentication, String petId) {
+    public Set<PetResponse> get(Principal authentication) {
         try {
-            PetEntity entity = petRepository.findByIdAndActiveIsTrue(petId)
-                    .orElseThrow(GenericNotFoundException::new);
+            List<PetEntity> pets = petRepository.findByAppUser_EmailAndActiveIsTrue(authentication.getName());
 
-            return convert.convertPetEntityIntoResponse(entity);
+            if(pets.isEmpty())
+                throw new GenericNotFoundException("Cadastro de pet não encontrado.");
+
+            return pets.stream()
+                    .map(p -> convert.convertPetEntityIntoResponse(p))
+                    .collect(Collectors.toSet());
 
         } catch (GenericNotFoundException ex) {
             log.error("Pet not found: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Cadastro de pet não encontrado.", ex);
+                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         } catch (Exception ex) {
             log.error("Bad Request: " + ex.getMessage());
             throw new ResponseStatusException(

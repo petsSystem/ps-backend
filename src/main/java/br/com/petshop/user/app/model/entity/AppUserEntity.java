@@ -13,6 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -70,20 +72,25 @@ public class AppUserEntity implements UserDetails {
     @Column(name = "app_user_email_token_time")
     private LocalDateTime emailTokenTime;
 
+    @Column(name = "app_user_created")
+    private LocalDateTime created;
 
-    @ManyToMany(cascade= CascadeType.ALL)
-    @JoinTable(
-            name = "app_user_address",
-            joinColumns = @JoinColumn(name = "app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id"))
-    Set<AddressEntity> appUserAddresses;
+    @Column(name = "app_user_updated")
+    private LocalDateTime updated;
 
-    @ManyToMany(cascade= CascadeType.ALL)
-    @JoinTable(
-            name = "app_user_pet",
-            joinColumns = @JoinColumn(name = "app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "pet_id"))
-    Set<PetEntity> appUserPets;
+//    @ManyToMany(cascade= CascadeType.ALL)
+//    @JoinTable(
+//            name = "app_user_address",
+//            joinColumns = @JoinColumn(name = "app_user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "address_id"))
+//    Set<AddressEntity> appUserAddresses;
+//
+//    @ManyToMany(cascade= CascadeType.ALL)
+//    @JoinTable(
+//            name = "app_user_pet",
+//            joinColumns = @JoinColumn(name = "app_user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "pet_id"))
+//    Set<PetEntity> appUserPets;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

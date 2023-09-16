@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -22,4 +23,6 @@ public class PetUpdateRequest implements Serializable {
     private String  coat; //pelagem
     private String  weight; //peso
     private String  breed; //raça
+    private LocalDateTime updated = LocalDateTime.now();
+
 }

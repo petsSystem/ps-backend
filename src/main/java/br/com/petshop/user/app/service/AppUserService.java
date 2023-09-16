@@ -1,18 +1,19 @@
 package br.com.petshop.user.app.service;
 
 import br.com.petshop.authentication.service.JwtService;
-import br.com.petshop.user.app.model.dto.request.AppUserUpdateRequest;
-import br.com.petshop.user.app.model.dto.response.AppUserResponse;
-import br.com.petshop.user.app.model.entity.AddressEntity;
-import br.com.petshop.user.app.model.entity.AppUserEntity;
-import br.com.petshop.user.app.repository.AppUserRepository;
 import br.com.petshop.exception.EmailTokenException;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.user.app.model.dto.request.AddressRequest;
+import br.com.petshop.pet.model.dto.response.PetResponse;
+import br.com.petshop.pet.service.PetService;
 import br.com.petshop.user.app.model.dto.request.AppUserCreateRequest;
+import br.com.petshop.user.app.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.user.app.model.dto.request.ChangePasswordRequest;
 import br.com.petshop.user.app.model.dto.request.EmailValidateRequest;
+import br.com.petshop.user.app.model.dto.response.AddressResponse;
+import br.com.petshop.user.app.model.dto.response.AppUserResponse;
+import br.com.petshop.user.app.model.entity.AppUserEntity;
+import br.com.petshop.user.app.repository.AppUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,10 +33,12 @@ public class AppUserService {
 
     Logger log = LoggerFactory.getLogger(AppUserService.class);
     @Autowired private AppUserRepository appUserRepository;
+    @Autowired private AddressService addressService;
+
+    @Autowired private PetService petService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtService jwtService;
     @Autowired private ConvertService convert;
-
     @Autowired private AsyncService asyncService;
 
     public AppUserResponse create(AppUserCreateRequest request) {
@@ -182,41 +184,6 @@ public class AppUserService {
         }
     }
 
-    public AppUserResponse createAddress(Principal authentication, AddressRequest request) {
-        try {
-            AppUserEntity userEntity = findByEmail(authentication.getName());
-            AddressEntity addressEntity = convert.convertAddressRequestIntoEntity(request);
-            Set<AddressEntity> entities = userEntity.getAppUserAddresses();
-            if (entities == null)
-                entities = new HashSet<>();
-
-            entities.add(addressEntity);
-            userEntity.setAppUserAddresses(entities);
-            save(userEntity);
-            return convert.convertAppUserEntityIntoResponse(userEntity);
-        } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao atualizar dados do endereço do usuário. Tente novamente mais tarde.", ex);
-        }
-    }
-
-    public AppUserResponse deleteAddress(Principal authentication, String idAddress) {
-        try {
-            AppUserEntity userEntity = findByEmail(authentication.getName());
-
-            Set<AddressEntity> addressEntities = userEntity.getAppUserAddresses();
-            addressEntities.removeIf(a -> a.getId().equalsIgnoreCase(idAddress));
-            userEntity.setAppUserAddresses(addressEntities);
-
-            save(userEntity);
-            return convert.convertAppUserEntityIntoResponse(userEntity);
-        } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao excluir endereço do cadastro. Tente novamente mais tarde.", ex);
-        }
-    }
     public AppUserEntity findByEmail(String email) {
         return appUserRepository.findByEmailAndActiveIsTrue(email)
                 .orElseThrow(GenericNotFoundException::new);
@@ -228,7 +195,13 @@ public class AppUserService {
             if (!userEntity.getEmailValidated())
                 sendEmailToken(userEntity);
 
-            return convert.convertAppUserEntityIntoResponse(userEntity);
+            AppUserResponse response = convert.convertAppUserEntityIntoResponse(userEntity);
+            Set<AddressResponse> addressResponse = addressService.get(authentication);
+            response.setAddresses(addressResponse);
+            Set<PetResponse>petResponse = petService.get(authentication);
+            response.setPets(petResponse);
+
+            return response;
         } catch (Exception ex) {
             log.error("Bad Request: " + ex.getMessage());
             throw new ResponseStatusException(

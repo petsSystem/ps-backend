@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -21,4 +22,6 @@ public class PetCreateRequest implements Serializable {
     private String  weight; //peso
     @Builder.Default
     private Boolean active = true;
+    @Builder.Default
+    private LocalDateTime created = LocalDateTime.now();
 }
