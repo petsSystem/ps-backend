@@ -2,6 +2,7 @@ package br.com.petshop.authentication.service;
 
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
+import br.com.petshop.authentication.model.enums.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,13 @@ public class AuthenticationService {
             var jwt = jwtService.generateToken((UserDetails) auth.getPrincipal());
             return AuthenticationResponse.builder().token(jwt).build();
         } catch (BadCredentialsException ex) {
-            log.error("Bad Credentials: " + ex.getMessage());
+            log.error(Message.AUTH_ERROR_USER_PASSWORD.get() + " Error: " +  ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "Usuário ou senha estão incorretos.", ex);
+                    HttpStatus.UNAUTHORIZED, Message.AUTH_ERROR_USER_PASSWORD.get(), ex);
         } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
+            log.error(Message.AUTH_ERROR_LOGIN.get() + " Error: " +  ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao efetuar login. Tente novamente mais tarde.", ex);
+                    HttpStatus.BAD_REQUEST, Message.AUTH_ERROR_LOGIN.get(), ex);
         }
     }
 }

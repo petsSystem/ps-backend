@@ -1,7 +1,8 @@
 package br.com.petshop.authentication.service;
 
-import br.com.petshop.user.app.repository.AppUserRepository;
-import br.com.petshop.user.web.repository.WebUserRepository;
+import br.com.petshop.app.user.repository.AppUserRepository;
+import br.com.petshop.authentication.model.enums.Message;
+import br.com.petshop.system.user.repository.SystemUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
     @Autowired private AppUserRepository appUserRepository;
-    @Autowired private WebUserRepository webUserRepository;
+    @Autowired private SystemUserRepository systemUserRepository;
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override
@@ -20,10 +21,10 @@ public class UserService {
                 username = username.substring(4);
                 if (prefix.equals("app"))
                     return appUserRepository.findByEmailAndActiveIsTrue(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User app not found"));
+                        .orElseThrow(() -> new UsernameNotFoundException(Message.AUTH_NOT_FOUND.get()));
                 else
-                    return webUserRepository.findByEmail(username)
-                            .orElseThrow(() -> new UsernameNotFoundException("User web not found"));
+                    return systemUserRepository.findByEmailAndActiveIsTrue(username)
+                            .orElseThrow(() -> new UsernameNotFoundException(Message.AUTH_NOT_FOUND.get()));
             }
         };
     }

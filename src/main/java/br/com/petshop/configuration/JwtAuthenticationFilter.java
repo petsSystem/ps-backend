@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.isNotEmpty(userEmail)
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             String prefix =  (request.getServletPath().contains("app")) ?
-                    "app_" : "web_";
+                    "app_" : "system_";
             UserDetails userDetails = userDetails = userService.userDetailsService()
                     .loadUserByUsername(prefix.concat(userEmail));
 
