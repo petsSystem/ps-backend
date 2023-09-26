@@ -12,16 +12,10 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressUpdateRequest implements Serializable {
-    private String postalCode;
-    private String street;
-    private String number;
-    private String neighborhood;
-    private String city;
-    private String state;
-    private String country;
-    private String lat;
-    private String lon;
+public class AppUserForgetRequest implements Serializable {
+    private String email;
+    @Builder.Default
+    private Boolean changePassword = true;
     @Builder.Default
     private LocalDateTime updated = LocalDateTime.now();
 }

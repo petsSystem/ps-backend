@@ -48,11 +48,11 @@ public class SystemAuthenticationController {
                             "}\n" +
                             "\n")})}),
     })
-    @PostMapping("")
+    @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public AuthenticationResponse login(
             @RequestBody AuthenticationRequest request) {
-        request.setEmail("system_".concat(request.getEmail()));
+        request.setEmail("sys_".concat(request.getEmail()));
         return authenticationService.login(request);
     }
 }

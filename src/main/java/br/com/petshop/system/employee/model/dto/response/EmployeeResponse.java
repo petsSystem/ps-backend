@@ -1,5 +1,6 @@
-package br.com.petshop.system.subsidiary.model.dto.request;
+package br.com.petshop.system.employee.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +15,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubsidiaryCreateRequest implements Serializable {
+public class EmployeeResponse implements Serializable {
+    private String id;
+    private String type;
     private String name;
+    private String cpf;
     private String phone;
 
     private String addressPostalCode;
@@ -25,13 +29,9 @@ public class SubsidiaryCreateRequest implements Serializable {
     private String addressCity;
     private String addressState;
     private String addressCountry;
-    private String addressLat;
-    private String addressLon;
 
-    private String companyId;
-
-    @Builder.Default
-    private Boolean active = true;
-    @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+    private Boolean active;
+    private LocalDateTime created;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDateTime updated;
 }

@@ -2,7 +2,6 @@ package br.com.petshop.app.user.model.enums;
 
 public enum Message {
 
-    //USER MESSAGES
     USER_ALREADY_REGISTERED("Usuário/Email já cadastrado."),
     USER_NOT_FOUND("Usuário/Email não cadastrado."),
     USER_ERROR_INVALID_TOKEN("Token inválido."),
@@ -14,16 +13,7 @@ public enum Message {
     USER_ERROR_CREATE("Erro ao cadastrar usuário. Tente novamente mais tarde."),
     USER_ERROR_UPDATE("Erro ao atualizar dados do usuário. Tente novamente mais tarde."),
     USER_ERROR_DELETE("Erro ao excluir dados do usuário. Tente novamente mais tarde."),
-    USER_ERROR_GET("Erro ao retornar dados do usuário. Tente novamente mais tarde."),
-
-    //ADDRESS MESSAGES
-    ADDRESS_ALREADY_REGISTERED("Endereço já cadastrado."),
-    ADDRESS_NOT_FOUND("Endereço não cadastrado."),
-
-    ADDRESS_ERROR_CREATE("Erro ao cadastrar novo endereço. Tente novamente mais tarde."),
-    ADDRESS_ERROR_UPDATE("Erro ao atualizar dados do endereço. Tente novamente mais tarde."),
-    ADDRESS_ERROR_DELETE("Erro ao excluir endereço. Tente novamente mais tarde."),
-    ADDRESS_ERROR_GET("Erro ao recuperar dados do endereço. Tente novamente mais tarde.");
+    USER_ERROR_GET("Erro ao retornar dados do usuário. Tente novamente mais tarde.");
 
     private String message;
 

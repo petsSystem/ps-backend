@@ -1,5 +1,6 @@
-package br.com.petshop.app.user.model.entity;
+package br.com.petshop.app.address.model.entity;
 
+import br.com.petshop.app.user.model.entity.AppUserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,33 +28,33 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "address")
-public class AddressEntity implements Serializable {
+@Table(name = "app_address")
+public class AppAddressEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "address_id")
+    @Column(name = "app_address_id")
     private String addressId;
-    @Column(name = "address_street")
+    @Column(name = "app_address_street")
     private String street;
-    @Column(name = "address_number")
+    @Column(name = "app_address_number")
     private String number;
-    @Column(name = "address_postal_code")
+    @Column(name = "app_address_postal_code")
     private String postalCode;
-    @Column(name = "address_neighborhood")
+    @Column(name = "app_address_neighborhood")
     private String neighborhood;
-    @Column(name = "address_city")
+    @Column(name = "app_address_city")
     private String city;
-    @Column(name = "address_state")
+    @Column(name = "app_address_state")
     private String state;
-    @Column(name = "address_country")
+    @Column(name = "app_address_country")
     private String country;
-    @Column(name = "address_lat")
+    @Column(name = "app_address_lat")
     private String lat;
-    @Column(name = "address_lon")
+    @Column(name = "app_address_lon")
     private String lon;
-    @Column(name = "address_created")
+    @Column(name = "app_address_created")
     private LocalDateTime created;
-    @Column(name = "address_updated")
+    @Column(name = "app_address_updated")
     private LocalDateTime updated;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

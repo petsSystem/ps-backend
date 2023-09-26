@@ -1,13 +1,9 @@
 package br.com.petshop.app.user.service;
 
-import br.com.petshop.app.user.model.dto.response.AddressResponse;
-import br.com.petshop.app.user.model.dto.response.AppUserResponse;
-import br.com.petshop.app.user.model.dto.request.AddressUpdateRequest;
-import br.com.petshop.app.user.model.entity.AddressEntity;
-import br.com.petshop.app.user.model.entity.AppUserEntity;
-import br.com.petshop.app.user.model.dto.request.AddressCreateRequest;
 import br.com.petshop.app.user.model.dto.request.AppUserCreateRequest;
 import br.com.petshop.app.user.model.dto.request.AppUserUpdateRequest;
+import br.com.petshop.app.user.model.dto.response.AppUserResponse;
+import br.com.petshop.app.user.model.entity.AppUserEntity;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +42,5 @@ public class AppUserConverterService {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(newEntity, entity);
         return entity;
-    }
-    public AddressEntity addressCreateRequestIntoEntity(AddressCreateRequest request) {
-        return mapper.map(request, AddressEntity.class);
-    }
-
-    public AddressEntity addressUpdateRequestIntoEntity(AddressUpdateRequest request, AddressEntity entity) {
-        AddressEntity newEntity = mapper.map(request, AddressEntity.class);
-        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-        mapper.map(newEntity, entity);
-        return entity;
-    }
-
-    public AddressResponse addressEntityIntoResponse(AddressEntity entity) {
-        return mapper.map(entity, AddressResponse.class);
     }
 }

@@ -1,7 +1,6 @@
-package br.com.petshop.system.subsidiary.model.entity;
+package br.com.petshop.system.employee.model.entity;
 
-import br.com.petshop.system.address.model.entity.SysAddressEntity;
-import br.com.petshop.system.company.model.entity.CompanyEntity;
+import br.com.petshop.system.subsidiary.model.entity.SubsidiaryEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,47 +28,55 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "subsidiary")
-public class SubsidiaryEntity implements Serializable {
+@Table(name = "employee")
+public class EmployeeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "subsidiary_id")
+    @Column(name = "employee_id")
     private String id;
-    @Column(name = "subsidiary_name")
+    @Column(name = "employee_type")
+    private String type;
+    @Column(name = "employee_name")
     private String name;
-    @Column(name = "subsidiary_phone")
+    @Column(name = "employee_cpf", unique = true)
+    private String cpf;
+    @Column(name = "employee_email", unique = true)
+    private String email;
+    @Column(name = "employee_phone")
     private String phone;
 
-    @Column(name = "subsidiary_address_postal_code")
+    @Column(name = "employee_address_postal_code")
     private String addressPostalCode;
-    @Column(name = "subsidiary_address_street")
+    @Column(name = "employee_address_street")
     private String addressStreet;
-    @Column(name = "subsidiary_address_number")
+    @Column(name = "employee_address_number")
     private String addressNumber;
-    @Column(name = "subsidiary_address_neighborhood")
+    @Column(name = "employee_address_neighborhood")
     private String addressNeighborhood;
-    @Column(name = "subsidiary_address_city")
+    @Column(name = "employee_address_city")
     private String addressCity;
-    @Column(name = "subsidiary_address_state")
+    @Column(name = "employee_address_state")
     private String addressState;
-    @Column(name = "subsidiary_address_country")
+    @Column(name = "employee_address_country")
     private String addressCountry;
-    @Column(name = "subsidiary_address_lat")
+    @Column(name = "employee_address_lat")
     private String addressLat;
-    @Column(name = "subsidiary_address_lon")
+    @Column(name = "employee_address_lon")
     private String addressLon;
 
-    @Column(name = "subsidiary_active")
+    @Column(name = "employee_active")
     private Boolean active;
 
-    @Column(name = "subsidiary_created")
+    @Column(name = "employee_creator")
+    private String creator;
+    @Column(name = "employee_created")
     private LocalDateTime created;
-    @Column(name = "subsidiary_updated")
+    @Column(name = "employee_updated")
     private LocalDateTime updated;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "company_id", nullable = false)
+    @JoinColumn(name = "subsidiary_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private CompanyEntity company;
+    private SubsidiaryEntity subsidiary;
 }

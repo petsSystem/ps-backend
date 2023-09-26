@@ -1,5 +1,6 @@
 package br.com.petshop.system.company.service;
 
+import br.com.petshop.system.company.model.dto.enums.Message;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
@@ -27,7 +28,7 @@ public class CompanyService {
         try {
             Optional<CompanyEntity> company = companyRepository.findByCnpjAndActiveIsTrue(request.getCnpj());
             if (company.isPresent())
-                throw new GenericAlreadyRegisteredException("Empresa já cadastrada no sistema.");
+                throw new GenericAlreadyRegisteredException(Message.COMPANY_ALREADY_REGISTERED.get());
 
             CompanyEntity companyEntity = convert.createRequestIntoEntity(request);
 
@@ -36,20 +37,24 @@ public class CompanyService {
             return convert.entityIntoResponse(companyEntity);
 
         } catch (GenericAlreadyRegisteredException ex) {
-            log.error("Already registered: " + ex.getMessage());
+            log.error("Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex);
         } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
+            log.error(Message.COMPANY_ERROR_CREATE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao cadastrar empresa. Tente novamente mais tarde.", ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_CREATE.get(), ex);
         }
     }
 
-    public CompanyResponse update(Principal authentication, String companyId, CompanyUpdateRequest request) {
+    public CompanyEntity findByIdAndActiveIsTrue(String companyId) {
+        return companyRepository.findByIdAndActiveIsTrue(companyId)
+                .orElseThrow(GenericNotFoundException::new);
+    }
+
+    public CompanyResponse updateById(String companyId, CompanyUpdateRequest request) {
         try {
-            CompanyEntity entity = companyRepository.findByIdAndActiveIsTrue(companyId)
-                    .orElseThrow(GenericNotFoundException::new);
+            CompanyEntity entity = findByIdAndActiveIsTrue(companyId);
 
             entity = convert.updateRequestIntoEntity(request, entity);
             entity = companyRepository.save(entity);
@@ -57,68 +62,113 @@ public class CompanyService {
             return convert.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
-            log.error("Company not found: " + ex.getMessage());
+            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
+            log.error(Message.COMPANY_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao atualizar dados da empresa. Tente novamente mais tarde.", ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_UPDATE.get(), ex);
         }
     }
 
-    public void deactivate(String companyId) {
+    public CompanyResponse update(Principal authentication, CompanyUpdateRequest request) {
         try {
-            CompanyEntity entity = companyRepository.findByIdAndActiveIsTrue(companyId)
+            CompanyEntity entity = companyRepository.findByIdAndActiveIsTrue(null)
                     .orElseThrow(GenericNotFoundException::new);
-            entity.setActive(false);
-            companyRepository.save(entity);
 
-        } catch (GenericNotFoundException ex) {
-            log.error("Company not found: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Cadastro de empresa não encontrado.", ex);
+            entity = convert.updateRequestIntoEntity(request, entity);
+            entity = companyRepository.save(entity);
+
+            return convert.entityIntoResponse(entity);
+
         } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
+            log.error(Message.COMPANY_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao excluir dados da empresa. Tente novamente mais tarde.", ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_UPDATE.get(), ex);
         }
     }
 
     public CompanyResponse getByCompanyId(Principal authentication, String companyId) {
         try {
-            CompanyEntity entity = companyRepository.findByIdAndActiveIsTrue(companyId)
-                    .orElseThrow(GenericNotFoundException::new);
+            CompanyEntity entity = findByIdAndActiveIsTrue(companyId);
 
             return convert.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
-            log.error("Company not found: " + ex.getMessage());
+            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
+            log.error(Message.COMPANY_ERROR_GET.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao recuperar dados da empresa. Tente novamente mais tarde.", ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_GET.get(), ex);
         }
     }
 
     public CompanyResponse get(Principal authentication) {
         try {
-//            CompanyEntity entity = companyRepository.findByIdAndActiveIsTrue(companyId)
-//                    .orElseThrow(GenericNotFoundException::new);
+//            CompanyEntity entity = findById(companyId);
 //
 //            return convert.entityIntoResponse(entity);
             return null;
 
-        } catch (GenericNotFoundException ex) {
-            log.error("Company not found: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
         } catch (Exception ex) {
-            log.error("Bad Request: " + ex.getMessage());
+            log.error(Message.COMPANY_ERROR_GET.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Erro ao recuperar dados da empresa. Tente novamente mais tarde.", ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_GET.get(), ex);
+        }
+    }
+
+    public void deactivate(String companyId) {
+        try {
+            CompanyEntity entity = findByIdAndActiveIsTrue(companyId);
+            entity.setActive(false);
+            companyRepository.save(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.COMPANY_ERROR_DEACTIVATE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_DEACTIVATE.get(), ex);
+        }
+    }
+
+    public void activate(String companyId) {
+        try {
+            CompanyEntity entity = companyRepository.findById(companyId)
+                    .orElseThrow(GenericNotFoundException::new);
+            entity.setActive(true);
+            companyRepository.save(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.COMPANY_ERROR_ACTIVATE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_ACTIVATE.get(), ex);
+        }
+    }
+
+    public void delete(String companyId) {
+        try {
+            CompanyEntity entity = companyRepository.findById(companyId)
+                    .orElseThrow(GenericNotFoundException::new);
+            companyRepository.delete(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.COMPANY_ERROR_DELETE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_DELETE.get(), ex);
         }
     }
 }

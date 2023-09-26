@@ -1,14 +1,15 @@
-package br.com.petshop.app.user.service;
+package br.com.petshop.app.address.service;
 
-import br.com.petshop.app.user.model.dto.request.AddressUpdateRequest;
-import br.com.petshop.app.user.model.dto.response.AddressResponse;
-import br.com.petshop.app.user.model.enums.Message;
+import br.com.petshop.app.address.model.dto.request.AppAddressCreateRequest;
+import br.com.petshop.app.address.model.dto.request.AppAddressUpdateRequest;
+import br.com.petshop.app.address.model.dto.response.AppAddressResponse;
+import br.com.petshop.app.address.model.entity.AppAddressEntity;
+import br.com.petshop.app.address.model.enums.Message;
+import br.com.petshop.app.address.repository.AppAddressRepository;
+import br.com.petshop.app.user.model.entity.AppUserEntity;
+import br.com.petshop.app.user.service.AppUserService;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.app.user.model.dto.request.AddressCreateRequest;
-import br.com.petshop.app.user.model.entity.AddressEntity;
-import br.com.petshop.app.user.model.entity.AppUserEntity;
-import br.com.petshop.app.user.repository.AddressRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +24,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class AddressService {
+public class AppAddressService {
 
-    Logger log = LoggerFactory.getLogger(AddressService.class);
+    Logger log = LoggerFactory.getLogger(AppAddressService.class);
     @Autowired private AppUserService appUserService;
-    @Autowired private AddressRepository addressRepository;
-    @Autowired private AppUserConverterService convert;
+    @Autowired private AppAddressRepository addressRepository;
+    @Autowired private AppAddressConverterService convert;
 
-    public AddressResponse create(Principal authentication, AddressCreateRequest request) {
+    public AppAddressResponse create(Principal authentication, AppAddressCreateRequest request) {
         try {
-            Optional<AddressEntity> opEntity = addressRepository.findByStreetAndNumber(request.getStreet(), request.getNumber());
+            Optional<AppAddressEntity> opEntity = addressRepository.findByStreetAndNumber(request.getStreet(), request.getNumber());
             if (opEntity.isPresent())
                 throw new GenericAlreadyRegisteredException(Message.ADDRESS_ALREADY_REGISTERED.get());
 
             AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
-            AddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
+            AppAddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
             addressEntity.setAppUser(userEntity);
 //            Set<AddressEntity> entities = userEntity.getAppUserAddresses();
 //            if (entities == null)
@@ -58,9 +59,9 @@ public class AddressService {
         }
     }
 
-    public Set<AddressResponse> get(Principal authentication) {
+    public Set<AppAddressResponse> get(Principal authentication) {
         try {
-            List<AddressEntity> address = addressRepository.findByAppUser_Email(authentication.getName());
+            List<AppAddressEntity> address = addressRepository.findByAppUser_Email(authentication.getName());
 
             return address.stream()
                     .map(a -> convert.addressEntityIntoResponse(a))
@@ -72,9 +73,9 @@ public class AddressService {
         }
     }
 
-    public AddressResponse update(String addressId, AddressUpdateRequest request) {
+    public AppAddressResponse update(String addressId, AppAddressUpdateRequest request) {
         try {
-            AddressEntity addressEntity = findById(addressId);
+            AppAddressEntity addressEntity = findById(addressId);
             addressEntity = convert.addressUpdateRequestIntoEntity(request, addressEntity);
             addressEntity = addressRepository.save(addressEntity);
 //            Set<AddressEntity> addressEntities = userEntity.getAppUserAddresses();
@@ -95,7 +96,7 @@ public class AddressService {
 
     public void delete(String addressId) {
         try {
-            AddressEntity addressEntity = findById(addressId);
+            AppAddressEntity addressEntity = findById(addressId);
             addressRepository.delete(addressEntity);
 //            Set<AddressEntity> addressEntities = userEntity.getAppUserAddresses();
 //            addressEntities.removeIf(a -> a.getId().equalsIgnoreCase(idAddress));
@@ -114,7 +115,7 @@ public class AddressService {
         }
     }
 
-    public AddressEntity findById(String addressId) {
+    public AppAddressEntity findById(String addressId) {
         return addressRepository.findByAddressId(addressId)
                 .orElseThrow(GenericNotFoundException::new);
     }

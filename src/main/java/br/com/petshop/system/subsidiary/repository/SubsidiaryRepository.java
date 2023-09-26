@@ -9,6 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface SubsidiaryRepository extends JpaRepository<SubsidiaryEntity, Integer> {
-//    List<SubsidiaryEntity> findByCompanyId(String companyId);
     Optional<SubsidiaryEntity> findByIdAndActiveIsTrue(String subsidiaryId);
+
+    Optional<SubsidiaryEntity> findById(String subsidiaryId);
+    List<SubsidiaryEntity> findByCompany_id(String companyId);
 }

@@ -1,4 +1,4 @@
-package br.com.petshop.app.user.model.dto.request;
+package br.com.petshop.app.address.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressCreateRequest implements Serializable {
+public class AppAddressUpdateRequest implements Serializable {
     private String postalCode;
     private String street;
     private String number;
@@ -23,5 +23,5 @@ public class AddressCreateRequest implements Serializable {
     private String lat;
     private String lon;
     @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime updated = LocalDateTime.now();
 }

@@ -1,4 +1,4 @@
-package br.com.petshop.app.user.model.dto.response;
+package br.com.petshop.app.address.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressResponse implements Serializable {
+public class AppAddressResponse implements Serializable {
     private String id;
     private String postalCode;
     @JsonInclude(JsonInclude.Include.NON_NULL)

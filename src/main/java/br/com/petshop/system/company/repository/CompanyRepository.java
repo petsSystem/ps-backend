@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<CompanyEntity, Integer> {
-    Optional<CompanyEntity> findByIdAndActiveIsTrue(String petId);
-    Optional<CompanyEntity> findByCnpjAndActiveIsTrue(String petId);
+    Optional<CompanyEntity> findById(String companyId);
+    Optional<CompanyEntity> findByIdAndActiveIsTrue(String companyId);
+    Optional<CompanyEntity> findByCnpjAndActiveIsTrue(String companyId);
 }

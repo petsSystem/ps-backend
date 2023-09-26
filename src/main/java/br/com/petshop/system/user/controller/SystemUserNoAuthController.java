@@ -1,6 +1,6 @@
 package br.com.petshop.system.user.controller;
 
-import br.com.petshop.app.user.service.AppUserService;
+import br.com.petshop.system.user.service.SystemUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "System Users Services (NO AUTH)")
 public class SystemUserNoAuthController {
-    @Autowired private AppUserService userService;
+    @Autowired private SystemUserService userService;
 
     @Operation(summary = "Serviço que recupera senha do usuário no Sistema Petshop.")
     @ApiResponses(value = {

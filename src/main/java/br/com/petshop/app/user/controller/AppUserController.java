@@ -133,7 +133,7 @@ public class AppUserController {
                             "}\n" +
                             "\n")})}),
     })
-    @GetMapping("/email/validate/resend")
+    @PatchMapping("/email/validate/resend")
     @ResponseStatus(HttpStatus.OK)
     public AppUserResponse emailValidateResend (
             Principal authentication) {

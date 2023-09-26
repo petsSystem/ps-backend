@@ -1,9 +1,9 @@
-package br.com.petshop.app.user.controller;
+package br.com.petshop.app.address.controller;
 
-import br.com.petshop.app.user.model.dto.request.AddressUpdateRequest;
-import br.com.petshop.app.user.model.dto.response.AddressResponse;
-import br.com.petshop.app.user.model.dto.request.AddressCreateRequest;
-import br.com.petshop.app.user.service.AddressService;
+import br.com.petshop.app.address.model.dto.request.AppAddressCreateRequest;
+import br.com.petshop.app.address.model.dto.request.AppAddressUpdateRequest;
+import br.com.petshop.app.address.model.dto.response.AppAddressResponse;
+import br.com.petshop.app.address.service.AppAddressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -28,8 +28,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/app/users/addresses")
 @Tag(name = "User Address Services")
-public class AddressController {
-    @Autowired private AddressService addressService;
+public class AppAddressController {
+    @Autowired private AppAddressService addressService;
 
     @Operation(summary = "Serviço de inclusão de endereço no cadastro do usuário no APP.")
     @ApiResponses(value = {
@@ -58,9 +58,9 @@ public class AddressController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public AddressResponse create(
+    public AppAddressResponse create(
             Principal authentication,
-            @RequestBody AddressCreateRequest request) {
+            @RequestBody AppAddressCreateRequest request) {
         return addressService.create(authentication, request);
     }
 
@@ -80,9 +80,9 @@ public class AddressController {
     })
     @PutMapping("/{addressId}")
     @ResponseStatus(HttpStatus.OK)
-    public AddressResponse update(
+    public AppAddressResponse update(
             @PathVariable ("addressId") String addressId,
-            @RequestBody AddressUpdateRequest request) {
+            @RequestBody AppAddressUpdateRequest request) {
         return addressService.update(addressId, request);
     }
 
@@ -113,7 +113,7 @@ public class AddressController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Set<AddressResponse> get(
+    public Set<AppAddressResponse> get(
             Principal authentication) {
         return addressService.get(authentication);
     }

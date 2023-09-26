@@ -1,7 +1,9 @@
 package br.com.petshop.app.user.service;
 
+import br.com.petshop.app.address.model.dto.response.AppAddressResponse;
+import br.com.petshop.app.address.service.AppAddressService;
+import br.com.petshop.app.user.model.dto.request.AppUserForgetRequest;
 import br.com.petshop.app.user.model.dto.request.AppUserUpdateRequest;
-import br.com.petshop.app.user.model.dto.response.AddressResponse;
 import br.com.petshop.app.user.model.dto.response.AppUserResponse;
 import br.com.petshop.app.user.model.enums.Message;
 import br.com.petshop.authentication.service.JwtService;
@@ -34,7 +36,7 @@ public class AppUserService {
 
     Logger log = LoggerFactory.getLogger(AppUserService.class);
     @Autowired private AppUserRepository appUserRepository;
-    @Autowired private AddressService addressService;
+    @Autowired private AppAddressService addressService;
     @Autowired private PetService petService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtService jwtService;
@@ -133,13 +135,13 @@ public class AppUserService {
         }
     }
 
-    public void forget(String email) {
+    public void forget(AppUserForgetRequest request) {
         try {
-            AppUserEntity userEntity = findByEmail(email);
+            AppUserEntity userEntity = findByEmail(request.getEmail());
 
             String newPassword = generatePassword();
             userEntity.setPassword(passwordEncoder.encode(newPassword));
-            userEntity.setChangePassword(true);
+            userEntity.setChangePassword(request.getChangePassword());
 
             save(userEntity);
 
@@ -208,7 +210,7 @@ public class AppUserService {
                 sendEmailToken(userEntity);
 
             AppUserResponse response = convert.appUserEntityIntoResponse(userEntity);
-            Set<AddressResponse> addressResponse = addressService.get(authentication);
+            Set<AppAddressResponse> addressResponse = addressService.get(authentication);
             response.setAddresses(addressResponse);
             Set<PetResponse>petResponse = petService.getAll(authentication);
             response.setPets(petResponse);

@@ -1,11 +1,11 @@
 package br.com.petshop.system.user.controller;
 
-import br.com.petshop.app.user.model.dto.request.AppUserCreateRequest;
-import br.com.petshop.app.user.model.dto.request.AppUserUpdateRequest;
-import br.com.petshop.app.user.model.dto.request.ChangePasswordRequest;
-import br.com.petshop.app.user.model.dto.request.EmailValidateRequest;
-import br.com.petshop.app.user.model.dto.response.AppUserResponse;
-import br.com.petshop.app.user.service.AppUserService;
+import br.com.petshop.system.user.model.dto.request.ChangePasswordRequest;
+import br.com.petshop.system.user.model.dto.request.EmailValidateRequest;
+import br.com.petshop.system.user.model.dto.request.SystemUserCreateRequest;
+import br.com.petshop.system.user.model.dto.request.SystemUserUpdateRequest;
+import br.com.petshop.system.user.model.dto.response.SystemUserResponse;
+import br.com.petshop.system.user.service.SystemUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -31,7 +31,7 @@ import java.security.Principal;
 @RequestMapping("/api/v1/system/users")
 @Tag(name = "System Users Services")
 public class SystemUserController {
-    @Autowired private AppUserService userService;
+    @Autowired private SystemUserService systemUserService;
 
     @Operation(summary = "Serviço que cria usuário no Sistema PetShop.")
     @ApiResponses(value = {
@@ -60,9 +60,9 @@ public class SystemUserController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse create (
-            @RequestBody AppUserCreateRequest request) {
-        return userService.create(request);
+    public SystemUserResponse create (
+            @RequestBody SystemUserCreateRequest request) {
+        return systemUserService.create(request);
     }
 
     @Operation(summary = "Serviço de alteração dos dados do usuário no Sistema PetShop.")
@@ -81,10 +81,10 @@ public class SystemUserController {
     })
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse update (
+    public SystemUserResponse update (
             Principal authentication,
-            @RequestBody AppUserUpdateRequest request) {
-        return userService.update(authentication, request);
+            @RequestBody SystemUserUpdateRequest request) {
+        return systemUserService.update(authentication, request);
     }
 
 
@@ -104,9 +104,9 @@ public class SystemUserController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse get (
+    public SystemUserResponse get (
             Principal authentication) {
-        return userService.getByEmail(authentication);
+        return systemUserService.getByEmail(authentication);
     }
 
     @Operation(summary = "Serviço de validação do email do usuário no Sistema PetShop.")
@@ -147,10 +147,10 @@ public class SystemUserController {
     })
     @PatchMapping("/email/validate")
     @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse emailValidate (
+    public SystemUserResponse emailValidate (
             Principal authentication,
             @RequestBody EmailValidateRequest request) {
-        return userService.emailValidate(authentication, request);
+        return systemUserService.emailValidate(authentication, request);
     }
 
     @Operation(summary = "Serviço de reenvio de token para validação do email do usuário no Sistema PetShop.")
@@ -169,9 +169,9 @@ public class SystemUserController {
     })
     @GetMapping("/email/validate/resend")
     @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse emailValidateResend (
+    public SystemUserResponse emailValidateResend (
             Principal authentication) {
-        return userService.emailValidateResend(authentication);
+        return systemUserService.emailValidateResend(authentication);
     }
 
     @Operation(summary = "Serviço que altera senha do usuário no Sistema PetShop.")
@@ -193,7 +193,7 @@ public class SystemUserController {
     public void changePassword (
             Principal authentication,
             @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(authentication, request);
+        systemUserService.changePassword(authentication, request);
     }
 
     @Operation(summary = "Serviço para desativar usuário no Sistema PetShop.")
@@ -214,6 +214,6 @@ public class SystemUserController {
     @ResponseStatus(HttpStatus.OK)
     public void deactivate (
             @PathVariable ("email") String email) {
-        userService.deactivate(email);
+        systemUserService.deactivate(email);
     }
 }
