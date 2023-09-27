@@ -1,6 +1,5 @@
 package br.com.petshop.system.subsidiary.model.entity;
 
-import br.com.petshop.system.address.model.entity.SysAddressEntity;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
