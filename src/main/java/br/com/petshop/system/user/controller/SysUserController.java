@@ -1,11 +1,11 @@
 package br.com.petshop.system.user.controller;
 
-import br.com.petshop.system.user.model.dto.request.ChangePasswordRequest;
-import br.com.petshop.system.user.model.dto.request.EmailValidateRequest;
-import br.com.petshop.system.user.model.dto.request.SystemUserCreateRequest;
-import br.com.petshop.system.user.model.dto.request.SystemUserUpdateRequest;
-import br.com.petshop.system.user.model.dto.response.SystemUserResponse;
-import br.com.petshop.system.user.service.SystemUserService;
+import br.com.petshop.system.user.model.dto.request.SysChangePasswordRequest;
+import br.com.petshop.system.user.model.dto.request.SysEmailValidateRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
+import br.com.petshop.system.user.model.dto.response.SysUserResponse;
+import br.com.petshop.system.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/system/users")
+@RequestMapping("/api/v1/sys/users")
 @Tag(name = "System Users Services")
-public class SystemUserController {
-    @Autowired private SystemUserService systemUserService;
+public class SysUserController {
+    @Autowired private SysUserService systemUserService;
 
     @Operation(summary = "Serviço que cria usuário no Sistema PetShop.")
     @ApiResponses(value = {
@@ -60,8 +60,8 @@ public class SystemUserController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public SystemUserResponse create (
-            @RequestBody SystemUserCreateRequest request) {
+    public SysUserResponse create (
+            @RequestBody SysUserCreateRequest request) {
         return systemUserService.create(request);
     }
 
@@ -81,9 +81,9 @@ public class SystemUserController {
     })
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    public SystemUserResponse update (
+    public SysUserResponse update (
             Principal authentication,
-            @RequestBody SystemUserUpdateRequest request) {
+            @RequestBody SysUserUpdateRequest request) {
         return systemUserService.update(authentication, request);
     }
 
@@ -104,7 +104,7 @@ public class SystemUserController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public SystemUserResponse get (
+    public SysUserResponse get (
             Principal authentication) {
         return systemUserService.getByEmail(authentication);
     }
@@ -147,9 +147,9 @@ public class SystemUserController {
     })
     @PatchMapping("/email/validate")
     @ResponseStatus(HttpStatus.OK)
-    public SystemUserResponse emailValidate (
+    public SysUserResponse emailValidate (
             Principal authentication,
-            @RequestBody EmailValidateRequest request) {
+            @RequestBody SysEmailValidateRequest request) {
         return systemUserService.emailValidate(authentication, request);
     }
 
@@ -169,7 +169,7 @@ public class SystemUserController {
     })
     @GetMapping("/email/validate/resend")
     @ResponseStatus(HttpStatus.OK)
-    public SystemUserResponse emailValidateResend (
+    public SysUserResponse emailValidateResend (
             Principal authentication) {
         return systemUserService.emailValidateResend(authentication);
     }
@@ -192,7 +192,7 @@ public class SystemUserController {
     @ResponseStatus(HttpStatus.OK)
     public void changePassword (
             Principal authentication,
-            @RequestBody ChangePasswordRequest request) {
+            @RequestBody SysChangePasswordRequest request) {
         systemUserService.changePassword(authentication, request);
     }
 

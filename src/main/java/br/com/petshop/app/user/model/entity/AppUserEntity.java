@@ -32,43 +32,43 @@ import java.util.List;
 public class AppUserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "app_user_id")
+    @Column(name = "id")
     private String id;
-    @Column(name = "app_user_name")
+    @Column(name = "name")
     private String name;
-    @Column(name = "app_user_cpf")
+    @Column(name = "cpf")
     private String cpf;
-    @Column(name = "app_user_email", unique = true)
+    @Column(name = "email", unique = true)
     private String email;
-    @Column(name = "app_user_password")
+    @Column(name = "password")
     private String password;
-    @Column(name = "app_user_change_password")
+    @Column(name = "change_password")
     private Boolean changePassword;
-    @Column(name = "app_user_phone")
+    @Column(name = "phone")
     private String phone;
-    @Column(name = "app_user_date_birth")
+    @Column(name = "date_birth")
     private String dateBirth;
     @Enumerated(EnumType.STRING)
-    @Column(name = "app_user_role")
+    @Column(name = "role")
     private Role role;
 
-    @Column(name = "app_user_active")
+    @Column(name = "active")
     private Boolean active;
 
-    @Column(name = "app_user_email_validated")
+    @Column(name = "email_validated")
     private Boolean emailValidated;
 
-    @Column(name = "app_user_email_token")
+    @Column(name = "email_token")
     private String emailToken;
 
-    @Column(name = "app_user_email_token_time")
+    @Column(name = "email_token_time")
     private LocalDateTime emailTokenTime;
 
-    @Column(name = "app_user_created")
-    private LocalDateTime created;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "app_user_updated")
-    private LocalDateTime updated;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 //    @ManyToMany(cascade= CascadeType.ALL)
 //    @JoinTable(

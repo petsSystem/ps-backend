@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/system/employees")
+@RequestMapping("/api/v1/sys/employees")
 @Tag(name = "Employee Services")
 public class EmployeeController {
 
@@ -126,7 +127,7 @@ public class EmployeeController {
         return employeeService.update(authentication, request);
     }
 
-    //SOMENTE SYSTEM_ADMIN
+    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
 
     @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema.",
             description = "Acesso: admin, owner e manager")
@@ -198,6 +199,74 @@ public class EmployeeController {
     }
 
     //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
+    @Operation(summary = "Serviço de desativação do cadastro do funcionário no sistema.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Cadasteo do funcionário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao desativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping("/{employeeId}/deactivate")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public void deactivate(
+            @PathVariable("employeeId") String employeeId) {
+        employeeService.deactivate(employeeId);
+    }
+
+    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
+    @Operation(summary = "Serviço de ativação do cadastro do funcionário no sistema.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Cadasteo do funcionário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao ativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping("/{employeeId}/activate")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public void activate(
+            @PathVariable("employeeId") String employeeId) {
+        employeeService.activate(employeeId);
+    }
+
+    //SOMENTE 'ADMIN'
     @Operation(summary = "Serviço de exclusão do cadastro do funcionário no sistema.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -218,16 +287,16 @@ public class EmployeeController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao excluir dados do funcionário do sistema. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
     @DeleteMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public void deactivate(
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void delete(
             @PathVariable("employeeId") String employeeId) {
-        employeeService.deactivate(employeeId);
+        employeeService.delete(employeeId);
     }
 }

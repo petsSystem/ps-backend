@@ -33,38 +33,38 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "pet")
+@Table(name = "app_pet")
 public class PetEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "pet_id")
+    @Column(name = "id")
     private String id;
-    @Column(name = "pet_name")
+    @Column(name = "name")
     private String name;
-    @Column(name = "pet_gender")
+    @Column(name = "gender")
     private PetGender gender;
-    @Column(name = "pet_species")
+    @Column(name = "species")
     private PetSpecie species;
-    @Column(name = "pet_date_birth")
+    @Column(name = "date_birth")
     private String dateBirth;
-    @Column(name = "pet_size")
+    @Column(name = "size")
     private PetSize size;
-    @Column(name = "pet_neutered")
+    @Column(name = "neutered")
     private String neutered;
-    @Column(name = "pet_temper")
+    @Column(name = "temper")
     private PetTemper temper;
-    @Column(name = "pet_coat")
+    @Column(name = "coat")
     private PetCoat coat;
-    @Column(name = "pet_weight")
+    @Column(name = "weight")
     private String weight;
-    @Column(name = "pet_breed")
+    @Column(name = "breed")
     private String breed;
-    @Column(name = "pet_active")
+    @Column(name = "active")
     private Boolean active;
-    @Column(name = "pet_created")
-    private LocalDateTime created;
-    @Column(name = "pet_updated")
-    private LocalDateTime updated;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "app_user_id", nullable = false)

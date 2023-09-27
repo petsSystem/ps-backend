@@ -29,8 +29,8 @@ public class EmployeeCreateRequest implements Serializable {
     private String addressState;
     private String addressCountry;
 
+    private String subsidiaryId;
+
     @Builder.Default
     private Boolean active = true;
-    @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
 }

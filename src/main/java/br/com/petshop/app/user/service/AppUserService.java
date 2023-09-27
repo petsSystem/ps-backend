@@ -32,7 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class AppUserService {
+public class
+AppUserService {
 
     Logger log = LoggerFactory.getLogger(AppUserService.class);
     @Autowired private AppUserRepository appUserRepository;
@@ -210,10 +211,14 @@ public class AppUserService {
                 sendEmailToken(userEntity);
 
             AppUserResponse response = convert.appUserEntityIntoResponse(userEntity);
+
             Set<AppAddressResponse> addressResponse = addressService.get(authentication);
-            response.setAddresses(addressResponse);
-            Set<PetResponse>petResponse = petService.getAll(authentication);
-            response.setPets(petResponse);
+            if (!addressResponse.isEmpty())
+                response.setAddresses(addressResponse);
+
+            Set<PetResponse> petResponse = petService.get(authentication);
+            if (!petResponse.isEmpty())
+                response.setPets(petResponse);
 
             return response;
         } catch (GenericNotFoundException ex) {

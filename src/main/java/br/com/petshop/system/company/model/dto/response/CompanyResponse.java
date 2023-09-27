@@ -19,5 +19,5 @@ public class CompanyResponse implements Serializable {
     private String name;
     private String cnpj;
     private Boolean active;
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
 }

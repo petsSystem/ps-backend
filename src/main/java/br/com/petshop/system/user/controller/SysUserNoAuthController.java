@@ -1,6 +1,6 @@
 package br.com.petshop.system.user.controller;
 
-import br.com.petshop.system.user.service.SystemUserService;
+import br.com.petshop.system.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/system/noauth/users")
+@RequestMapping("/api/v1/sys/noauth/users")
 @RequiredArgsConstructor
 @Tag(name = "System Users Services (NO AUTH)")
-public class SystemUserNoAuthController {
-    @Autowired private SystemUserService userService;
+public class SysUserNoAuthController {
+    @Autowired private SysUserService userService;
 
     @Operation(summary = "Serviço que recupera senha do usuário no Sistema Petshop.")
     @ApiResponses(value = {

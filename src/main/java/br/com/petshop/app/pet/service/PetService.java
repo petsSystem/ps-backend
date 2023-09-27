@@ -107,21 +107,14 @@ public class PetService {
         }
     }
 
-    public Set<PetResponse> getAll(Principal authentication) {
+    public Set<PetResponse> get(Principal authentication) {
         try {
             List<PetEntity> pets = petRepository.findByAppUser_EmailAndActiveIsTrue(authentication.getName());
-
-            if (pets.isEmpty())
-                throw new GenericNotFoundException();
 
             return pets.stream()
                     .map(p -> convert.entityIntoResponse(p))
                     .collect(Collectors.toSet());
 
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.PET_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,Message.PET_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
             log.error(Message.PET_ERROR_GET.get() + " Bad Request: " + ex.getMessage());
             throw new ResponseStatusException(

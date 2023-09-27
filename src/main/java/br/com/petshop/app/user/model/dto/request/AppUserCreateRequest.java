@@ -26,5 +26,5 @@ public class AppUserCreateRequest implements Serializable {
     @Builder.Default
     private Boolean emailValidated = false;
     @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

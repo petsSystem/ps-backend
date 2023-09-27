@@ -32,30 +32,30 @@ import java.time.LocalDateTime;
 public class AppAddressEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "app_address_id")
+    @Column(name = "id")
     private String addressId;
-    @Column(name = "app_address_street")
+    @Column(name = "street")
     private String street;
-    @Column(name = "app_address_number")
+    @Column(name = "number")
     private String number;
-    @Column(name = "app_address_postal_code")
+    @Column(name = "postal_code")
     private String postalCode;
-    @Column(name = "app_address_neighborhood")
+    @Column(name = "neighborhood")
     private String neighborhood;
-    @Column(name = "app_address_city")
+    @Column(name = "city")
     private String city;
-    @Column(name = "app_address_state")
+    @Column(name = "state")
     private String state;
-    @Column(name = "app_address_country")
+    @Column(name = "country")
     private String country;
-    @Column(name = "app_address_lat")
+    @Column(name = "lat")
     private String lat;
-    @Column(name = "app_address_lon")
+    @Column(name = "lon")
     private String lon;
-    @Column(name = "app_address_created")
-    private LocalDateTime created;
-    @Column(name = "app_address_updated")
-    private LocalDateTime updated;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "app_user_id", nullable = false)

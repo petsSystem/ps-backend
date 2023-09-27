@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/system/companies")
+@RequestMapping("/api/v1/sys/companies")
 @Tag(name = "Company Services")
 public class CompanyController {
 

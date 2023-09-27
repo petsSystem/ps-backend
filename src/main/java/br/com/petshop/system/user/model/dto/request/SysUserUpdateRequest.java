@@ -7,13 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemUserUpdateRequest implements Serializable {
+public class SysUserUpdateRequest implements Serializable {
     private String password;
     @Builder.Default
     private Role role = Role.USER;
@@ -21,6 +20,6 @@ public class SystemUserUpdateRequest implements Serializable {
     private Boolean active = true;
     @Builder.Default
     private Boolean emailValidated = false;
-    @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+//    @Builder.Default
+//    private LocalDateTime created = LocalDateTime.now();
 }

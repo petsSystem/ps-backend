@@ -28,6 +28,6 @@ public class PetUpdateRequest implements Serializable {
     private PetCoat coat; //pelagem
     private String  weight; //peso
     private String  breed; //raça
-    private LocalDateTime updated = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 }

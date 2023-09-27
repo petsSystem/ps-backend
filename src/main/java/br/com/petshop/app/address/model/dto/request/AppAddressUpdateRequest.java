@@ -23,5 +23,5 @@ public class AppAddressUpdateRequest implements Serializable {
     private String lat;
     private String lon;
     @Builder.Default
-    private LocalDateTime updated = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

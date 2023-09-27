@@ -31,7 +31,7 @@ import java.security.Principal;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/system/subsidiaries")
+@RequestMapping("/api/v1/sys/subsidiaries")
 @Tag(name = "Subsidiary Services")
 public class SubsidiaryController {
 
@@ -71,7 +71,7 @@ public class SubsidiaryController {
         return subsidiaryService.create(authentication, request);
     }
 
-    //SOMENTE ADMIN
+    //SOMENTE ADMIN e OWNER
     @Operation(summary = "Serviço de atualização do estabelecimento no sistema pelo id.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
@@ -100,16 +100,16 @@ public class SubsidiaryController {
     })
     @PutMapping("/{subsidiaryId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
     public SubsidiaryResponse updateById(
             @PathVariable("subsidiaryId") String subsidiaryId,
             @RequestBody SubsidiaryUpdateRequest request) {
         return subsidiaryService.updateById(subsidiaryId, request);
     }
 
-    //SOMENTE OWNER
+    //SOMENTE MANAGER
     @Operation(summary = "Serviço de atualização dos dados do estabelecimento do login.",
-            description = "Acesso: 'OWNER'")
+            description = "Acesso: 'MANAGER'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -125,14 +125,14 @@ public class SubsidiaryController {
     })
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('OWNER')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public SubsidiaryResponse update(
             Principal authentication,
             @RequestBody SubsidiaryUpdateRequest request) {
         return subsidiaryService.update(authentication, request);
     }
 
-    //SOMENTE ADMIN
+    //SOMENTE ADMIN e OWNER
     @Operation(summary = "Serviço de recuperação das informações do estabelecimento no sistema pelo id.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
@@ -161,14 +161,14 @@ public class SubsidiaryController {
     })
     @GetMapping("/{subsidiaryId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public SubsidiaryResponse getByCompanyId(
+    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
+    public SubsidiaryResponse getBySubsidiaryId(
             Principal authentication,
             @PathVariable("subsidiaryId") String subsidiaryId) {
         return subsidiaryService.getByCompanyId(authentication, subsidiaryId);
     }
 
-    //SOMENTE OWNER
+    //SOMENTE OWNER e MANAGER
     @Operation(summary = "Serviço de recuperação das informações do estabelecimento do login.",
             description = "Acesso: 'OWNER'")
     @ApiResponses(value = {
@@ -186,8 +186,8 @@ public class SubsidiaryController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('OWNER')")
-    public SubsidiaryResponse get(
+    @PreAuthorize("hasAnyAuthority('OWNER','MANAGER')")
+    public Set<SubsidiaryResponse> get(
             Principal authentication) {
         return subsidiaryService.get(authentication);
     }

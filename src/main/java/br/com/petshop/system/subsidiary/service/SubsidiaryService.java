@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class SubsidiaryService {
@@ -119,7 +120,7 @@ public class SubsidiaryService {
         }
     }
 
-    public SubsidiaryResponse get(Principal authentication) {
+    public Set<SubsidiaryResponse> get(Principal authentication) {
         try {
 //            SubsidiaryEntity entity = findById(companyId);
 //

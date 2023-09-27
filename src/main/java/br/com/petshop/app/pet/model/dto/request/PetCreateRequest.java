@@ -31,5 +31,5 @@ public class PetCreateRequest implements Serializable {
     @Builder.Default
     private Boolean active = true;
     @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

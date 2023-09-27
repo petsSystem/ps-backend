@@ -1,17 +1,17 @@
 package br.com.petshop.system.user.service;
 
 import br.com.petshop.notification.MailNotificationService;
-import br.com.petshop.system.user.model.entity.SystemUserEntity;
+import br.com.petshop.system.user.model.entity.SysUserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SystemUserAsyncService {
+public class SysUserAsyncService {
     @Autowired private MailNotificationService mailNotificationService;
 
     @Async
-    public void forget(SystemUserEntity userEntity, String newPassword) {
+    public void forget(SysUserEntity userEntity, String newPassword) {
 
         String subject = "Nova senha - Pet System";
         String body = "Sua nova senha é: " + newPassword;
@@ -20,7 +20,7 @@ public class SystemUserAsyncService {
     }
 
     @Async
-    public void emailValidate(SystemUserEntity userEntity) {
+    public void emailValidate(SysUserEntity userEntity) {
 
         String subject = "Validação de email - Pet System";
         String body = "Seu token de validação é: " + userEntity.getEmailToken();

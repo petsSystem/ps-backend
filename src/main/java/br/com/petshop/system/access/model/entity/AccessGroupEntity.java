@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "access_group")
+@Table(name = "sys_access_group")
 public class AccessGroupEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

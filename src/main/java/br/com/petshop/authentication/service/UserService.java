@@ -2,7 +2,7 @@ package br.com.petshop.authentication.service;
 
 import br.com.petshop.app.user.repository.AppUserRepository;
 import br.com.petshop.authentication.model.enums.Message;
-import br.com.petshop.system.user.repository.SystemUserRepository;
+import br.com.petshop.system.user.repository.SysUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
     @Autowired private AppUserRepository appUserRepository;
-    @Autowired private SystemUserRepository systemUserRepository;
+    @Autowired private SysUserRepository systemUserRepository;
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override

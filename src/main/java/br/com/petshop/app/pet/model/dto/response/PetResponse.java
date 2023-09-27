@@ -25,5 +25,5 @@ public class PetResponse implements Serializable {
     private String  weight; //peso
     private String  breed; //raça
     private Boolean active;
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
 }

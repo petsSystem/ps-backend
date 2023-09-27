@@ -8,6 +8,8 @@ import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.model.enums.Message;
 import br.com.petshop.system.employee.repository.EmployeeRepository;
+import br.com.petshop.system.subsidiary.model.entity.SubsidiaryEntity;
+import br.com.petshop.system.subsidiary.service.SubsidiaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +25,24 @@ public class EmployeeService {
     Logger log = LoggerFactory.getLogger(EmployeeService.class);
     @Autowired private EmployeeRepository employeeRepository;
     @Autowired private EmployeeConverterService convert;
+    @Autowired private SubsidiaryService subsidiaryService;
 
     public EmployeeResponse create(Principal authentication, EmployeeCreateRequest request) {
         try {
-            Optional<EmployeeEntity> employee = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
-            if (employee.isPresent())
-                throw new GenericAlreadyRegisteredException(Message.EMPLOYEE_ALREADY_REGISTERED.get());
+            Optional<EmployeeEntity> entity = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
 
+            if (entity.isPresent()) {
+                EmployeeEntity employee = entity.get();
+                if (employee.getSubsidiary().getId().equalsIgnoreCase(request.getSubsidiaryId())) {
+                    throw new GenericAlreadyRegisteredException("Funcionário já cadastrado no sistema");
+                } else { //se o cpf estiver vinculado a outra filial, desativar e criar novo cadastro
+                    employee.setActive(false);
+                    employeeRepository.save(employee);
+                }
+            }
+            SubsidiaryEntity subsidiary = subsidiaryService.findByIdAndActiveIsTrue(request.getSubsidiaryId());
             EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-
+            employeeEntity.setSubsidiary(subsidiary);
             employeeEntity = employeeRepository.save(employeeEntity);
 
             return convert.entityIntoResponse(employeeEntity);
@@ -89,24 +100,6 @@ public class EmployeeService {
         }
     }
 
-    public void deactivate(String employeeId) {
-        try {
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-            entity.setActive(false);
-            employeeRepository.save(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_DELETE.get(), ex);
-        }
-    }
-
     public EmployeeResponse getById(Principal authentication, String employeeId) {
         try {
             EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
@@ -141,6 +134,59 @@ public class EmployeeService {
             log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
+        }
+    }
+
+    public void deactivate(String employeeId) {
+        try {
+            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
+                    .orElseThrow(GenericNotFoundException::new);
+            entity.setActive(false);
+            employeeRepository.save(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(Message.EMPLOYEE_ERROR_DEACTIVATE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_DEACTIVATE.get(), ex);
+        }
+    }
+
+    public void activate(String employeeId) {
+        try {
+            EmployeeEntity entity = employeeRepository.findById(employeeId)
+                    .orElseThrow(GenericNotFoundException::new);
+            entity.setActive(true);
+            employeeRepository.save(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(Message.EMPLOYEE_ERROR_ACTIVATE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_ACTIVATE.get(), ex);
+        }
+    }
+
+    public void delete(String employeeId) {
+        try {
+            EmployeeEntity entity = employeeRepository.findById(employeeId)
+                    .orElseThrow(GenericNotFoundException::new);
+            employeeRepository.delete(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(Message.EMPLOYEE_ERROR_DELETE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_DELETE.get(), ex);
         }
     }
 }

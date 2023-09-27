@@ -125,9 +125,9 @@ public class PetController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Set<PetResponse> getAll(
+    public Set<PetResponse> get(
             Principal authentication) {
-        return petService.getAll(authentication);
+        return petService.get(authentication);
     }
 
     @Operation(summary = "Serviço de recuperação das informações cadastradas do Pet do usuário no APP.")

@@ -1,13 +1,15 @@
 package br.com.petshop.system.user.model.entity;
 
 import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.system.audit.AuditorBaseEntity;
+import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,41 +30,26 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "system_user")
-public class SystemUserEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "system_user_id")
-    private String id;
-    @Column(name = "system_user_email", unique = true)
+@Table(name = "sys_user")
+public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
+    @Column(unique = true)
     private String email;
-    @Column(name = "system_user_password")
     private String password;
-    @Column(name = "system_user_change_password")
+    @Column(name = "change_password")
     private Boolean changePassword;
     @Enumerated(EnumType.STRING)
-    @Column(name = "system_user_role")
     private Role role;
-
-    @Column(name = "system_user_active")
     private Boolean active;
-
-    @Column(name = "system_user_email_validated")
+    @Column(name = "email_validated")
     private Boolean emailValidated;
-
-    @Column(name = "system_user_email_token")
+    @Column(name = "email_token")
     private String emailToken;
-
-    @Column(name = "system_user_email_token_time")
+    @Column(name = "email_token_time")
     private LocalDateTime emailTokenTime;
 
-
-
-    @Column(name = "system_user_created")
-    private LocalDateTime created;
-
-    @Column(name = "system_user_updated")
-    private LocalDateTime updated;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = true)
+    private EmployeeEntity employee;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

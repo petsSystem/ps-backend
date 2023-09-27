@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/system/auth")
+@RequestMapping("/api/v1/sys/auth")
 @Tag(name = "System Authentication Services")
-public class SystemAuthenticationController {
+public class SysAuthenticationController {
     @Autowired private AuthenticationService authenticationService;
 
     @Operation(summary = "Serviço que efetua login no sistema Pet System.")

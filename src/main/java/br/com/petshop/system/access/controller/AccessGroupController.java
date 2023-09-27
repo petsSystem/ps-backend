@@ -26,7 +26,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/system/access")
+@RequestMapping("/api/v1/sys/access")
 @Tag(name = "System Profile Services")
 public class AccessGroupController {
     @Autowired private AccessGroupService accessGroupService;

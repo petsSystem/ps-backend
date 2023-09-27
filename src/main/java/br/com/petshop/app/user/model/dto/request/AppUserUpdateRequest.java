@@ -19,5 +19,5 @@ public class AppUserUpdateRequest implements Serializable {
     private String phone;
     private String dateBirth;
     @Builder.Default
-    private LocalDateTime updated = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

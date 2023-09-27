@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemUserResponse implements Serializable {
+public class SysUserResponse implements Serializable {
     private String id;
     private String email;
     @JsonInclude(JsonInclude.Include.NON_NULL)

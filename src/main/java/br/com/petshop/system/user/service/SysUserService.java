@@ -4,13 +4,13 @@ import br.com.petshop.authentication.service.JwtService;
 import br.com.petshop.exception.EmailTokenException;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.user.model.dto.request.ChangePasswordRequest;
-import br.com.petshop.system.user.model.dto.request.EmailValidateRequest;
-import br.com.petshop.system.user.model.dto.request.SystemUserCreateRequest;
-import br.com.petshop.system.user.model.entity.SystemUserEntity;
-import br.com.petshop.system.user.model.dto.request.SystemUserUpdateRequest;
-import br.com.petshop.system.user.model.dto.response.SystemUserResponse;
-import br.com.petshop.system.user.repository.SystemUserRepository;
+import br.com.petshop.system.user.model.dto.request.SysChangePasswordRequest;
+import br.com.petshop.system.user.model.dto.request.SysEmailValidateRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
+import br.com.petshop.system.user.model.entity.SysUserEntity;
+import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
+import br.com.petshop.system.user.model.dto.response.SysUserResponse;
+import br.com.petshop.system.user.repository.SysUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +25,30 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-public class SystemUserService {
+public class SysUserService {
 
-    Logger log = LoggerFactory.getLogger(SystemUserService.class);
-    @Autowired private SystemUserRepository systemUserRepository;
+    Logger log = LoggerFactory.getLogger(SysUserService.class);
+    @Autowired private SysUserRepository systemUserRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtService jwtService;
-    @Autowired private SystemUserConverterService convert;
-    @Autowired private SystemUserAsyncService asyncService;
+    @Autowired private SysUserConverterService convert;
+    @Autowired private SysUserAsyncService asyncService;
 
-    public SystemUserResponse create (SystemUserCreateRequest request) {
+    public SysUserResponse create (SysUserCreateRequest request) {
         try {
-            SystemUserEntity userEntity = systemUserRepository.findByEmailAndActiveIsTrue(request.getEmail()).orElse(null);
+            SysUserEntity userEntity = systemUserRepository.findByEmailAndActiveIsTrue(request.getEmail()).orElse(null);
 
             if (userEntity != null)
                 throw new GenericAlreadyRegisteredException("Email já cadastrado.");
 
             request.setPassword(passwordEncoder.encode(request.getPassword()));
             UserDetails user = convert.createRequestIntoEntity(request);
-            userEntity = (SystemUserEntity) user;
+            userEntity = (SysUserEntity) user;
             userEntity.setEmailValidated(false);
 
             sendEmailToken(userEntity);
 
-            SystemUserResponse response = convert.entityIntoResponse(userEntity);
+            SysUserResponse response = convert.entityIntoResponse(userEntity);
             response.setToken(jwtService.generateToken(user));
 
             return response;
@@ -63,7 +63,7 @@ public class SystemUserService {
         }
     }
 
-    private void sendEmailToken (SystemUserEntity userEntity) {
+    private void sendEmailToken (SysUserEntity userEntity) {
         userEntity.setEmailToken(generateEmailTokenValidate());
         userEntity.setEmailTokenTime(LocalDateTime.now());
 
@@ -77,9 +77,9 @@ public class SystemUserService {
         return String.valueOf(number);
     }
 
-    public SystemUserResponse emailValidate (Principal authentication, EmailValidateRequest request) {
+    public SysUserResponse emailValidate (Principal authentication, SysEmailValidateRequest request) {
         try {
-            SystemUserEntity userEntity = findByEmail(authentication.getName());
+            SysUserEntity userEntity = findByEmail(authentication.getName());
             if (request.emailToken().equalsIgnoreCase(userEntity.getEmailToken()) &&
                     !emailTokenExpired(userEntity.getEmailTokenTime())) {
                 userEntity.setEmailValidated(true);
@@ -107,9 +107,9 @@ public class SystemUserService {
         return false;
     }
 
-    public SystemUserResponse emailValidateResend (Principal authentication) {
+    public SysUserResponse emailValidateResend (Principal authentication) {
         try {
-            SystemUserEntity userEntity = findByEmail(authentication.getName());
+            SysUserEntity userEntity = findByEmail(authentication.getName());
 
             sendEmailToken(userEntity);
 
@@ -124,7 +124,7 @@ public class SystemUserService {
 
     public void forget (String email) {
         try {
-            SystemUserEntity userEntity = findByEmail(email);
+            SysUserEntity userEntity = findByEmail(email);
 
             String newPassword = generatePassword();
             userEntity.setPassword(passwordEncoder.encode(newPassword));
@@ -150,9 +150,9 @@ public class SystemUserService {
         return newPassword.substring(0,6);
     }
 
-    public void changePassword (Principal authentication, ChangePasswordRequest request) {
+    public void changePassword (Principal authentication, SysChangePasswordRequest request) {
         try {
-            SystemUserEntity userEntity = findByEmail(authentication.getName());
+            SysUserEntity userEntity = findByEmail(authentication.getName());
             userEntity.setPassword(passwordEncoder.encode(request.password()));
             userEntity.setChangePassword(false);
             save(userEntity);
@@ -162,10 +162,10 @@ public class SystemUserService {
                     HttpStatus.BAD_REQUEST, "Erro ao trocar senha. Tente novamente mais tarde.", ex);
         }
     }
-    public SystemUserResponse update (Principal authentication, SystemUserUpdateRequest request) {
+    public SysUserResponse update (Principal authentication, SysUserUpdateRequest request) {
         try {
-            SystemUserEntity userEntity = findByEmail(authentication.getName());
-            SystemUserEntity newEntity = convert.updateRequestIntoEntity(request, userEntity);
+            SysUserEntity userEntity = findByEmail(authentication.getName());
+            SysUserEntity newEntity = convert.updateRequestIntoEntity(request, userEntity);
             if (request.getPassword() != null)
                 newEntity.setPassword(passwordEncoder.encode(request.getPassword()));
             save(newEntity);
@@ -177,18 +177,18 @@ public class SystemUserService {
         }
     }
 
-    public SystemUserEntity findByEmail (String email) {
+    public SysUserEntity findByEmail (String email) {
         return systemUserRepository.findByEmailAndActiveIsTrue(email)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    public SystemUserResponse getByEmail (Principal authentication) {
+    public SysUserResponse getByEmail (Principal authentication) {
         try {
-            SystemUserEntity userEntity = findByEmail(authentication.getName());
+            SysUserEntity userEntity = findByEmail(authentication.getName());
             if (!userEntity.getEmailValidated())
                 sendEmailToken(userEntity);
 
-            SystemUserResponse response = convert.entityIntoResponse(userEntity);
+            SysUserResponse response = convert.entityIntoResponse(userEntity);
             return response;
 
         } catch (Exception ex) {
@@ -198,13 +198,13 @@ public class SystemUserService {
         }
     }
 
-    public SystemUserEntity save (SystemUserEntity entity) {
+    public SysUserEntity save (SysUserEntity entity) {
         return systemUserRepository.save(entity);
     }
 
     public void deactivate(String email) {
         try {
-            SystemUserEntity userEntity = findByEmail(email);
+            SysUserEntity userEntity = findByEmail(email);
             userEntity.setActive(false);
             save(userEntity);
         } catch (Exception ex) {

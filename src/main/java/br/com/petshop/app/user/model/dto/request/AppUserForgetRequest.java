@@ -17,5 +17,5 @@ public class AppUserForgetRequest implements Serializable {
     @Builder.Default
     private Boolean changePassword = true;
     @Builder.Default
-    private LocalDateTime updated = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

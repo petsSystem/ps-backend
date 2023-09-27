@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -16,6 +15,4 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CompanyUpdateRequest implements Serializable {
     private String name;
-    @Builder.Default
-    private LocalDateTime updated = LocalDateTime.now();
 }

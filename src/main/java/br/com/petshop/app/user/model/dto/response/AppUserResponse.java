@@ -36,5 +36,5 @@ public class AppUserResponse implements Serializable {
     private String token;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean emailValidated;
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
 }
