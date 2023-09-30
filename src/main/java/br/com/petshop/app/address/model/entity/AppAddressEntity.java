@@ -33,7 +33,7 @@ public class AppAddressEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private String addressId;
+    private String id;
     @Column(name = "street")
     private String street;
     @Column(name = "number")
@@ -52,10 +52,13 @@ public class AppAddressEntity implements Serializable {
     private String lat;
     @Column(name = "lon")
     private String lon;
+    @Column(name = "principal")
+    private Boolean principal;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "app_user_id", nullable = false)

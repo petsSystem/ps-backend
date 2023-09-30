@@ -16,6 +16,18 @@ import java.io.Serializable;
 public class CompanyCreateRequest implements Serializable {
     private String name;
     private String cnpj;
+    private String phone;
+
+    private String addressPostalCode;
+    private String addressStreet;
+    private String addressNumber;
+    private String addressNeighborhood;
+    private String addressCity;
+    private String addressState;
+    private String addressCountry;
+    private String addressLat;
+    private String addressLon;
+
     @Builder.Default
-    private Boolean active = true;
+    private Boolean active = false;
 }

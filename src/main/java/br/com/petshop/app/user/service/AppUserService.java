@@ -213,12 +213,10 @@ AppUserService {
             AppUserResponse response = convert.appUserEntityIntoResponse(userEntity);
 
             Set<AppAddressResponse> addressResponse = addressService.get(authentication);
-            if (!addressResponse.isEmpty())
-                response.setAddresses(addressResponse);
+            response.setAddresses(addressResponse);
 
             Set<PetResponse> petResponse = petService.get(authentication);
-            if (!petResponse.isEmpty())
-                response.setPets(petResponse);
+            response.setPets(petResponse);
 
             return response;
         } catch (GenericNotFoundException ex) {

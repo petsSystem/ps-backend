@@ -18,6 +18,19 @@ public class CompanyResponse implements Serializable {
     private String id;
     private String name;
     private String cnpj;
+    private String phone;
+
+    private String addressPostalCode;
+    private String addressStreet;
+    private String addressNumber;
+    private String addressNeighborhood;
+    private String addressCity;
+    private String addressState;
+    private String addressCountry;
+    private String addressLat;
+    private String addressLon;
+
     private Boolean active;
+
     private LocalDateTime createdAt;
 }

@@ -22,7 +22,8 @@ public class AppAddressCreateRequest implements Serializable {
     private String country;
     private String lat;
     private String lon;
-
+    @Builder.Default
+    private Boolean principal = true;
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 }

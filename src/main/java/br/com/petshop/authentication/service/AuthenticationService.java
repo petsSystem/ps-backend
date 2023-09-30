@@ -3,6 +3,7 @@ package br.com.petshop.authentication.service;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import br.com.petshop.authentication.model.enums.Message;
+import br.com.petshop.exception.GenericNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,6 +32,7 @@ public class AuthenticationService {
 
             var jwt = jwtService.generateToken((UserDetails) auth.getPrincipal());
             return AuthenticationResponse.builder().token(jwt).build();
+
         } catch (BadCredentialsException ex) {
             log.error(Message.AUTH_ERROR_USER_PASSWORD.get() + " Error: " +  ex.getMessage());
             throw new ResponseStatusException(

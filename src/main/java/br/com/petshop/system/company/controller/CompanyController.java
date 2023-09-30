@@ -35,8 +35,19 @@ public class CompanyController {
 
     //SOMENTE ADMIN
     @Operation(summary = "Serviço de inclusão da empresa no sistema.",
-            description = "Acesso: 'ADMIN'")
+            description = "Acesso: 'ADMIN', 'OWNER'")
     @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao cadastrar empresa. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/companies\"\n" +
+                            "}\n" +
+                            "\n")})}),
             @ApiResponse(
                     responseCode = "422",
                     description = "Empresa já cadastrada.",
@@ -48,41 +59,19 @@ public class CompanyController {
                             "\"instance\": \"/api/v1/system/companies\"\n" +
                             "}\n" +
                             "\n")})}),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao cadastrar empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies\"\n" +
-                            "}\n" +
-                            "\n")})})
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER')")
     public CompanyResponse create(Principal authentication,
                                   @RequestBody CompanyCreateRequest request) {
         return companyService.create(authentication, request);
     }
 
-    //SOMENTE ADMIN
+    //SOMENTE ADMIN e OWNER
     @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
             @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
@@ -93,18 +82,29 @@ public class CompanyController {
                             "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
                             "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro da empresa não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "}\n" +
                             "\n")})})
     })
     @PutMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
     public CompanyResponse updateById(
             @PathVariable("companyId") String companyId,
             @RequestBody CompanyUpdateRequest request) {
         return companyService.updateById(companyId, request);
     }
 
-    //SOMENTE OWNER
+    //SOMENTE MANAGER
     @Operation(summary = "Serviço de atualização dos dados da empresa do login.",
             description = "Acesso: 'OWNER'")
     @ApiResponses(value = {
@@ -122,28 +122,17 @@ public class CompanyController {
     })
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('OWNER')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public CompanyResponse update(
             Principal authentication,
             @RequestBody CompanyUpdateRequest request) {
         return companyService.update(authentication, request);
     }
 
-    //SOMENTE ADMIN
+    //SOMENTE ADMIN e OWNER
     @Operation(summary = "Serviço de recuperação das informações da empresa no sistema pelo id.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
             @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
@@ -154,18 +143,29 @@ public class CompanyController {
                             "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
                             "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro da empresa não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "}\n" +
                             "\n")})})
     })
     @GetMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
     public CompanyResponse getByCompanyId(
             Principal authentication,
             @PathVariable("companyId") String companyId) {
         return companyService.getByCompanyId(authentication, companyId);
     }
 
-    //SOMENTE OWNER
+    //SOMENTE 'OWNER','MANAGER'
     @Operation(summary = "Serviço de recuperação das informações da empresa do login.",
             description = "Acesso: 'OWNER'")
     @ApiResponses(value = {
@@ -183,7 +183,7 @@ public class CompanyController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('OWNER')")
+    @PreAuthorize("hasAnyAuthority('OWNER','MANAGER')")
     public CompanyResponse get(
             Principal authentication) {
         return companyService.get(authentication);

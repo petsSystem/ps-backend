@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface AppAddressRepository extends JpaRepository<AppAddressEntity, Integer> {
-    Optional<AppAddressEntity> findByAddressId(String addressId);
+    Optional<AppAddressEntity> findById(String addressId);
     List<AppAddressEntity> findByAppUser_Email(String email);
     Optional<AppAddressEntity> findByStreetAndNumber(String street, String number);
 }

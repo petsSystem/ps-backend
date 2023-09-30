@@ -27,7 +27,4 @@ public class EmployeeUpdateRequest implements Serializable {
     private String addressCity;
     private String addressState;
     private String addressCountry;
-
-    @Builder.Default
-    private LocalDateTime updated = LocalDateTime.now();
 }

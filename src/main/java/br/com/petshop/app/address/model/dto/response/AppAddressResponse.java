@@ -31,6 +31,8 @@ public class AppAddressResponse implements Serializable {
     private String lat;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String lon;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean principal;
     private LocalDateTime createdAt;
 }
 

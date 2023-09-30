@@ -23,5 +23,25 @@ public class CompanyEntity extends AuditorBaseEntity implements Serializable {
     private String name;
     @Column(unique = true)
     private String cnpj;
+    private String phone;
     private Boolean active;
+
+    @Column(name = "address_postal_code")
+    private String addressPostalCode;
+    @Column(name = "address_street")
+    private String addressStreet;
+    @Column(name = "address_number")
+    private String addressNumber;
+    @Column(name = "address_neighborhood")
+    private String addressNeighborhood;
+    @Column(name = "address_city")
+    private String addressCity;
+    @Column(name = "address_state")
+    private String addressState;
+    @Column(name = "address_country")
+    private String addressCountry;
+    @Column(name = "address_lat")
+    private String addressLat;
+    @Column(name = "address_lon")
+    private String addressLon;
 }

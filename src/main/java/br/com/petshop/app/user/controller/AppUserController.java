@@ -31,7 +31,7 @@ import java.security.Principal;
 public class AppUserController {
     @Autowired private AppUserService userService;
 
-    @Operation(summary = "Serviço de alteração dos dados do usuário no APP.")
+    @Operation(summary = "Serviço que altera senha do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -40,52 +40,30 @@ public class AppUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users\"\n" +
+                            "\"detail\": \"Erro ao trocar senha. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users/password\"\n" +
                             "}\n" +
                             "\n")})}),
     })
-    @PutMapping()
+    @PatchMapping("/password")
     @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse update (
+    public void changePassword (
             Principal authentication,
-            @RequestBody AppUserUpdateRequest request) {
-        return userService.update(authentication, request);
-    }
-
-
-    @Operation(summary = "Serviço para recuperar dados do cadastro do usuário no APP.")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao retornar dados do usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users\"\n" +
-                            "}\n" +
-                            "\n")})}),
-    })
-    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public AppUserResponse get (
-            Principal authentication) {
-        return userService.getByEmail(authentication);
+            @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(authentication, request);
     }
 
     @Operation(summary = "Serviço de validação do email do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "412",
-                    description = "Usuário digita token incorreto.",
+                    responseCode = "400",
+                    description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Precondition Failed\",\n" +
-                            "    \"status\": 412,\n" +
-                            "    \"detail\": \"Token inválido.\",\n" +
-                            "    \"instance\": \"/api/v1/app/users/email/validate\"\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao validar email. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users/email/validate\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -100,16 +78,16 @@ public class AppUserController {
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
+                    responseCode = "412",
+                    description = "Usuário digita token incorreto.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao validar email. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/email/validate\"\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Precondition Failed\",\n" +
+                            "    \"status\": 412,\n" +
+                            "    \"detail\": \"Token inválido.\",\n" +
+                            "    \"instance\": \"/api/v1/app/users/email/validate\"\n" +
                             "}\n" +
-                            "\n")})}),
+                            "\n")})})
     })
     @PatchMapping("/email/validate")
     @ResponseStatus(HttpStatus.OK)
@@ -140,7 +118,7 @@ public class AppUserController {
         return userService.emailValidateResend(authentication);
     }
 
-    @Operation(summary = "Serviço que altera senha do usuário no APP.")
+    @Operation(summary = "Serviço de alteração dos dados do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -149,17 +127,38 @@ public class AppUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao trocar senha. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/password\"\n" +
+                            "\"detail\": \"Erro ao atualizar usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users\"\n" +
                             "}\n" +
                             "\n")})}),
     })
-    @PatchMapping("/password")
+    @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    public void changePassword (
+    public AppUserResponse update (
             Principal authentication,
-            @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(authentication, request);
+            @RequestBody AppUserUpdateRequest request) {
+        return userService.update(authentication, request);
+    }
+
+    @Operation(summary = "Serviço para recuperar dados do cadastro do usuário no APP.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao retornar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users\"\n" +
+                            "}\n" +
+                            "\n")})}),
+    })
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public AppUserResponse get (
+            Principal authentication) {
+        return userService.getByEmail(authentication);
     }
 
     @Operation(summary = "Serviço para desativar usuário no APP.")
@@ -171,7 +170,7 @@ public class AppUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao desativar usuário. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao excluir dados do usuário. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1app/users/{email}/deactivate\"\n" +
                             "}\n" +
                             "\n")})}),

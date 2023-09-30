@@ -31,7 +31,7 @@ public class EmployeeResponse implements Serializable {
     private String addressCountry;
 
     private Boolean active;
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDateTime updated;
+    private LocalDateTime updatedAt;
 }

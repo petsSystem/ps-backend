@@ -26,17 +26,6 @@ public class AppAuthenticationController {
     @Operation(summary = "Serviço que efetua login no aplicativo.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "401",
-                    description = "Usuário ou senha estão incorretos.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Unauthorized\",\n" +
-                            "\"status\": 401,\n" +
-                            "\"detail\": \"Usuário ou senha estão incorretos.\",\n" +
-                            "\"instance\": \"/api/v1/app/token/auth\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -47,6 +36,17 @@ public class AppAuthenticationController {
                             "\"instance\": \"/api/v1/app/token/auth\"\n" +
                             "}\n" +
                             "\n")})}),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Usuário ou senha estão incorretos.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Unauthorized\",\n" +
+                            "\"status\": 401,\n" +
+                            "\"detail\": \"Usuário ou senha estão incorretos.\",\n" +
+                            "\"instance\": \"/api/v1/app/token/auth\"\n" +
+                            "}\n" +
+                            "\n")})})
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)

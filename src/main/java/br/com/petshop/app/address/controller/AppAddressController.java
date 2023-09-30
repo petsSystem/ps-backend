@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -86,6 +87,28 @@ public class AppAddressController {
         return addressService.update(addressId, request);
     }
 
+    @Operation(summary = "Serviço para setar o endereço principal do usuáro no APP.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao setar endereço principal. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users/address/{idAddress}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+    })
+    @PatchMapping("/{addressId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void setPrincipal(
+            Principal authentication,
+            @PathVariable ("addressId") String addressId) {
+        addressService.setPrincipal(authentication, addressId);
+    }
+
     @Operation(summary = "Serviço de recuperação de todos os endereços do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -135,7 +158,8 @@ public class AppAddressController {
     @DeleteMapping("/{addressId}")
     @ResponseStatus(HttpStatus.OK)
     public void delete(
+            Principal authentication,
             @PathVariable ("addressId") String addressId) {
-        addressService.delete(addressId);
+        addressService.delete(authentication, addressId);
     }
 }

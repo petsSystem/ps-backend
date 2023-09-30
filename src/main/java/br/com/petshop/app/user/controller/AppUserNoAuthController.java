@@ -30,17 +30,6 @@ public class AppUserNoAuthController {
     @Operation(summary = "Serviço que cria usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "422",
-                    description = "Cliente já cadastrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Unprocessable Entity\",\n" +
-                            "    \"status\": 422,\n" +
-                            "    \"detail\": \"Email já cadastrado.\",\n" +
-                            "    \"instance\": \"/api/v1/app/noauth/users\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -51,6 +40,17 @@ public class AppUserNoAuthController {
                             "\"instance\": \"/api/v1/app/noauth/users\"\n" +
                             "}\n" +
                             "\n")})}),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Cliente já cadastrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Unprocessable Entity\",\n" +
+                            "    \"status\": 422,\n" +
+                            "    \"detail\": \"Email já cadastrado.\",\n" +
+                            "    \"instance\": \"/api/v1/app/noauth/users\"\n" +
+                            "}\n" +
+                            "\n")})})
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -62,17 +62,6 @@ public class AppUserNoAuthController {
     @Operation(summary = "Serviço que recupera senha do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Email não está cadastrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Email não cadastrado.\",\n" +
-                            "    \"instance\": \"/api/v1/app/noauth/users/{email}/forget\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -83,6 +72,17 @@ public class AppUserNoAuthController {
                             "\"instance\": \"/api/v1/app/noauth/users/{email}/forget\"\n" +
                             "}\n" +
                             "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Email não está cadastrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Email não cadastrado.\",\n" +
+                            "    \"instance\": \"/api/v1/app/noauth/users/{email}/forget\"\n" +
+                            "}\n" +
+                            "\n")})})
     })
     @PatchMapping("/forget")
     @ResponseStatus(HttpStatus.ACCEPTED)

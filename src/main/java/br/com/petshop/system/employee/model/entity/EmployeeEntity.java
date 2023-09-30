@@ -1,7 +1,7 @@
 package br.com.petshop.system.employee.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
-import br.com.petshop.system.subsidiary.model.entity.SubsidiaryEntity;
+import br.com.petshop.system.company.model.entity.CompanyEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,9 +56,9 @@ public class EmployeeEntity extends AuditorBaseEntity implements Serializable {
     private String addressLon;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "subsidiary_id", nullable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private SubsidiaryEntity subsidiary;
+    private CompanyEntity company;
 
 }

@@ -2,14 +2,14 @@ package br.com.petshop.system.employee.service;
 
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.company.model.entity.CompanyEntity;
+import br.com.petshop.system.company.service.CompanyService;
 import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.model.enums.Message;
 import br.com.petshop.system.employee.repository.EmployeeRepository;
-import br.com.petshop.system.subsidiary.model.entity.SubsidiaryEntity;
-import br.com.petshop.system.subsidiary.service.SubsidiaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class EmployeeService {
     Logger log = LoggerFactory.getLogger(EmployeeService.class);
     @Autowired private EmployeeRepository employeeRepository;
     @Autowired private EmployeeConverterService convert;
-    @Autowired private SubsidiaryService subsidiaryService;
+    @Autowired private CompanyService companyService;
 
     public EmployeeResponse create(Principal authentication, EmployeeCreateRequest request) {
         try {
@@ -33,16 +33,16 @@ public class EmployeeService {
 
             if (entity.isPresent()) {
                 EmployeeEntity employee = entity.get();
-                if (employee.getSubsidiary().getId().equalsIgnoreCase(request.getSubsidiaryId())) {
+                if (employee.getCompany().getId().equalsIgnoreCase(request.getCompanyId())) {
                     throw new GenericAlreadyRegisteredException("Funcionário já cadastrado no sistema");
                 } else { //se o cpf estiver vinculado a outra filial, desativar e criar novo cadastro
                     employee.setActive(false);
                     employeeRepository.save(employee);
                 }
             }
-            SubsidiaryEntity subsidiary = subsidiaryService.findByIdAndActiveIsTrue(request.getSubsidiaryId());
+            CompanyEntity company = companyService.findByIdAndActiveIsTrue(request.getCompanyId());
             EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-            employeeEntity.setSubsidiary(subsidiary);
+            employeeEntity.setCompany(company);
             employeeEntity = employeeRepository.save(employeeEntity);
 
             return convert.entityIntoResponse(employeeEntity);

@@ -29,7 +29,7 @@ public class EmployeeCreateRequest implements Serializable {
     private String addressState;
     private String addressCountry;
 
-    private String subsidiaryId;
+    private String companyId;
 
     @Builder.Default
     private Boolean active = true;

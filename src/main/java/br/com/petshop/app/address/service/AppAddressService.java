@@ -47,6 +47,9 @@ public class AppAddressService {
 //            entities.add(addressEntity);
 //            userEntity.setAppUserAddresses(entities);
             addressEntity = addressRepository.save(addressEntity);
+
+            setPrincipal(authentication, addressEntity.getId());
+
             return convert.addressEntityIntoResponse(addressEntity);
         } catch (GenericAlreadyRegisteredException ex) {
             log.error("Error: " + ex.getMessage());
@@ -94,10 +97,44 @@ public class AppAddressService {
         }
     }
 
-    public void delete(String addressId) {
+    public void setPrincipal (Principal authentication, String addressId) {
+        try {
+            List<AppAddressEntity> addresses = addressRepository.findByAppUser_Email(authentication.getName());
+            addresses.stream().forEach(a -> {
+                if (a.getPrincipal()) {
+                    a.setPrincipal(false);
+                    addressRepository.save(a);
+                }
+                if (a.getId().equalsIgnoreCase(addressId)) {
+                    a.setPrincipal(true);
+                    addressRepository.save(a);
+                }
+            });
+        } catch (Exception ex) {
+            log.error(Message.ADDRESS_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.ADDRESS_ERROR_UPDATE.get(), ex);
+        }
+    }
+
+    public void delete(Principal authentication, String addressId) {
         try {
             AppAddressEntity addressEntity = findById(addressId);
             addressRepository.delete(addressEntity);
+
+            List<AppAddressEntity> addresses = addressRepository.findByAppUser_Email(authentication.getName());
+            if (!addresses.isEmpty()) {
+                Optional<AppAddressEntity> entity = addresses.stream()
+                        .filter(a -> a.getPrincipal())
+                        .findFirst();
+                if (entity.isEmpty()) {
+                    String id = addresses.get(addresses.size() - 1).getId();
+                    addressEntity = findById(id);
+                    addressEntity.setPrincipal(true);
+                    addressRepository.save(addressEntity);
+                }
+            }
+
 //            Set<AddressEntity> addressEntities = userEntity.getAppUserAddresses();
 //            addressEntities.removeIf(a -> a.getId().equalsIgnoreCase(idAddress));
 //            userEntity.setAppUserAddresses(addressEntities);
@@ -116,7 +153,7 @@ public class AppAddressService {
     }
 
     public AppAddressEntity findById(String addressId) {
-        return addressRepository.findByAddressId(addressId)
+        return addressRepository.findById(addressId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 }

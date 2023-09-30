@@ -15,4 +15,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CompanyUpdateRequest implements Serializable {
     private String name;
+    private String phone;
+
+    private String addressPostalCode;
+    private String addressStreet;
+    private String addressNumber;
+    private String addressNeighborhood;
+    private String addressCity;
+    private String addressState;
+    private String addressCountry;
+    private String addressLat;
+    private String addressLon;
 }

@@ -28,9 +28,7 @@ public class AppUserResponse implements Serializable {
     private String dateBirth;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean changePassword;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<AppAddressResponse> addresses;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<PetResponse> pets;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String token;
