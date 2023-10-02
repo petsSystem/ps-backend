@@ -8,7 +8,8 @@ public enum Message {
     ADDRESS_ERROR_CREATE("Erro ao cadastrar novo endereço. Tente novamente mais tarde."),
     ADDRESS_ERROR_UPDATE("Erro ao atualizar dados do endereço. Tente novamente mais tarde."),
     ADDRESS_ERROR_DELETE("Erro ao excluir endereço. Tente novamente mais tarde."),
-    ADDRESS_ERROR_GET("Erro ao recuperar dados do endereço. Tente novamente mais tarde.");
+    ADDRESS_ERROR_GET("Erro ao recuperar dados do endereço. Tente novamente mais tarde."),
+    ADDRESS_ERROR_PRINCIPAL("Erro ao setar endereço principal. Tente novamente mais tarde.");
 
     private String message;
 

@@ -33,9 +33,9 @@ public class AppAddressService {
 
     public AppAddressResponse create(Principal authentication, AppAddressCreateRequest request) {
         try {
-            Optional<AppAddressEntity> opEntity = addressRepository.findByStreetAndNumber(request.getStreet(), request.getNumber());
-            if (opEntity.isPresent())
-                throw new GenericAlreadyRegisteredException(Message.ADDRESS_ALREADY_REGISTERED.get());
+//            Optional<AppAddressEntity> opEntity = addressRepository.findByStreetAndNumber(request.getStreet(), request.getNumber());
+//            if (opEntity.isPresent())
+//                throw new GenericAlreadyRegisteredException(Message.ADDRESS_ALREADY_REGISTERED.get());
 
             AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
             AppAddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
@@ -51,10 +51,7 @@ public class AppAddressService {
             setPrincipal(authentication, addressEntity.getId());
 
             return convert.addressEntityIntoResponse(addressEntity);
-        } catch (GenericAlreadyRegisteredException ex) {
-            log.error("Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex);
+
         } catch (Exception ex) {
             log.error(Message.ADDRESS_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -86,10 +83,6 @@ public class AppAddressService {
 //            userEntity.setAppUserAddresses(addressEntities);
 //            save(userEntity);
             return convert.addressEntityIntoResponse(addressEntity);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.ADDRESS_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.ADDRESS_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
             log.error(Message.ADDRESS_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -111,9 +104,9 @@ public class AppAddressService {
                 }
             });
         } catch (Exception ex) {
-            log.error(Message.ADDRESS_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
+            log.error(Message.ADDRESS_ERROR_PRINCIPAL.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.ADDRESS_ERROR_UPDATE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.ADDRESS_ERROR_PRINCIPAL.get(), ex);
         }
     }
 
@@ -141,10 +134,6 @@ public class AppAddressService {
 //
 //            save(userEntity);
 //            return convert.convertAppUserEntityIntoResponse(userEntity);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.ADDRESS_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.ADDRESS_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
             log.error(Message.ADDRESS_ERROR_DELETE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(

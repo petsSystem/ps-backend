@@ -41,19 +41,8 @@ public class AppAddressController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar endereço do usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "422",
-                    description = "Endereço já existe.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Unprocessable Entity\",\n" +
-                            "\"status\": 422,\n" +
-                            "\"detail\": \"Endereço já existe.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address\"\n" +
+                            "\"detail\": \"Erro ao cadastrar novo endereço. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users/addresses\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -75,9 +64,9 @@ public class AppAddressController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao excluir endereço do cadastro. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address/{idAddress}\"\n" +
+                            "\"instance\": \"/api/v1/app/users/addresses/{idAddress}\"\n" +
                             "}\n" +
-                            "\n")})}),
+                            "\n")})})
     })
     @PutMapping("/{addressId}")
     @ResponseStatus(HttpStatus.OK)
@@ -97,7 +86,7 @@ public class AppAddressController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao setar endereço principal. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address/{idAddress}\"\n" +
+                            "\"instance\": \"/api/v1/app/users/addresses/{idAddress}\"\n" +
                             "}\n" +
                             "\n")})}),
     })
@@ -118,19 +107,8 @@ public class AppAddressController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar endereço do usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Não há endereço(s) cadastrado(s).",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Not Found\",\n" +
-                            "\"status\": 404,\n" +
-                            "\"detail\": \"Não há endereço(s) cadastrado(s).\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address\"\n" +
+                            "\"detail\": \"Erro ao recuperar dados do endereço. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/app/users/addresses\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -151,7 +129,7 @@ public class AppAddressController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao excluir endereço do cadastro. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/users/address/{idAddress}\"\n" +
+                            "\"instance\": \"/api/v1/app/users/addresses/{idAddress}\"\n" +
                             "}\n" +
                             "\n")})}),
     })

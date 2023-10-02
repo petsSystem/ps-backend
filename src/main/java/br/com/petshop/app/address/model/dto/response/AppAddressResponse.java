@@ -33,6 +33,23 @@ public class AppAddressResponse implements Serializable {
     private String lon;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean principal;
+    private String formattedAddress;
     private LocalDateTime createdAt;
+
+    public String getFormattedAddress() {
+        return this.street
+                .concat(", ")
+                .concat(this.number)
+                .concat(" - ")
+                .concat(this.neighborhood)
+                .concat(", ")
+                .concat(this.city)
+                .concat(" - ")
+                .concat(this.state)
+                .concat(", ")
+                .concat(this.postalCode)
+                .concat(", ")
+                .concat(this.country);
+    }
 }
 
