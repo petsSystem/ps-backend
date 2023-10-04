@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
 
@@ -40,8 +41,12 @@ public class CompanyEntity extends AuditorBaseEntity implements Serializable {
     private String addressState;
     @Column(name = "address_country")
     private String addressCountry;
+
     @Column(name = "address_lat")
-    private String addressLat;
+    private Double addressLat;
     @Column(name = "address_lon")
-    private String addressLon;
+    private Double addressLon;
+    @Column(columnDefinition = "geometry(Point,4326)")
+    private Point geom;
+    private Double distance;
 }

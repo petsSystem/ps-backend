@@ -1,10 +1,12 @@
 package br.com.petshop.app.user.service;
 
 import br.com.petshop.app.address.model.dto.response.AppAddressResponse;
+import br.com.petshop.app.address.model.entity.AppAddressEntity;
 import br.com.petshop.app.address.service.AppAddressService;
 import br.com.petshop.app.user.model.dto.request.AppUserForgetRequest;
 import br.com.petshop.app.user.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.app.user.model.dto.response.AppUserResponse;
+import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.app.user.model.enums.Message;
 import br.com.petshop.authentication.service.JwtService;
 import br.com.petshop.exception.EmailTokenException;
@@ -17,6 +19,9 @@ import br.com.petshop.app.user.model.dto.request.ChangePasswordRequest;
 import br.com.petshop.app.user.model.dto.request.EmailValidateRequest;
 import br.com.petshop.app.user.model.entity.AppUserEntity;
 import br.com.petshop.app.user.repository.AppUserRepository;
+import br.com.petshop.system.company.service.CompanyService;
+import br.com.petshop.utils.PetGeometry;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,6 +49,10 @@ AppUserService {
     @Autowired private JwtService jwtService;
     @Autowired private AppUserConverterService convert;
     @Autowired private AppUserAsyncService asyncService;
+
+    @Autowired private CompanyService companyService;
+
+    @Autowired private PetGeometry geometry;
 
     public AppUserResponse create(AppUserCreateRequest request) {
         try {
@@ -247,6 +257,21 @@ AppUserService {
             log.error(Message.USER_ERROR_DELETE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.USER_ERROR_DELETE.get(), ex);
+        }
+    }
+
+    public List<CompanySummaryResponse> findAround(Double lat, Double lon, Double radius) {
+        try {
+            Point point = geometry.getPoint(lat, lon);
+            return companyService.findAround(point, radius);
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_COMPANY_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_ERROR_COMPANY.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_COMPANY.get(), ex);
         }
     }
 }

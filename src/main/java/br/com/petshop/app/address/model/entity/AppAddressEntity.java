@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -32,28 +33,22 @@ import java.time.LocalDateTime;
 public class AppAddressEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
     private String id;
-    @Column(name = "street")
     private String street;
-    @Column(name = "number")
     private String number;
     @Column(name = "postal_code")
     private String postalCode;
-    @Column(name = "neighborhood")
     private String neighborhood;
-    @Column(name = "city")
     private String city;
-    @Column(name = "state")
     private String state;
-    @Column(name = "country")
     private String country;
-    @Column(name = "lat")
-    private String lat;
-    @Column(name = "lon")
-    private String lon;
-    @Column(name = "principal")
     private Boolean principal;
+
+    private Double lat;
+    private Double lon;
+    @Column(columnDefinition = "geometry(Point,4326)")
+    private Point geom;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")

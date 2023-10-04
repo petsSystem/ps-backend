@@ -3,6 +3,7 @@ package br.com.petshop.system.company.service;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
+import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -28,5 +29,8 @@ public class CompanyConverterService {
 
     public CompanyResponse entityIntoResponse(CompanyEntity entity) {
         return mapper.map(entity, CompanyResponse.class);
+    }
+    public CompanySummaryResponse entityIntoAppResponse(CompanyEntity entity) {
+        return mapper.map(entity, CompanySummaryResponse.class);
     }
 }

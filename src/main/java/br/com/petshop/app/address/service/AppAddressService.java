@@ -8,8 +8,12 @@ import br.com.petshop.app.address.model.enums.Message;
 import br.com.petshop.app.address.repository.AppAddressRepository;
 import br.com.petshop.app.user.model.entity.AppUserEntity;
 import br.com.petshop.app.user.service.AppUserService;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.utils.PetGeometry;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,8 @@ public class AppAddressService {
     @Autowired private AppAddressRepository addressRepository;
     @Autowired private AppAddressConverterService convert;
 
+    @Autowired private PetGeometry geometry;
+
     public AppAddressResponse create(Principal authentication, AppAddressCreateRequest request) {
         try {
 //            Optional<AppAddressEntity> opEntity = addressRepository.findByStreetAndNumber(request.getStreet(), request.getNumber());
@@ -40,6 +46,7 @@ public class AppAddressService {
             AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
             AppAddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
             addressEntity.setAppUser(userEntity);
+            addressEntity.setGeom(geometry.getPoint(addressEntity.getLat(), addressEntity.getLon()));
 //            Set<AddressEntity> entities = userEntity.getAppUserAddresses();
 //            if (entities == null)
 //                entities = new HashSet<>();
@@ -66,6 +73,18 @@ public class AppAddressService {
             return address.stream()
                     .map(a -> convert.addressEntityIntoResponse(a))
                     .collect(Collectors.toSet());
+        } catch (Exception ex) {
+            log.error(Message.ADDRESS_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.ADDRESS_ERROR_GET.get(), ex);
+        }
+    }
+
+    public AppAddressEntity getPrincipal(Principal authentication) {
+        try {
+            Optional<AppAddressEntity> address = addressRepository.findByAppUser_EmailAndPrincipalIsTrue(authentication.getName());
+
+            return address.get();
         } catch (Exception ex) {
             log.error(Message.ADDRESS_ERROR_GET.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(

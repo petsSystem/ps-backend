@@ -1,10 +1,11 @@
 package br.com.petshop.app.user.controller;
 
 import br.com.petshop.app.user.model.dto.request.AppUserUpdateRequest;
-import br.com.petshop.app.user.model.dto.response.AppUserResponse;
-import br.com.petshop.app.user.service.AppUserService;
 import br.com.petshop.app.user.model.dto.request.ChangePasswordRequest;
 import br.com.petshop.app.user.model.dto.request.EmailValidateRequest;
+import br.com.petshop.app.user.model.dto.response.AppUserResponse;
+import br.com.petshop.app.user.service.AppUserService;
+import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/app/users")
@@ -180,5 +183,39 @@ public class AppUserController {
     public void deactivate (
             @PathVariable ("email") String email) {
         userService.deactivate(email);
+    }
+
+    @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao buscar petshop próximo ao endereço informado.\",\n" +
+                            "\"instance\": \"/api/v1/system/companies/nearby\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro de empresas não encontrado para o endereço informado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Não há petshop(s) próximo(s) ao endereço informado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/companies/nearby\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/companies/nearby")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompanySummaryResponse> findAround(
+            @RequestParam("lat") Double lat,
+            @RequestParam("lon") Double lon,
+            @RequestParam("radius") Double radius) {
+        return userService.findAround(lat, lon, radius);
     }
 }

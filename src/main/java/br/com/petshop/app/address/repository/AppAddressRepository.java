@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface AppAddressRepository extends JpaRepository<AppAddressEntity, Integer> {
     Optional<AppAddressEntity> findById(String addressId);
     List<AppAddressEntity> findByAppUser_Email(String email);
+    Optional<AppAddressEntity> findByAppUser_EmailAndPrincipalIsTrue(String email);
     Optional<AppAddressEntity> findByStreetAndNumber(String street, String number);
 }

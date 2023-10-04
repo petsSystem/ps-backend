@@ -1,13 +1,16 @@
 package br.com.petshop.system.company.service;
 
+import br.com.petshop.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.enums.Message;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
+import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.repository.CompanyRepository;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.utils.PetGeometry;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +19,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyService {
     Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired private CompanyRepository companyRepository;
     @Autowired private CompanyConverterService convert;
+
+    @Autowired private PetGeometry geometry;
 
     public CompanyResponse create(Principal authentication, CompanyCreateRequest request) {
         try {
@@ -31,6 +38,8 @@ public class CompanyService {
                 throw new GenericAlreadyRegisteredException(Message.COMPANY_ALREADY_REGISTERED.get());
 
             CompanyEntity companyEntity = convert.createRequestIntoEntity(request);
+            companyEntity.setGeom((Point)
+                    geometry.getPoint(companyEntity.getAddressLat(), companyEntity.getAddressLon()));
 
             companyEntity = companyRepository.save(companyEntity);
 
@@ -46,6 +55,24 @@ public class CompanyService {
                     HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_CREATE.get(), ex);
         }
     }
+
+    public List<CompanySummaryResponse> findAround(Point p, Double distance) {
+        List<CompanyEntity> companies = companyRepository.findNearWithinDistance(p, distance);
+        return companies.stream()
+                .map(c -> {
+                    CompanySummaryResponse response = convert.entityIntoAppResponse(c);
+                    Double dist = companyRepository.getDistance(p, c.getId());
+                    response.setDistance(dist);
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+//    public List<CompanyEntity> findAround(Double lat, Double lon, Double distance){
+//        log.info("Looking for city around ({},{}) withing {} meters", lat, lon, distance);
+//        Point p = factory.createPoint(new Coordinate(lon, lat));
+//        return companyRepository.findNearWithinDistance(p, distance);
+//    }
 
     public CompanyEntity findByIdAndActiveIsTrue(String companyId) {
         return companyRepository.findByIdAndActiveIsTrue(companyId)
