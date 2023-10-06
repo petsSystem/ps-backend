@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/app/noauth/users")
 @RequiredArgsConstructor
-@Tag(name = "App Users Services (NO AUTH)")
+@Tag(name = "APP - Users Services (NO AUTH)")
 public class AppUserNoAuthController {
     @Autowired private AppUserService userService;
 

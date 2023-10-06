@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/sys/noauth/users")
 @RequiredArgsConstructor
-@Tag(name = "System Users Services (NO AUTH)")
+@Tag(name = "SYS - Users Services (NO AUTH)")
 public class SysUserNoAuthController {
     @Autowired private SysUserService userService;
 

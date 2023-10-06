@@ -30,7 +30,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/app/users")
-@Tag(name = "App Users Services")
+@Tag(name = "APP - Users Services")
 public class AppUserController {
     @Autowired private AppUserService userService;
 

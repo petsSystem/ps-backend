@@ -25,10 +25,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/sys/employees")
-@Tag(name = "Employee Services")
+@Tag(name = "SYS - Employee Services")
 public class EmployeeController {
 
     @Autowired private EmployeeService employeeService;
@@ -98,7 +99,7 @@ public class EmployeeController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public EmployeeResponse updateById(
             Principal authentication,
-            @PathVariable("employeeId") String employeeId,
+            @PathVariable("employeeId") UUID employeeId,
             @RequestBody EmployeeUpdateRequest request) {
         return employeeService.updateById(authentication, employeeId, request);
     }
@@ -160,7 +161,7 @@ public class EmployeeController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public EmployeeResponse getById(
             Principal authentication,
-            @PathVariable("employeeId") String employeeId) {
+            @PathVariable("employeeId") UUID employeeId) {
         return employeeService.getById(authentication, employeeId);
     }
 
@@ -228,7 +229,7 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public void deactivate(
-            @PathVariable("employeeId") String employeeId) {
+            @PathVariable("employeeId") UUID employeeId) {
         employeeService.deactivate(employeeId);
     }
 
@@ -262,7 +263,7 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public void activate(
-            @PathVariable("employeeId") String employeeId) {
+            @PathVariable("employeeId") UUID employeeId) {
         employeeService.activate(employeeId);
     }
 
@@ -296,7 +297,7 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete(
-            @PathVariable("employeeId") String employeeId) {
+            @PathVariable("employeeId") UUID employeeId) {
         employeeService.delete(employeeId);
     }
 }

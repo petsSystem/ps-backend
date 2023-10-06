@@ -27,7 +27,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/app/pets")
-@Tag(name = "Pets Services")
+@Tag(name = "APP - Pets Services")
 public class PetController {
 
     @Autowired private PetService petService;

@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -29,7 +30,7 @@ public class EmployeeCreateRequest implements Serializable {
     private String addressState;
     private String addressCountry;
 
-    private String companyId;
+    private UUID companyId;
 
     @Builder.Default
     private Boolean active = true;

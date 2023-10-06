@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @MappedSuperclass
@@ -27,7 +28,7 @@ import java.time.LocalDateTime;
 public abstract class AuditorBaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    protected String id;
+    protected UUID id;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)

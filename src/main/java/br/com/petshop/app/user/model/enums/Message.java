@@ -5,7 +5,7 @@ public enum Message {
     USER_ALREADY_REGISTERED("Usuário/Email já cadastrado."),
     USER_NOT_FOUND("Usuário/Email não cadastrado."),
     USER_COMPANY_NOT_FOUND("Não há petshop(s) próximo(s) ao endereço informado."),
-    USER_ERROR_COMPANY("Erro ao buscar petshop próximo ao endereço informado."),
+    USER_ERROR_COMPANY("Erro ao buscar petshop próximo ao endereço informado. Tente novamente mais tarde"),
     USER_ERROR_INVALID_TOKEN("Token inválido."),
     USER_ERROR_VALIDATE_EMAIL("Erro ao validar email. Tente novamente mais tarde."),
     USER_ERROR_EXPIRED_TOKEN("Token expirado. Solicite novo token."),

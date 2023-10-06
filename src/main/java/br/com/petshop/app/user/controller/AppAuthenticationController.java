@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/app/auth")
-@Tag(name = "APP Authentication Services")
+@Tag(name = "APP - Authentication Services")
 public class AppAuthenticationController {
     @Autowired private AuthenticationService authenticationService;
 

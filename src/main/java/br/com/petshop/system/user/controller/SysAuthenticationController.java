@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/sys/auth")
-@Tag(name = "System Authentication Services")
+@Tag(name = "SYS - Authentication Services")
 public class SysAuthenticationController {
     @Autowired private AuthenticationService authenticationService;
 

@@ -25,15 +25,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/sys/companies")
-@Tag(name = "Company Services")
+@Tag(name = "SYS - Company Services")
 public class CompanyController {
 
     @Autowired private CompanyService companyService;
 
-    //SOMENTE ADMIN
+    //SOMENTE ADMIN e OWNER
     @Operation(summary = "Serviço de inclusão da empresa no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER'")
     @ApiResponses(value = {
@@ -68,9 +70,69 @@ public class CompanyController {
         return companyService.create(authentication, request);
     }
 
+    //SOMENTE 'ADMIN', 'OWNER','MANAGER'
+    @Operation(summary = "Serviço de recuperação das informações da empresa do login.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/companies\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+//    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER','MANAGER','USER')")
+    public List<CompanyResponse> get (
+            Principal authentication) {
+        return companyService.get(authentication);
+    }
+
+    //SOMENTE ADMIN e OWNER
+//    @Operation(summary = "Serviço de recuperação das informações da empresa no sistema pelo id.",
+//            description = "Acesso: 'ADMIN'")
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Erro no sistema.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "\"type\": \"about:blank\",\n" +
+//                            "\"title\": \"Bad Request\",\n" +
+//                            "\"status\": 400,\n" +
+//                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
+//                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+//                            "}\n" +
+//                            "\n")})}),
+//            @ApiResponse(
+//                    responseCode = "404",
+//                    description = "Cadastro da empresa não encontrado.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "    \"type\": \"about:blank\",\n" +
+//                            "    \"title\": \"Not Found\",\n" +
+//                            "    \"status\": 404,\n" +
+//                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+//                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+//                            "}\n" +
+//                            "\n")})})
+//    })
+////    @GetMapping("/{companyId}")
+////    @ResponseStatus(HttpStatus.OK)
+////    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
+////    public CompanyResponse getByCompanyId(
+////            Principal authentication,
+////            @PathVariable("companyId") UUID companyId) {
+////        return companyService.getByCompanyId(authentication, companyId);
+////    }
+
     //SOMENTE ADMIN e OWNER
     @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
-            description = "Acesso: 'ADMIN'")
+            description = "Acesso: 'ADMIN', 'OWNER'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -99,7 +161,7 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
     public CompanyResponse updateById(
-            @PathVariable("companyId") String companyId,
+            @PathVariable("companyId") UUID companyId,
             @RequestBody CompanyUpdateRequest request) {
         return companyService.updateById(companyId, request);
     }
@@ -129,65 +191,9 @@ public class CompanyController {
         return companyService.update(authentication, request);
     }
 
-    //SOMENTE ADMIN e OWNER
-    @Operation(summary = "Serviço de recuperação das informações da empresa no sistema pelo id.",
-            description = "Acesso: 'ADMIN'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping("/{companyId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER')")
-    public CompanyResponse getByCompanyId(
-            Principal authentication,
-            @PathVariable("companyId") String companyId) {
-        return companyService.getByCompanyId(authentication, companyId);
-    }
 
-    //SOMENTE 'OWNER','MANAGER'
-    @Operation(summary = "Serviço de recuperação das informações da empresa do login.",
-            description = "Acesso: 'OWNER'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('OWNER','MANAGER')")
-    public CompanyResponse get(
-            Principal authentication) {
-        return companyService.get(authentication);
-    }
+
+
 
     //SOMENTE ADMIN
     @Operation(summary = "Serviço de desativação do cadastro da empresa no sistema.",
@@ -220,7 +226,7 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deactivate(
-            @PathVariable("companyId") String companyId) {
+            @PathVariable("companyId") UUID companyId) {
         companyService.deactivate(companyId);
     }
 
@@ -255,7 +261,7 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void activate(
-            @PathVariable("companyId") String companyId) {
+            @PathVariable("companyId") UUID companyId) {
         companyService.activate(companyId);
     }
 
@@ -290,7 +296,7 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete(
-            @PathVariable("companyId") String companyId) {
+            @PathVariable("companyId") UUID companyId) {
         companyService.delete(companyId);
     }
 }

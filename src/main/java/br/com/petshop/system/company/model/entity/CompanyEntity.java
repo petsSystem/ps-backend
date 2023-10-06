@@ -1,8 +1,17 @@
 package br.com.petshop.system.company.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
+import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +21,8 @@ import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
+import java.util.Set;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -21,6 +32,10 @@ import java.io.Serializable;
 @Entity
 @Table(name = "sys_company")
 public class CompanyEntity extends AuditorBaseEntity implements Serializable {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    @Column(name = "company_id")
+//    protected UUID companyId;
     private String name;
     @Column(unique = true)
     private String cnpj;
@@ -49,4 +64,17 @@ public class CompanyEntity extends AuditorBaseEntity implements Serializable {
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point geom;
     private Double distance;
+
+
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "companyEmployees", cascade = CascadeType.ALL)
+    Set<EmployeeEntity> employees;
+
+    //    @ManyToMany(cascade= CascadeType.ALL)
+//    @JoinTable(
+//            name = "app_user_address",
+//            joinColumns = @JoinColumn(name = "app_user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "address_id"))
+//    Set<AddressEntity> appUserAddresses;
 }

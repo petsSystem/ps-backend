@@ -8,6 +8,7 @@ import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.employee.model.enums.Message;
 import br.com.petshop.system.employee.repository.EmployeeRepository;
 import org.slf4j.Logger;
@@ -18,7 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -30,20 +35,30 @@ public class EmployeeService {
     public EmployeeResponse create(Principal authentication, EmployeeCreateRequest request) {
         try {
             Optional<EmployeeEntity> entity = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
-
-            if (entity.isPresent()) {
-                EmployeeEntity employee = entity.get();
-                if (employee.getCompany().getId().equalsIgnoreCase(request.getCompanyId())) {
-                    throw new GenericAlreadyRegisteredException("Funcionário já cadastrado no sistema");
-                } else { //se o cpf estiver vinculado a outra filial, desativar e criar novo cadastro
-                    employee.setActive(false);
-                    employeeRepository.save(employee);
-                }
-            }
-            CompanyEntity company = companyService.findByIdAndActiveIsTrue(request.getCompanyId());
+            CompanyEntity companyEntity = companyService.findByIdAndActiveIsTrue(request.getCompanyId());
             EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-            employeeEntity.setCompany(company);
-            employeeEntity = employeeRepository.save(employeeEntity);
+
+            if (entity.isEmpty()) {
+                employeeEntity.setCompanyEmployees(Set.of(companyEntity));
+                employeeRepository.save(employeeEntity);
+
+            } else { //associar a nova empresa
+                if (request.getType() != EmployeeType.OWNER)
+                    throw new GenericAlreadyRegisteredException("Funcionário já cadastrado");
+
+                employeeEntity = entity.get();
+                List<CompanyEntity> companies = companyService.findByEmployeeId(employeeEntity.getId());
+
+                Optional<CompanyEntity> optionalCompany = companies.stream()
+                        .filter(c -> c.getId().equals(request.getCompanyId()))
+                        .findFirst();
+                if (optionalCompany.isEmpty()) {
+                    companies.add(companyEntity);
+                    employeeEntity.setCompanyEmployees(companies.stream().collect(Collectors.toSet()));
+                    employeeRepository.save(employeeEntity);
+                } else
+                    throw new GenericAlreadyRegisteredException("Company already registered for this employee");
+            }
 
             return convert.entityIntoResponse(employeeEntity);
 
@@ -58,7 +73,7 @@ public class EmployeeService {
         }
     }
 
-    public EmployeeResponse updateById(Principal authentication, String employeeId, EmployeeUpdateRequest request) {
+    public EmployeeResponse updateById(Principal authentication, UUID employeeId, EmployeeUpdateRequest request) {
         try {
             EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
                     .orElseThrow(GenericNotFoundException::new);
@@ -81,7 +96,7 @@ public class EmployeeService {
 
     public EmployeeResponse update(Principal authentication, EmployeeUpdateRequest request) {
         try {
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue("")
+            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(null)
                     .orElseThrow(GenericNotFoundException::new);
 
             entity = convert.updateRequestIntoEntity(request, entity);
@@ -100,7 +115,7 @@ public class EmployeeService {
         }
     }
 
-    public EmployeeResponse getById(Principal authentication, String employeeId) {
+    public EmployeeResponse getById(Principal authentication, UUID employeeId) {
         try {
             EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
                     .orElseThrow(GenericNotFoundException::new);
@@ -137,7 +152,7 @@ public class EmployeeService {
         }
     }
 
-    public void deactivate(String employeeId) {
+    public void deactivate(UUID employeeId) {
         try {
             EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
                     .orElseThrow(GenericNotFoundException::new);
@@ -155,7 +170,7 @@ public class EmployeeService {
         }
     }
 
-    public void activate(String employeeId) {
+    public void activate(UUID employeeId) {
         try {
             EmployeeEntity entity = employeeRepository.findById(employeeId)
                     .orElseThrow(GenericNotFoundException::new);
@@ -173,7 +188,7 @@ public class EmployeeService {
         }
     }
 
-    public void delete(String employeeId) {
+    public void delete(UUID employeeId) {
         try {
             EmployeeEntity entity = employeeRepository.findById(employeeId)
                     .orElseThrow(GenericNotFoundException::new);

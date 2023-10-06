@@ -28,7 +28,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/app/users/addresses")
-@Tag(name = "User Address Services")
+@Tag(name = "APP - Addresses Services")
 public class AppAddressController {
     @Autowired private AppAddressService addressService;
 

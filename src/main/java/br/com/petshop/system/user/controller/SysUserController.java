@@ -29,7 +29,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/sys/users")
-@Tag(name = "System Users Services")
+@Tag(name = "SYS - Users Services")
 public class SysUserController {
     @Autowired private SysUserService systemUserService;
 
