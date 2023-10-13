@@ -50,6 +50,11 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     private String emailToken;
     @Column(name = "email_token_time")
     private LocalDateTime emailTokenTime;
+//    private Boolean enabled;
+//    private String username;
+//    public Boolean accountNonExpired;
+//    public Boolean accountNonLocked;
+//    public Boolean credentialsNonExpired;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = true)

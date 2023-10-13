@@ -46,8 +46,8 @@ public class AppAddressEntity implements Serializable {
 
     private Double lat;
     private Double lon;
-    @Column(columnDefinition = "geometry(Point,4326)")
-    private Point geom;
+//    @Column(columnDefinition = "geometry(Point,4326)")
+//    private Point geom;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

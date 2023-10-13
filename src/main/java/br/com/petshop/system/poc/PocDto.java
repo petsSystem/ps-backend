@@ -1,6 +1,5 @@
-package br.com.petshop.system.employee.model.dto.request;
+package br.com.petshop.system.poc;
 
-import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,20 +8,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.UUID;
+import java.util.List;
+
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeCreateRequest implements Serializable {
+public class PocDto implements Serializable {
     private String name;
     private String cpf;
+    private String email;
     private String phone;
-    private EmployeeType type;
+    private Boolean active;
     private Address address;
-    private UUID companyId;
-    @Builder.Default
-    private Boolean active = true;
+    private List<String> companyIds;
 }

@@ -2,10 +2,13 @@ package br.com.petshop.system.company.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.model.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,6 +21,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
@@ -32,44 +37,25 @@ import java.util.UUID;
 @Entity
 @Table(name = "sys_company")
 public class CompanyEntity extends AuditorBaseEntity implements Serializable {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    @Column(name = "company_id")
-//    protected UUID companyId;
     private String name;
     @Column(unique = true)
     private String cnpj;
     private String phone;
     private Boolean active;
 
-    @Column(name = "address_postal_code")
-    private String addressPostalCode;
-    @Column(name = "address_street")
-    private String addressStreet;
-    @Column(name = "address_number")
-    private String addressNumber;
-    @Column(name = "address_neighborhood")
-    private String addressNeighborhood;
-    @Column(name = "address_city")
-    private String addressCity;
-    @Column(name = "address_state")
-    private String addressState;
-    @Column(name = "address_country")
-    private String addressCountry;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    private Address address;
 
-    @Column(name = "address_lat")
-    private Double addressLat;
-    @Column(name = "address_lon")
-    private Double addressLon;
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point geom;
-    private Double distance;
 
-
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "companyEmployees", cascade = CascadeType.ALL)
-    Set<EmployeeEntity> employees;
+//
+//
+//    @JsonIgnore
+//    @ManyToMany(mappedBy = "companyEmployees", cascade = CascadeType.ALL)
+//    Set<EmployeeEntity> employees;
 
     //    @ManyToMany(cascade= CascadeType.ALL)
 //    @JoinTable(

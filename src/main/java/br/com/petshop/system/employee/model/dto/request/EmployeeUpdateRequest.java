@@ -1,6 +1,7 @@
 package br.com.petshop.system.employee.model.dto.request;
 
 import br.com.petshop.system.employee.model.enums.EmployeeType;
+import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,15 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeUpdateRequest implements Serializable {
-    private EmployeeType type;
     private String name;
     private String phone;
-
-    private String addressPostalCode;
-    private String addressStreet;
-    private String addressNumber;
-    private String addressNeighborhood;
-    private String addressCity;
-    private String addressState;
-    private String addressCountry;
+    private EmployeeType type;
+    private Address address;
 }

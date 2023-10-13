@@ -3,7 +3,9 @@ package br.com.petshop.system.employee.controller;
 import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
+import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.employee.service.EmployeeService;
+import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -11,6 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,14 +35,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/sys/employees")
-@Tag(name = "SYS - Employee Services")
+@Tag(name = "SYS - Employees Services")
 public class EmployeeController {
 
     @Autowired private EmployeeService employeeService;
 
-    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
+    //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
     @Operation(summary = "Serviço de inclusão da funcionário no sistema.",
-    description = "Acesso: admin, owner e manager")
+    description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -67,19 +73,18 @@ public class EmployeeController {
         return employeeService.create(authentication, request);
     }
 
-    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
-    @Operation(summary = "Serviço de atualização de qualquer funcionário no sistema.",
-            description = "Acesso: admin, owner e manager")
+    @Operation(summary = "Serviço de ativação do cadastro da empresa no sistema.",
+            description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadastro do funcionário não encontrado.",
+                    responseCode = "404",
+                    description = "Cadasteo da empresa não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -89,85 +94,23 @@ public class EmployeeController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "\"detail\": \"Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @PutMapping("/{employeeId}")
+    @PatchMapping(path = "/{companyId}", consumes = "application/json-patch+json")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public EmployeeResponse updateById(
-            Principal authentication,
-            @PathVariable("employeeId") UUID employeeId,
-            @RequestBody EmployeeUpdateRequest request) {
-        return employeeService.updateById(authentication, employeeId, request);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public EmployeeResponse partialUpdate(
+            @PathVariable("companyId") UUID companyId,
+            @RequestBody JsonPatch patch) {
+        return employeeService.partialUpdate(companyId, patch);
     }
 
-    //ACESSO: TODOS OS USERS
-    @Operation(summary = "Serviço de atualização dos dados do funcionário logado no sistema.",
-            description = "Acesso: todos os usuários")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PutMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public EmployeeResponse update(
-            Principal authentication,
-            @RequestBody EmployeeUpdateRequest request) {
-        return employeeService.update(authentication, request);
-    }
-
-    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
-
+    //ACESSO: ALL (COM FILTROS)
     @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema.",
-            description = "Acesso: admin, owner e manager")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadastro do funcionário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping("/{employeeId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public EmployeeResponse getById(
-            Principal authentication,
-            @PathVariable("employeeId") UUID employeeId) {
-        return employeeService.getById(authentication, employeeId);
-    }
-
-    //ACESSO: TODOS OS USUARIOS
-    @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema.",
-            description = "Acesso: todos os usuários")
+            description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -194,23 +137,31 @@ public class EmployeeController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public EmployeeResponse get(
-            Principal authentication) {
-        return employeeService.get(authentication);
+    public Page<EmployeeResponse> get(
+            Principal authentication,
+            @RequestParam(required = false) String companyId,
+            @RequestParam(required = false) String cpf,
+            @RequestParam(required = false) EmployeeType type,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return employeeService.get(authentication, pageable, companyId, cpf, type, active);
     }
 
-    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
-    @Operation(summary = "Serviço de desativação do cadastro do funcionário no sistema.")
+    //ACESSO: ALL
+    @Operation(summary = "Serviço de atualização de qualquer funcionário no sistema.",
+            description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
-                    description = "Cadasteo do funcionário não encontrado.",
+                    description = "Cadastro do funcionário não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
+                            "    \"detail\": \"Funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -220,55 +171,93 @@ public class EmployeeController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao desativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
+                            "\"detail\": \"Erro ao atualizar dados do funcionário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @PatchMapping("/{employeeId}/deactivate")
+    @PutMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public void deactivate(
-            @PathVariable("employeeId") UUID employeeId) {
-        employeeService.deactivate(employeeId);
+    public EmployeeResponse updateById(
+            Principal authentication,
+            @PathVariable("employeeId") UUID employeeId,
+            @RequestBody EmployeeUpdateRequest request) {
+        return employeeService.updateById(authentication, employeeId, request);
     }
 
-    //SOMENTE 'ADMIN', 'OWNER', 'MANAGER'
-    @Operation(summary = "Serviço de ativação do cadastro do funcionário no sistema.")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadasteo do funcionário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao ativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PatchMapping("/{employeeId}/activate")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public void activate(
-            @PathVariable("employeeId") UUID employeeId) {
-        employeeService.activate(employeeId);
-    }
+    //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
+//    @Operation(summary = "Serviço de desativação do cadastro do funcionário no sistema.",
+//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Cadasteo do funcionário não encontrado.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "    \"type\": \"about:blank\",\n" +
+//                            "    \"title\": \"Not Found\",\n" +
+//                            "    \"status\": 404,\n" +
+//                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
+//                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
+//                            "}\n" +
+//                            "\n")})}),
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Erro no sistema.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "\"type\": \"about:blank\",\n" +
+//                            "\"title\": \"Bad Request\",\n" +
+//                            "\"status\": 400,\n" +
+//                            "\"detail\": \"Erro ao desativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
+//                            "\"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
+//                            "}\n" +
+//                            "\n")})})
+//    })
+//    @PatchMapping("/{employeeId}/deactivate")
+//    @ResponseStatus(HttpStatus.OK)
+//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+//    public void deactivate(
+//            @PathVariable("employeeId") UUID employeeId) {
+//        employeeService.deactivate(employeeId);
+//    }
 
-    //SOMENTE 'ADMIN'
-    @Operation(summary = "Serviço de exclusão do cadastro do funcionário no sistema.")
+    //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
+//    @Operation(summary = "Serviço de ativação do cadastro do funcionário no sistema.",
+//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Cadasteo do funcionário não encontrado.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "    \"type\": \"about:blank\",\n" +
+//                            "    \"title\": \"Not Found\",\n" +
+//                            "    \"status\": 404,\n" +
+//                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
+//                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
+//                            "}\n" +
+//                            "\n")})}),
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Erro no sistema.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "\"type\": \"about:blank\",\n" +
+//                            "\"title\": \"Bad Request\",\n" +
+//                            "\"status\": 400,\n" +
+//                            "\"detail\": \"Erro ao ativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
+//                            "\"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
+//                            "}\n" +
+//                            "\n")})})
+//    })
+//    @PatchMapping("/{employeeId}/activate")
+//    @ResponseStatus(HttpStatus.OK)
+//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+//    public void activate(
+//            @PathVariable("employeeId") UUID employeeId) {
+//        employeeService.activate(employeeId);
+//    }
+
+    //ACESSO: 'ADMIN'
+    @Operation(summary = "Serviço de exclusão do cadastro do funcionário no sistema.",
+            description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -296,7 +285,7 @@ public class EmployeeController {
     @DeleteMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void delete(
+    public void delete (
             @PathVariable("employeeId") UUID employeeId) {
         employeeService.delete(employeeId);
     }

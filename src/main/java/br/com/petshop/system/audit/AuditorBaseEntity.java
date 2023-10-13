@@ -1,6 +1,7 @@
 package br.com.petshop.system.audit;
 
 import br.com.petshop.system.user.model.entity.SysUserEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -43,10 +44,12 @@ public abstract class AuditorBaseEntity implements Serializable {
     @CreatedBy
     @JoinColumn(name = "created_by", nullable = true, insertable = true, updatable = false)
     @ManyToOne
+    @JsonIgnore
     protected SysUserEntity createdBy;
 
     @LastModifiedBy
     @JoinColumn(name = "updated_by", nullable = true, insertable = true, updatable = false)
     @ManyToOne
+    @JsonIgnore
     protected SysUserEntity updatedBy;
 }

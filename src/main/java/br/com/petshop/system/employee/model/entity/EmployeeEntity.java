@@ -2,7 +2,10 @@ package br.com.petshop.system.employee.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
+import br.com.petshop.system.employee.model.enums.EmployeeType;
+import br.com.petshop.system.model.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,10 +23,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,11 +41,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "sys_employee")
 public class EmployeeEntity extends AuditorBaseEntity implements Serializable {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    @Column(name = "employee_id")
-//    protected UUID employeeId;
-    private String type;
     private String name;
     @Column(unique = true)
     private String cpf;
@@ -48,35 +49,28 @@ public class EmployeeEntity extends AuditorBaseEntity implements Serializable {
     private String phone;
     private Boolean active;
 
-    @Column(name = "address_postal_code")
-    private String addressPostalCode;
-    @Column(name = "address_street")
-    private String addressStreet;
-    @Column(name = "address_number")
-    private String addressNumber;
-    @Column(name = "address_neighborhood")
-    private String addressNeighborhood;
-    @Column(name = "address_city")
-    private String addressCity;
-    @Column(name = "address_state")
-    private String addressState;
-    @Column(name = "address_country")
-    private String addressCountry;
-    @Column(name = "address_lat")
-    private String addressLat;
-    @Column(name = "address_lon")
-    private String addressLon;
+    private EmployeeType type;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    private Address address;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    List<String> companyIds;
 
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "company_id", nullable = false)
 //    @OnDelete(action = OnDeleteAction.CASCADE)
 //    @JsonIgnore
 //    private CompanyEntity company;
-
-    @ManyToMany(cascade= CascadeType.ALL)
-    @JoinTable(
-            name = "sys_company_employee",
-            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"))
-    Set<CompanyEntity> companyEmployees;
+//
+//    @ManyToMany(cascade= CascadeType.ALL)
+//    @JoinTable(
+//            name = "sys_company_employee",
+//            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"))
+//    Set<CompanyEntity> companyEmployees;
 }

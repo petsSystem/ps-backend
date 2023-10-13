@@ -1,5 +1,6 @@
 package br.com.petshop.system.company.model.dto.response;
 
+import br.com.petshop.system.model.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,33 +24,21 @@ public class CompanySummaryResponse implements Serializable {
     private Double distance;
 
     @JsonIgnore
-    private String addressPostalCode;
-    @JsonIgnore
-    private String addressStreet;
-    @JsonIgnore
-    private String addressNumber;
-    @JsonIgnore
-    private String addressNeighborhood;
-    @JsonIgnore
-    private String addressCity;
-    @JsonIgnore
-    private String addressState;
-    @JsonIgnore
-    private String addressCountry;
+    private Address address;
 
     public String getFormattedAddress() {
-        return this.addressStreet
+        return this.address.getStreet()
                 .concat(", ")
-                .concat(this.addressNumber)
+                .concat(this.address.getNumber())
                 .concat(" - ")
-                .concat(this.addressNeighborhood)
+                .concat(this.address.getNeighborhood())
                 .concat(", ")
-                .concat(this.addressCity)
+                .concat(this.address.getCity())
                 .concat(" - ")
-                .concat(this.addressState)
+                .concat(this.address.getState())
                 .concat(", ")
-                .concat(this.addressPostalCode)
+                .concat(this.address.getPostalCode())
                 .concat(", ")
-                .concat(this.addressCountry);
+                .concat(this.address.getCountry());
     }
 }

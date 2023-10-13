@@ -1,6 +1,6 @@
 package br.com.petshop.system.employee.model.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,17 +21,7 @@ public class EmployeeResponse implements Serializable {
     private String name;
     private String cpf;
     private String phone;
-
-    private String addressPostalCode;
-    private String addressStreet;
-    private String addressNumber;
-    private String addressNeighborhood;
-    private String addressCity;
-    private String addressState;
-    private String addressCountry;
-
+    private Address address;
     private Boolean active;
     private LocalDateTime createdAt;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDateTime updatedAt;
 }

@@ -1,5 +1,6 @@
 package br.com.petshop.system.company.model.dto.request;
 
+import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,17 +18,7 @@ public class CompanyCreateRequest implements Serializable {
     private String name;
     private String cnpj;
     private String phone;
-
-    private String addressPostalCode;
-    private String addressStreet;
-    private String addressNumber;
-    private String addressNeighborhood;
-    private String addressCity;
-    private String addressState;
-    private String addressCountry;
-    private String addressLat;
-    private String addressLon;
-
+    private Address address;
     @Builder.Default
     private Boolean active = false;
 }

@@ -46,7 +46,7 @@ public class AppAddressService {
             AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
             AppAddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
             addressEntity.setAppUser(userEntity);
-            addressEntity.setGeom(geometry.getPoint(addressEntity.getLat(), addressEntity.getLon()));
+//            addressEntity.setGeom(geometry.getPoint(addressEntity.getLat(), addressEntity.getLon()));
 //            Set<AddressEntity> entities = userEntity.getAppUserAddresses();
 //            if (entities == null)
 //                entities = new HashSet<>();

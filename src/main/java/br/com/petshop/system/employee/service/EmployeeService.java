@@ -2,26 +2,40 @@ package br.com.petshop.system.employee.service;
 
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.company.model.dto.response.CompanyResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.service.CompanyService;
 import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.employee.model.entity.EmployeeSpecification;
 import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.employee.model.enums.Message;
 import br.com.petshop.system.employee.repository.EmployeeRepository;
+import br.com.petshop.system.user.model.entity.SysUserEntity;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -29,47 +43,106 @@ import java.util.stream.Collectors;
 public class EmployeeService {
     Logger log = LoggerFactory.getLogger(EmployeeService.class);
     @Autowired private EmployeeRepository employeeRepository;
+    @Autowired private EmployeeSpecification specification;
     @Autowired private EmployeeConverterService convert;
     @Autowired private CompanyService companyService;
+    @Autowired private ObjectMapper objectMapper;
 
     public EmployeeResponse create(Principal authentication, EmployeeCreateRequest request) {
         try {
             Optional<EmployeeEntity> entity = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
+
+            if (entity.isPresent())
+                throw new GenericAlreadyRegisteredException();
+
             CompanyEntity companyEntity = companyService.findByIdAndActiveIsTrue(request.getCompanyId());
+
             EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-
-            if (entity.isEmpty()) {
-                employeeEntity.setCompanyEmployees(Set.of(companyEntity));
-                employeeRepository.save(employeeEntity);
-
-            } else { //associar a nova empresa
-                if (request.getType() != EmployeeType.OWNER)
-                    throw new GenericAlreadyRegisteredException("Funcionário já cadastrado");
-
-                employeeEntity = entity.get();
-                List<CompanyEntity> companies = companyService.findByEmployeeId(employeeEntity.getId());
-
-                Optional<CompanyEntity> optionalCompany = companies.stream()
-                        .filter(c -> c.getId().equals(request.getCompanyId()))
-                        .findFirst();
-                if (optionalCompany.isEmpty()) {
-                    companies.add(companyEntity);
-                    employeeEntity.setCompanyEmployees(companies.stream().collect(Collectors.toSet()));
-                    employeeRepository.save(employeeEntity);
-                } else
-                    throw new GenericAlreadyRegisteredException("Company already registered for this employee");
-            }
+            employeeRepository.save(employeeEntity);
 
             return convert.entityIntoResponse(employeeEntity);
 
         } catch (GenericAlreadyRegisteredException ex) {
-            log.error("Error: " + ex.getMessage());
+            log.error(Message.EMPLOYEE_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex);
+                    HttpStatus.UNPROCESSABLE_ENTITY, Message.EMPLOYEE_ALREADY_REGISTERED.get(), ex);
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_ERROR_CREATE_COMPANY.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_ERROR_CREATE_COMPANY.get(), ex);
         } catch (Exception ex) {
             log.error(Message.EMPLOYEE_ERROR_CREATE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_CREATE.get(), ex);
+        }
+    }
+
+    public EmployeeResponse partialUpdate(UUID employeeId, JsonPatch patch) {
+        try {
+            EmployeeEntity entity = employeeRepository.findById(employeeId)
+                    .orElseThrow(GenericNotFoundException::new);
+
+            entity = applyPatch(patch, entity);
+            entity = employeeRepository.save(entity);
+
+            return  convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.EMPLOYEE_ERROR_PARTIAL.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_PARTIAL.get(), ex);
+        }
+    }
+
+    private EmployeeEntity applyPatch(JsonPatch patch, EmployeeEntity entity) throws JsonPatchException, JsonProcessingException {
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        return objectMapper.treeToValue(patched, EmployeeEntity.class);
+    }
+
+    public  Page<EmployeeResponse> get(Principal authentication, Pageable pageable, String companyId,
+                                       String cpf, EmployeeType type, Boolean active) {
+        try {
+            Page<EmployeeEntity> entities;
+            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
+                    authentication).getPrincipal());
+
+            Specification<EmployeeEntity> filters = Specification
+                    .where(StringUtils.isBlank(cpf) ? null : specification.cpf(cpf))
+                    .and(type == null ? null : specification.type(type))
+                    .and(active == null ? null : specification.active(active));
+//                    .and(CollectionUtils.isEmpty(cities) ? null : inCity(cities));
+
+            entities = employeeRepository.findAll(filters, pageable);
+
+            List<EmployeeResponse> response = entities.stream()
+                    .map(c -> convert.entityIntoResponse(c))
+                    .collect(Collectors.toList());
+
+            return new PageImpl<>(response);
+
+//            if (systemUser.getRole() == Role.ADMIN)
+//                entities = companyRepository.findAll();
+//            else  if (systemUser.getRole() == Role.OWNER)
+//                entities = findByEmployeeId(systemUser.getEmployee().getId());
+//            else  if (systemUser.getRole() == Role.ADMIN)
+//                entities = findByEmployeeId(systemUser.getEmployee().getId());
+
+//            return entities.stream()
+//                    .map(c -> convert.entityIntoResponse(c))
+//                    .collect(Collectors.toList());
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
         }
     }
 
@@ -133,24 +206,7 @@ public class EmployeeService {
         }
     }
 
-    public EmployeeResponse get(Principal authentication) {
-        try {
-//            CompanyEntity entity = companyRepository.findByIdAndActiveIsTrue(companyId)
-//                    .orElseThrow(GenericNotFoundException::new);
-//
-//            return convert.entityIntoResponse(entity);
-            return null;
 
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
-        }
-    }
 
     public void deactivate(UUID employeeId) {
         try {
