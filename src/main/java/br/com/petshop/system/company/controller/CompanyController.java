@@ -8,6 +8,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -106,6 +107,13 @@ public class CompanyController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public CompanyResponse partialUpdate(
             @PathVariable("companyId") UUID companyId,
+            @Schema(example = "[\n" +
+                    "    {\n" +
+                    "        \"op\": \"replace\",\n" +
+                    "        \"path\": \"/active\",\n" +
+                    "        \"value\": \"true\"\n" +
+                    "    }\n" +
+                    "]")
             @RequestBody JsonPatch patch) {
         return companyService.partialUpdate(companyId, patch);
     }
