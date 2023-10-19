@@ -35,7 +35,7 @@ public class PetController {
     @Operation(summary = "Serviço de inclusão do Pet do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "422",
                     description = "Pet já cadastrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "\"type\": \"about:blank\",\n" +
@@ -67,7 +67,7 @@ public class PetController {
     @Operation(summary = "Serviço de atualização do cadastro do Pet do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "Cadastro do Pet não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
@@ -101,7 +101,7 @@ public class PetController {
     @Operation(summary = "Serviço de recuperação das informações cadastradas do Pet do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "Cadastro do Pet não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
@@ -133,7 +133,7 @@ public class PetController {
     @Operation(summary = "Serviço de recuperação das informações cadastradas do Pet do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "Cadastro do Pet não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
@@ -166,7 +166,7 @@ public class PetController {
     @Operation(summary = "Serviço de exclusão do cadastro do Pet do usuário no APP.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "Cadastro do Pet não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +

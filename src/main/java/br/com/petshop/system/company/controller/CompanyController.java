@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -80,17 +79,6 @@ public class CompanyController {
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadasteo da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -99,6 +87,17 @@ public class CompanyController {
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro da empresa não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -185,17 +184,6 @@ public class CompanyController {
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -204,6 +192,17 @@ public class CompanyController {
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao excluir empresa. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro da empresa não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
     })

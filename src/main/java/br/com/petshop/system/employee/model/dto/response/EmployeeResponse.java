@@ -1,5 +1,6 @@
 package br.com.petshop.system.employee.model.dto.response;
 
+import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -16,12 +19,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeResponse implements Serializable {
-    private String id;
-    private String type;
+    private UUID id;
+    private EmployeeType type;
     private String name;
     private String cpf;
     private String phone;
     private Address address;
     private Boolean active;
+    private List<UUID> companyIds;
     private LocalDateTime createdAt;
 }

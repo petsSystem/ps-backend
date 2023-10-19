@@ -40,5 +40,5 @@ public class PocController {
     public PocDto activate(@PathVariable UUID id, @RequestBody JsonPatch patch) {
         return pocService.patchMethod(id, patch);
     }
-    
+
 }

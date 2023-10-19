@@ -10,7 +10,6 @@ import br.com.petshop.system.company.model.dto.response.CompanyResponse;
 import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.repository.CompanyRepository;
-import br.com.petshop.system.employee.model.entity.EmployeeSpecification;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.utils.PetGeometry;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 public class CompanyService {
     Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired private CompanyRepository companyRepository;
-    @Autowired private EmployeeSpecification specification;
     @Autowired private CompanyConverterService convert;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private PetGeometry geometry;

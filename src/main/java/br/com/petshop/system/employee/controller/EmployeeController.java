@@ -1,6 +1,7 @@
 package br.com.petshop.system.employee.controller;
 
 import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
+import br.com.petshop.system.employee.model.dto.request.EmployeeFilterRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.enums.EmployeeType;
@@ -47,22 +48,33 @@ public class EmployeeController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
-                    description = "Funcionário já cadastrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Unprocessable Entity\",\n" +
-                            "\"status\": 422,\n" +
-                            "\"detail\": \"Funcionário já cadastrado no sistema.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees\"\n" +
-                            "}")})}),
-            @ApiResponse(
-                    responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao cadastrar funcionário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/employees\"\n" +
+                            "}")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Empresa / Loja não existe.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Empresa / Loja não existe.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Funcionário já cadastrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Unprocessable Entity\",\n" +
+                            "\"status\": 422,\n" +
+                            "\"detail\": \"Funcionário já cadastrado no sistema.\",\n" +
                             "\"instance\": \"/api/v1/system/employees\"\n" +
                             "}")})})
     })
@@ -74,20 +86,9 @@ public class EmployeeController {
         return employeeService.create(authentication, request);
     }
 
-    @Operation(summary = "Serviço de ativação do cadastro da empresa no sistema.",
+    @Operation(summary = "Serviço de atualização parcial de funcionário no sistema.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadasteo da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
             @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
@@ -95,16 +96,27 @@ public class EmployeeController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "\"detail\": \"Erro ao atualizar parcialmente os dados do funcionário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro de funcionário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @PatchMapping(path = "/{companyId}", consumes = "application/json-patch+json")
+    @PatchMapping(path = "/{employeeId}", consumes = "application/json-patch+json")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public EmployeeResponse partialUpdate(
-            @PathVariable("companyId") UUID companyId,
+            @PathVariable("employeeId") UUID employeeId,
             @Schema(example = "[\n" +
                     "    {\n" +
                     "        \"op\": \"replace\",\n" +
@@ -113,24 +125,13 @@ public class EmployeeController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return employeeService.partialUpdate(companyId, patch);
+        return employeeService.partialUpdate(employeeId, patch);
     }
 
     //ACESSO: ALL (COM FILTROS)
     @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadastro do funcionário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees\"\n" +
-                            "}\n" +
-                            "\n")})}),
             @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
@@ -141,38 +142,50 @@ public class EmployeeController {
                             "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/employees\"\n" +
                             "}\n" +
-                            "\n")})})
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Funcionário não pertence a empresa/loja informada.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso proibido.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Funcionário com mais de uma empresa associada. Necessário selecionar uma empresa/loja.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Unprocessable Entity\",\n" +
+                            "\"status\": 422,\n" +
+                            "\"detail\": \"Funcionário com mais de uma empresa associada. Necessário selecionar uma empresa/loja.\",\n" +
+                            "\"instance\": \"/api/v1/system/employees\"\n" +
+                            "}")})})
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public Page<EmployeeResponse> get(
             Principal authentication,
-            @RequestParam(required = false) String companyId,
+            @RequestParam(required = false) UUID employeeId,
+            @RequestParam(required = false) UUID companyId,
             @RequestParam(required = false) String cpf,
             @RequestParam(required = false) EmployeeType type,
             @RequestParam(required = false) Boolean active,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return employeeService.get(authentication, pageable, companyId, cpf, type, active);
+        EmployeeFilterRequest filter = new EmployeeFilterRequest(employeeId, companyId, cpf, type, active);
+        return employeeService.get(authentication, pageable, filter);
     }
 
     //ACESSO: ALL
     @Operation(summary = "Serviço de atualização de qualquer funcionário no sistema.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadastro do funcionário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
+@ApiResponse (
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -181,6 +194,17 @@ public class EmployeeController {
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar dados do funcionário. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro de funcionário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
