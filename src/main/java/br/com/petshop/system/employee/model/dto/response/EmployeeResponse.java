@@ -23,6 +23,7 @@ public class EmployeeResponse implements Serializable {
     private EmployeeType type;
     private String name;
     private String cpf;
+    private String email;
     private String phone;
     private Address address;
     private Boolean active;

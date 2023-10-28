@@ -1,12 +1,15 @@
 package br.com.petshop.system.user.model.dto.request;
 
 import br.com.petshop.authentication.model.enums.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -14,15 +17,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class SysUserCreateRequest implements Serializable {
     private String email;
-    private String password;
+    private UUID employeeId;
+    private UUID accessGroupId;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @Builder.Default
     private Boolean changePassword = false;
     @Builder.Default
-    private Role role = Role.USER;
-    @Builder.Default
     private Boolean active = true;
-    @Builder.Default
-    private Boolean emailValidated = false;
-//    @Builder.Default
-//    private LocalDateTime created = LocalDateTime.now();
 }

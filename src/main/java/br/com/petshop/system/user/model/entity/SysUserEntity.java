@@ -3,15 +3,13 @@ package br.com.petshop.system.user.model.entity;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.user.model.dto.response.SysUserResponse;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -35,6 +33,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "sys_user")
+//@JsonDeserialize(as = SysUserResponse.class)
 public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     @Column(unique = true)
     private String email;
@@ -44,17 +43,10 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     private Boolean active;
-    @Column(name = "email_validated")
-    private Boolean emailValidated;
     @Column(name = "email_token")
     private String emailToken;
     @Column(name = "email_token_time")
     private LocalDateTime emailTokenTime;
-//    private Boolean enabled;
-//    private String username;
-//    public Boolean accountNonExpired;
-//    public Boolean accountNonLocked;
-//    public Boolean credentialsNonExpired;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = true)

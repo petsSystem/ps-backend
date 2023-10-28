@@ -11,7 +11,7 @@ public class SysUserAsyncService {
     @Autowired private MailNotificationService mailNotificationService;
 
     @Async
-    public void forget(SysUserEntity userEntity, String newPassword) {
+    public void sendNewPassword(SysUserEntity userEntity, String newPassword) {
 
         String subject = "Nova senha - Pet System";
         String body = "Sua nova senha é: " + newPassword;

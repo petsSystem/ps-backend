@@ -19,6 +19,7 @@ public class EmployeeFilterRequest implements Serializable {
     private UUID employeeId;
     private UUID companyId;
     private String cpf;
+    private String email;
     private EmployeeType type;
     private Boolean active;
 }

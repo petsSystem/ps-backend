@@ -17,6 +17,7 @@ public class EmployeeSpecification {
         Specification<EmployeeEntity> filters = Specification
                 .where(filter.getEmployeeId() == null ? null : employeeIdEqual(filter.getEmployeeId()))
                 .and(StringUtils.isBlank(filter.getCpf()) ? null : cpfEqual(filter.getCpf()))
+                .and(StringUtils.isBlank(filter.getEmail()) ? null : emailEqual(filter.getEmail()))
                 .and(filter.getType() == null ? null : typeEqual(filter.getType()))
                 .and(filter.getActive() == null ? null : activeEqual(filter.getActive()))
                 .and(filter.getCompanyId() == null ? null : companyIdInList(filter.getCompanyId()));
@@ -33,6 +34,12 @@ public class EmployeeSpecification {
     public static Specification<EmployeeEntity> cpfEqual(String cpf) {
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.equal(root.get("cpf"), cpf);
+        };
+    }
+
+    public static Specification<EmployeeEntity> emailEqual(String email) {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get("email"), email);
         };
     }
 

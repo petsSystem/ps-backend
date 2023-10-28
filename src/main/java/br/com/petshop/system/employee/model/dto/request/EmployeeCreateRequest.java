@@ -19,6 +19,7 @@ import java.util.UUID;
 public class EmployeeCreateRequest implements Serializable {
     private String name;
     private String cpf;
+    private String email;
     private String phone;
     private EmployeeType type;
     private Address address;

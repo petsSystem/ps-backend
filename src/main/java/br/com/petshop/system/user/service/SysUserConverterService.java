@@ -18,16 +18,15 @@ public class SysUserConverterService {
     public SysUserEntity createRequestIntoEntity(SysUserCreateRequest request) {
         return mapper.map(request, SysUserEntity.class);
     }
-    public SysUserResponse entityIntoResponse(SysUserEntity entity) {
-        SysUserResponse response = mapper.map(entity, SysUserResponse.class);
-        response.setToken(null);
-        return response;
-
-    }
     public SysUserEntity updateRequestIntoEntity(SysUserUpdateRequest request, SysUserEntity entity) {
         SysUserEntity newEntity = mapper.map(request, SysUserEntity.class);
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(newEntity, entity);
         return entity;
+    }
+    public SysUserResponse entityIntoResponse(SysUserEntity entity) {
+        SysUserResponse response = mapper.map(entity, SysUserResponse.class);
+        return response;
+
     }
 }

@@ -11,14 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-//@CrossOrigin(maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/sys/auth")
 @Tag(name = "SYS - Authentication Services")
@@ -27,17 +25,6 @@ public class SysAuthenticationController {
 
     @Operation(summary = "Serviço que efetua login no sistema Pet System.")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Usuário ou senha estão incorretos.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Unauthorized\",\n" +
-                            "\"status\": 401,\n" +
-                            "\"detail\": \"Usuário ou senha estão incorretos.\",\n" +
-                            "\"instance\": \"/api/v1/web/token/auth\"\n" +
-                            "}\n" +
-                            "\n")})}),
             @ApiResponse(
                     responseCode = "400",
                     description = "Erro no sistema.",
@@ -49,6 +36,17 @@ public class SysAuthenticationController {
                             "\"instance\": \"/api/v1/web/token/auth\"\n" +
                             "}\n" +
                             "\n")})}),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Usuário ou senha estão incorretos.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Unauthorized\",\n" +
+                            "\"status\": 401,\n" +
+                            "\"detail\": \"Usuário ou senha estão incorretos.\",\n" +
+                            "\"instance\": \"/api/v1/web/token/auth\"\n" +
+                            "}\n" +
+                            "\n")})})
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)

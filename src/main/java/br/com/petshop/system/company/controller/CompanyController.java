@@ -52,7 +52,7 @@ public class CompanyController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao cadastrar empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies\"\n" +
+                            "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -63,7 +63,7 @@ public class CompanyController {
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
                             "\"detail\": \"Empresa já cadastrada no sistema.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies\"\n" +
+                            "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})}),
     })
@@ -86,7 +86,7 @@ public class CompanyController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -97,7 +97,7 @@ public class CompanyController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -129,7 +129,7 @@ public class CompanyController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies\"\n" +
+                            "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -143,9 +143,9 @@ public class CompanyController {
         return companyService.get(authentication, paging);
     }
 
-    //ACESSO: ADMIN, OWNER, MANAGER
-    @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
-            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+    //ACESSO: ALL
+    @Operation(summary = "Serviço de recuperação das informações da empresa pelo id.",
+            description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -154,8 +154,19 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -166,17 +177,52 @@ public class CompanyController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/{companyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CompanyResponse getById (
+            Principal authentication,
+            @PathVariable("companyId") UUID companyId) {
+        return companyService.getById(authentication, companyId);
+    }
+
+    //ACESSO: ADMIN, OWNER, MANAGER
+    @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
+            description = "Acesso: 'ALL'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro da empresa não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
     @PutMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN','OWNER', 'MANAGER')")
     public CompanyResponse updateById(
+            Principal authentication,
             @PathVariable("companyId") UUID companyId,
             @RequestBody CompanyUpdateRequest request) {
-        return companyService.updateById(companyId, request);
+        return companyService.updateById(authentication, companyId, request);
     }
 
     //ACESSO: ADMIN
@@ -191,7 +237,7 @@ public class CompanyController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao excluir empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -202,7 +248,7 @@ public class CompanyController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/{companiesId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
     })

@@ -168,10 +168,15 @@ public class EmployeeService {
 
             if (systemUser.getRole() != Role.ADMIN) {
                 List<UUID> companyIds = systemUser.getEmployee().getCompanyIds();
+                Boolean contains = false;
                 for (UUID companyId : companyIds) {
-                    if (entity.getCompanyIds().contains(companyId))
-                        throw new GenericForbiddenException();
+                    if (entity.getCompanyIds().contains(companyId)) {
+                        contains = true;
+                        break;
+                    }
                 }
+                if (!contains)
+                    throw new GenericForbiddenException();
             }
 
             entity = convert.updateRequestIntoEntity(request, entity);
@@ -194,83 +199,6 @@ public class EmployeeService {
         }
     }
 
-    public EmployeeResponse update(Principal authentication, EmployeeUpdateRequest request) {
-        try {
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(null)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            entity = convert.updateRequestIntoEntity(request, entity);
-            entity = employeeRepository.save(entity);
-
-            return convert.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_UPDATE.get(), ex);
-        }
-    }
-
-    public EmployeeResponse getById(Principal authentication, UUID employeeId) {
-        try {
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            return convert.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
-        }
-    }
-
-
-
-    public void deactivate(UUID employeeId) {
-        try {
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-            entity.setActive(false);
-            employeeRepository.save(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_DEACTIVATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_DEACTIVATE.get(), ex);
-        }
-    }
-
-    public void activate(UUID employeeId) {
-        try {
-            EmployeeEntity entity = employeeRepository.findById(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-            entity.setActive(true);
-            employeeRepository.save(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_ACTIVATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_ACTIVATE.get(), ex);
-        }
-    }
-
     public void delete(UUID employeeId) {
         try {
             EmployeeEntity entity = employeeRepository.findById(employeeId)
@@ -280,11 +208,18 @@ public class EmployeeService {
         } catch (GenericNotFoundException ex) {
             log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
             log.error(Message.EMPLOYEE_ERROR_DELETE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_DELETE.get(), ex);
         }
+    }
+
+    public EmployeeEntity findByIdAndActive(UUID employeeId) {
+        Optional<EmployeeEntity> entity = employeeRepository.findByIdAndActiveIsTrue(employeeId);
+        if (entity.isEmpty())
+            throw new GenericNotFoundException();
+        return entity.get();
     }
 }

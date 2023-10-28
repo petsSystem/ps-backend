@@ -44,7 +44,7 @@ public class EmployeeController {
 
     //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
     @Operation(summary = "Serviço de inclusão da funcionário no sistema.",
-    description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -97,7 +97,7 @@ public class EmployeeController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar parcialmente os dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -108,7 +108,7 @@ public class EmployeeController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -140,7 +140,7 @@ public class EmployeeController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees\"\n" +
+                            "\"instance\": \"/api/v1/sys/employees\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -151,7 +151,7 @@ public class EmployeeController {
                             "    \"title\": \"Forbidden\",\n" +
                             "    \"status\": 403,\n" +
                             "    \"detail\": \"Acesso proibido.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees\"\n" +
+                            "    \"instance\": \"/api/v1/sys/employees\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -162,7 +162,7 @@ public class EmployeeController {
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
                             "\"detail\": \"Funcionário com mais de uma empresa associada. Necessário selecionar uma empresa/loja.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees\"\n" +
+                            "\"instance\": \"/api/v1/sys/employees\"\n" +
                             "}")})})
     })
     @GetMapping()
@@ -172,12 +172,13 @@ public class EmployeeController {
             @RequestParam(required = false) UUID employeeId,
             @RequestParam(required = false) UUID companyId,
             @RequestParam(required = false) String cpf,
+            @RequestParam(required = false) String email,
             @RequestParam(required = false) EmployeeType type,
             @RequestParam(required = false) Boolean active,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        EmployeeFilterRequest filter = new EmployeeFilterRequest(employeeId, companyId, cpf, type, active);
+        EmployeeFilterRequest filter = new EmployeeFilterRequest(employeeId, companyId, cpf, email, type, active);
         return employeeService.get(authentication, pageable, filter);
     }
 
@@ -185,7 +186,7 @@ public class EmployeeController {
     @Operation(summary = "Serviço de atualização de qualquer funcionário no sistema.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
-@ApiResponse (
+            @ApiResponse (
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -193,7 +194,18 @@ public class EmployeeController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Usuário não tem permissão para alterar dados de funcionário.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso proibido.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -204,7 +216,7 @@ public class EmployeeController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -216,76 +228,6 @@ public class EmployeeController {
             @RequestBody EmployeeUpdateRequest request) {
         return employeeService.updateById(authentication, employeeId, request);
     }
-
-    //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
-//    @Operation(summary = "Serviço de desativação do cadastro do funcionário no sistema.",
-//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Cadasteo do funcionário não encontrado.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "    \"type\": \"about:blank\",\n" +
-//                            "    \"title\": \"Not Found\",\n" +
-//                            "    \"status\": 404,\n" +
-//                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-//                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao desativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/system/employees/{employeeId}/deactivate\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @PatchMapping("/{employeeId}/deactivate")
-//    @ResponseStatus(HttpStatus.OK)
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-//    public void deactivate(
-//            @PathVariable("employeeId") UUID employeeId) {
-//        employeeService.deactivate(employeeId);
-//    }
-
-    //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
-//    @Operation(summary = "Serviço de ativação do cadastro do funcionário no sistema.",
-//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Cadasteo do funcionário não encontrado.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "    \"type\": \"about:blank\",\n" +
-//                            "    \"title\": \"Not Found\",\n" +
-//                            "    \"status\": 404,\n" +
-//                            "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-//                            "    \"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao ativar dados do funcionário no sistema. Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/system/employees/{employeeId}/activate\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @PatchMapping("/{employeeId}/activate")
-//    @ResponseStatus(HttpStatus.OK)
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-//    public void activate(
-//            @PathVariable("employeeId") UUID employeeId) {
-//        employeeService.activate(employeeId);
-//    }
 
     //ACESSO: 'ADMIN'
     @Operation(summary = "Serviço de exclusão do cadastro do funcionário no sistema.",
@@ -299,7 +241,7 @@ public class EmployeeController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Cadastro do funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -310,7 +252,7 @@ public class EmployeeController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao excluir dados do funcionário do sistema. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/system/employees/{employeeId}\"\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })

@@ -1,8 +1,8 @@
 package br.com.petshop.configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.n52.jackson.datatype.jts.JtsModule;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +20,8 @@ public class ObjectMapperConfiguration {
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new JtsModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         return mapper;
     }
 }
