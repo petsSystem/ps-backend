@@ -169,7 +169,6 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     public Page<EmployeeResponse> get(
             Principal authentication,
-            @RequestParam(required = false) UUID employeeId,
             @RequestParam(required = false) UUID companyId,
             @RequestParam(required = false) String cpf,
             @RequestParam(required = false) String email,
@@ -178,8 +177,54 @@ public class EmployeeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        EmployeeFilterRequest filter = new EmployeeFilterRequest(employeeId, companyId, cpf, email, type, active);
+        EmployeeFilterRequest filter = new EmployeeFilterRequest(companyId, cpf, email, type, active);
         return employeeService.get(authentication, pageable, filter);
+    }
+
+    //ACESSO: ALL
+    @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema através do id.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Funcionário não pertence a mesma empresa/loja do usuário logado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso proibido.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro de funcionário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/{employeeId}")
+    @ResponseStatus(HttpStatus.OK)
+    public EmployeeResponse getById(
+            Principal authentication,
+            @PathVariable("employeeId") UUID employeeId) {
+        return employeeService.getById(authentication, employeeId);
     }
 
     //ACESSO: ALL

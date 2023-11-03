@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -16,7 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeFilterRequest implements Serializable {
-    private UUID employeeId;
     private UUID companyId;
     private String cpf;
     private String email;

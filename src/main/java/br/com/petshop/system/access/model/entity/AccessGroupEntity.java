@@ -1,20 +1,20 @@
 package br.com.petshop.system.access.model.entity;
 
-import br.com.petshop.system.access.model.pojo.Access;
+import br.com.petshop.system.access.model.dto.Functionality;
+import br.com.petshop.system.audit.AuditorBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
@@ -23,18 +23,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "sys_access_group")
-public class AccessGroupEntity implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "access_group_id")
-    private String id;
+public class AccessGroupEntity extends AuditorBaseEntity implements Serializable {
     private String name;
-    //    @Type(type = "jsonb")
-    @Column(name = "access_group_functionalities", columnDefinition = "jsonb")
-    private Access accesses;
-    @Column(name = "access_group_created")
-    private LocalDateTime created;
-
-    @Column(name = "access_group_updated")
-    private LocalDateTime updated;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<Functionality> accesses;
 }

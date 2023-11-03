@@ -4,7 +4,6 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.service.EmployeeService;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
@@ -14,6 +13,7 @@ import br.com.petshop.system.user.model.dto.response.SysUserResponse;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.system.user.model.enums.Message;
 import br.com.petshop.system.user.repository.SysUserRepository;
+import br.com.petshop.system.user.repository.SysUserSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SysUserService {
@@ -46,6 +49,7 @@ public class SysUserService {
     @Autowired private SysUserAsyncService asyncService;
     @Autowired private EmployeeService employeeService;
     @Autowired private ObjectMapper objectMapper;
+    @Autowired private SysUserSpecification specification;
 
     public SysUserResponse create (Principal authentication, SysUserCreateRequest request) {
         try {
@@ -169,17 +173,17 @@ public class SysUserService {
         if (systemUser.getRole() != Role.ADMIN) { //admin pode fazer qq coisa
 
             if (userId != systemUser.getId())
-                throw new GenericForbiddenException("Acesso negado.");
+                throw new GenericForbiddenException();
 
             String op = jsonPatchList.get(i).get("op").toString();
             String path = jsonPatchList.get(i).get("path").toString();
 
             if (!op.equalsIgnoreCase("add") ||
                     !op.equalsIgnoreCase("replace"))
-                throw new GenericForbiddenException("Acesso negado.");
+                throw new GenericForbiddenException();
 
             if (!path.equalsIgnoreCase("password"))
-                throw new GenericForbiddenException("Acesso negado.");
+                throw new GenericForbiddenException();
         }
     }
 
@@ -188,135 +192,94 @@ public class SysUserService {
         return objectMapper.treeToValue(patched, SysUserEntity.class);
     }
 
-    public Page<EmployeeResponse> get(Principal authentication, Pageable pageable, SysUserFilterRequest filter) {
-        return null;
+    public Page<SysUserResponse> get(Principal authentication, Pageable pageable, SysUserFilterRequest filter) {
+        try {
+            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
+                    authentication).getPrincipal());
+
+            if (systemUser.getRole() == Role.USER)
+                filter.setEmail(systemUser.getEmail());
+            else if (systemUser.getRole() == Role.OWNER || systemUser.getRole() == Role.MANAGER)
+                filter.setCompanyIds(systemUser.getEmployee().getCompanyIds());
+
+            return get(pageable, filter);
+
+       } catch (Exception ex) {
+            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
+        }
+    }
+
+    private  Page<SysUserResponse> get(Pageable pageable, SysUserFilterRequest filter) {
+        Specification<SysUserEntity> filters = specification.filter(filter);
+
+        Page<SysUserEntity> entities = systemUserRepository.findAll(filters, pageable);
+
+        List<SysUserResponse> response = entities.stream()
+                .map(c -> convert.entityIntoResponse(c))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(response);
+    }
+
+    public SysUserResponse getById(Principal authentication, UUID userId) {
+        try {
+            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
+                    authentication).getPrincipal());
+
+            if (systemUser.getRole() == Role.ADMIN) {
+                SysUserEntity entity = systemUserRepository.findById(userId).orElseThrow(GenericNotFoundException::new);
+                return convert.entityIntoResponse(entity);
+            }
+
+            SysUserEntity entity = systemUserRepository.findByIdAndActiveIsTrue(userId)
+                    .orElseThrow(GenericNotFoundException::new);
+
+            validateUserAccess(systemUser, entity);
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.USER_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.USER_ERROR_FORBIDDEN.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
+        }
+    }
+
+    private void validateUserAccess(SysUserEntity systemUser, SysUserEntity entity) {
+
+        //FAZER FOR PARA VERIFICAR LIST DE LIST SE CONTAINS
+
+
+        if (systemUser.getRole() != Role.ADMIN) {
+            if (!systemUser.getEmployee().getCompanyIds().contains(entity.getEmployee().getCompanyIds().get(0)))
+                throw new GenericForbiddenException();
+        }
     }
 
     public void delete(UUID userId) {
+        try {
+            SysUserEntity entity = systemUserRepository.findById(userId)
+                    .orElseThrow(GenericNotFoundException::new);
+            systemUserRepository.delete(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_ERROR_DELETE.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_DELETE.get(), ex);
+        }
     }
-
-
-//    private void sendEmailToken (SysUserEntity userEntity) {
-//        userEntity.setEmailToken(generateEmailTokenValidate());
-//        userEntity.setEmailTokenTime(LocalDateTime.now());
-//
-//        asyncService.emailValidate(userEntity);
-//
-//        save(userEntity);
-//    }
-//
-//    private String generateEmailTokenValidate () {
-//        int number = (int) (1000 + Math.random() * (9999 - 1000 + 1));
-//        return String.valueOf(number);
-//    }
-//
-//    public SysUserResponse emailValidate (Principal authentication, SysEmailValidateRequest request) {
-//        try {
-//            SysUserEntity userEntity = findByEmail(authentication.getName());
-//            if (request.emailToken().equalsIgnoreCase(userEntity.getEmailToken()) &&
-//                    !emailTokenExpired(userEntity.getEmailTokenTime())) {
-//                userEntity.setEmailValidated(true);
-//
-//                save(userEntity);
-//
-//                return convert.entityIntoResponse(userEntity);
-//            } else
-//                throw new EmailTokenException("Token inválido.");
-//
-//        } catch (EmailTokenException ex) {
-//            log.error("Token exception: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.UNAUTHORIZED, ex.getMessage(), ex);
-//        } catch (Exception ex) {
-//            log.error("Bad Request: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Erro ao validar email. Tente novamente mais tarde.", ex);
-//        }
-//    }
-//
-//    private Boolean emailTokenExpired (LocalDateTime emailTokenTime) {
-//        if (LocalDateTime.now().isAfter(emailTokenTime.plusMinutes(1)))
-//            throw new EmailTokenException("Token expirado. Solicite novo token.");
-//        return false;
-//    }
-//
-//    public SysUserResponse emailValidateResend (Principal authentication) {
-//        try {
-//            SysUserEntity userEntity = findByEmail(authentication.getName());
-//
-//            sendEmailToken(userEntity);
-//
-//            return convert.entityIntoResponse(userEntity);
-//
-//        } catch (Exception ex) {
-//            log.error("Bad Request: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Erro ao reenviar email de validação. Tente novamente mais tarde.", ex);
-//        }
-//    }
-//
-//
-//
-//
-//
-//    public void changePassword (Principal authentication, SysChangePasswordRequest request) {
-//        try {
-//            SysUserEntity userEntity = findByEmail(authentication.getName());
-//            userEntity.setPassword(passwordEncoder.encode(request.password()));
-//            userEntity.setChangePassword(false);
-//            save(userEntity);
-//        } catch (Exception ex) {
-//            log.error("Bad Request: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Erro ao trocar senha. Tente novamente mais tarde.", ex);
-//        }
-//    }
-//    public SysUserResponse update (Principal authentication, SysUserUpdateRequest request) {
-//        try {
-//            SysUserEntity userEntity = findByEmail(authentication.getName());
-//            SysUserEntity newEntity = convert.updateRequestIntoEntity(request, userEntity);
-//            if (request.getPassword() != null)
-//                newEntity.setPassword(passwordEncoder.encode(request.getPassword()));
-//            save(newEntity);
-//            return convert.entityIntoResponse(newEntity);
-//        } catch (Exception ex) {
-//            log.error("Bad Request: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Erro ao atualizar dados do usuário. Tente novamente mais tarde.", ex);
-//        }
-//    }
-//
-//
-//
-//    public SysUserResponse getByEmail (Principal authentication) {
-//        try {
-//            SysUserEntity userEntity = findByEmail(authentication.getName());
-//            if (!userEntity.getEmailValidated())
-//                sendEmailToken(userEntity);
-//
-//            SysUserResponse response = convert.entityIntoResponse(userEntity);
-//            return response;
-//
-//        } catch (Exception ex) {
-//            log.error("Bad Request: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Erro ao retornar dados do usuário. Tente novamente mais tarde.", ex);
-//        }
-//    }
-//
-//    public SysUserEntity save (SysUserEntity entity) {
-//        return systemUserRepository.save(entity);
-//    }
-//
-//    public void deactivate(String email) {
-//        try {
-//            SysUserEntity userEntity = findByEmail(email);
-//            userEntity.setActive(false);
-//            save(userEntity);
-//        } catch (Exception ex) {
-//            log.error("Bad Request: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, "Erro ao retornar dados do usuário. Tente novamente mais tarde.", ex);
-//        }
-//    }
 }

@@ -1,13 +1,13 @@
 package br.com.petshop.system.access.model.dto.request;
 
-import br.com.petshop.system.access.model.pojo.Access;
+import br.com.petshop.system.access.model.dto.Functionality;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,7 +15,5 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AccessGroupCreateRequest implements Serializable {
     private String name;
-    private Access accesses;
-    @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+    private List<Functionality> accesses;
 }

@@ -152,10 +152,49 @@ public class EmployeeService {
 
             filter.setCompanyId(companyIds.get(0));
         } else { //checar se o employee pertence ao companyId
-            if (filter.getCompanyId() != companyIds.get(0))
+            if (!companyIds.contains(filter.getCompanyId()))
                 throw new GenericForbiddenException();
         }
         return filter;
+    }
+
+    public EmployeeResponse getById(Principal authentication, UUID employeeId) {
+        try {
+            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
+                    authentication).getPrincipal());
+
+            if (systemUser.getRole() == Role.ADMIN) {
+                EmployeeEntity entity = employeeRepository.findById(employeeId).orElseThrow(GenericNotFoundException::new);
+                return convert.entityIntoResponse(entity);
+            }
+
+            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
+                    .orElseThrow(GenericNotFoundException::new);
+
+            validateUserAccess(systemUser, entity);
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.EMPLOYEE_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.EMPLOYEE_ERROR_FORBIDDEN.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
+        }
+    }
+
+    private void validateUserAccess(SysUserEntity systemUser, EmployeeEntity entity) {
+        if (systemUser.getRole() != Role.ADMIN) {
+            if (!systemUser.getEmployee().getCompanyIds().contains(entity.getCompanyIds().get(0)))
+                throw new GenericForbiddenException();
+        }
     }
 
     public EmployeeResponse updateById(Principal authentication, UUID employeeId, EmployeeUpdateRequest request) {

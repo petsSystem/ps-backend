@@ -15,20 +15,13 @@ public class EmployeeSpecification {
 
     public static Specification<EmployeeEntity> filter (EmployeeFilterRequest filter) {
         Specification<EmployeeEntity> filters = Specification
-                .where(filter.getEmployeeId() == null ? null : employeeIdEqual(filter.getEmployeeId()))
-                .and(StringUtils.isBlank(filter.getCpf()) ? null : cpfEqual(filter.getCpf()))
+                .where(StringUtils.isBlank(filter.getCpf()) ? null : cpfEqual(filter.getCpf()))
                 .and(StringUtils.isBlank(filter.getEmail()) ? null : emailEqual(filter.getEmail()))
                 .and(filter.getType() == null ? null : typeEqual(filter.getType()))
                 .and(filter.getActive() == null ? null : activeEqual(filter.getActive()))
                 .and(filter.getCompanyId() == null ? null : companyIdInList(filter.getCompanyId()));
 
         return filters;
-    }
-
-    public static Specification<EmployeeEntity> employeeIdEqual(UUID employeeId) {
-        return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.equal(root.get("id"), employeeId);
-        };
     }
 
     public static Specification<EmployeeEntity> cpfEqual(String cpf) {

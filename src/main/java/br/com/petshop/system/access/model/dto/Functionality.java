@@ -1,4 +1,4 @@
-package br.com.petshop.system.access.model.pojo;
+package br.com.petshop.system.access.model.dto;
 
 import br.com.petshop.system.access.model.enums.AccessType;
 import br.com.petshop.system.access.model.enums.FunctionalityName;
@@ -18,5 +18,5 @@ import java.util.List;
 @AllArgsConstructor
 public class Functionality implements Serializable {
     private FunctionalityName name;
-    private List<AccessType> accessesType;
+    private List<AccessType> type;
 }

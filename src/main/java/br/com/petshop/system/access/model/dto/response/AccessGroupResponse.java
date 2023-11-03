@@ -1,6 +1,6 @@
 package br.com.petshop.system.access.model.dto.response;
 
-import br.com.petshop.system.access.model.pojo.Access;
+import br.com.petshop.system.access.model.dto.Functionality;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
@@ -18,6 +19,6 @@ import java.time.LocalDateTime;
 public class AccessGroupResponse implements Serializable {
     private String id;
     private String name;
-    private Access accesses;
+    private List<Functionality> accesses;
     private LocalDateTime created;
 }
