@@ -1,7 +1,7 @@
 package br.com.petshop.system.access.model.dto;
 
-import br.com.petshop.system.access.model.enums.AccessType;
-import br.com.petshop.system.access.model.enums.FunctionalityName;
+import br.com.petshop.system.access.model.enums.Action;
+import br.com.petshop.system.access.model.enums.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Functionality implements Serializable {
-    private FunctionalityName name;
-    private List<AccessType> type;
+public class Permission implements Serializable {
+    private Resource resource;
+    private List<Action> actions;
 }

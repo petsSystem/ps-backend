@@ -1,6 +1,6 @@
 package br.com.petshop.system.access.model.entity;
 
-import br.com.petshop.system.access.model.dto.Functionality;
+import br.com.petshop.system.access.model.dto.Permission;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,5 +27,5 @@ public class AccessGroupEntity extends AuditorBaseEntity implements Serializable
     private String name;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private List<Functionality> accesses;
+    private List<Permission> permissions;
 }

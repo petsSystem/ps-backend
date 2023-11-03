@@ -1,6 +1,6 @@
 package br.com.petshop.system.access.model.enums;
 
-public enum AccessType {
+public enum Action {
     SHOW,
     EDIT,
     ACTIVATE,

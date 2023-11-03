@@ -1,6 +1,6 @@
 package br.com.petshop.system.access.model.dto.request;
 
-import br.com.petshop.system.access.model.dto.Functionality;
+import br.com.petshop.system.access.model.dto.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +15,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AccessGroupCreateRequest implements Serializable {
     private String name;
-    private List<Functionality> accesses;
+    private List<Permission> permissions;
 }

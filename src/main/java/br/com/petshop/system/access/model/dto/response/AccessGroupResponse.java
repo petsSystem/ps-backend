@@ -1,6 +1,6 @@
 package br.com.petshop.system.access.model.dto.response;
 
-import br.com.petshop.system.access.model.dto.Functionality;
+import br.com.petshop.system.access.model.dto.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +19,6 @@ import java.util.List;
 public class AccessGroupResponse implements Serializable {
     private String id;
     private String name;
-    private List<Functionality> accesses;
+    private List<Permission> permissions;
     private LocalDateTime created;
 }
