@@ -1,5 +1,7 @@
 package br.com.petshop.system.user.service;
 
+import br.com.petshop.system.access.model.dto.response.AccessGroupResponse;
+import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
@@ -26,7 +28,10 @@ public class SysUserConverterService {
     }
     public SysUserResponse entityIntoResponse(SysUserEntity entity) {
         SysUserResponse response = mapper.map(entity, SysUserResponse.class);
+        if (response.getEmployee() != null) {
+            EmployeeResponse employeeResponse = mapper.map(entity.getEmployee(), EmployeeResponse.class);
+            response.setEmployee(employeeResponse);
+        }
         return response;
-
     }
 }

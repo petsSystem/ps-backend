@@ -1,5 +1,6 @@
 package br.com.petshop.system.employee.model.dto.request;
 
+import br.com.petshop.system.company.model.enums.Category;
 import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Builder

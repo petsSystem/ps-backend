@@ -24,6 +24,8 @@ public class CompanyConverterService {
         CompanyEntity newEntity = mapper.map(request, CompanyEntity.class);
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(newEntity, entity);
+        if (request.getCategories() != null)
+            entity.setCategories(request.getCategories());
         return entity;
     }
 

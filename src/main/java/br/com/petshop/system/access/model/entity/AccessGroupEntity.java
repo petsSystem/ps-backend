@@ -24,6 +24,7 @@ import java.util.List;
 @Entity
 @Table(name = "sys_access_group")
 public class AccessGroupEntity extends AuditorBaseEntity implements Serializable {
+    @Column(unique = true)
     private String name;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

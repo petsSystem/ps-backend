@@ -3,8 +3,6 @@ package br.com.petshop.system.user.model.entity;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.user.model.dto.response.SysUserResponse;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +16,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -33,7 +34,6 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "sys_user")
-//@JsonDeserialize(as = SysUserResponse.class)
 public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     @Column(unique = true)
     private String email;
@@ -51,6 +51,10 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = true)
     private EmployeeEntity employee;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "access_group_ids", columnDefinition = "jsonb")
+    List<UUID> accessGroupIds;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

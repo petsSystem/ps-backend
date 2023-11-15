@@ -39,12 +39,10 @@ public class EmployeeEntity extends AuditorBaseEntity implements Serializable {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-//    @Basic(fetch = FetchType.LAZY)
     private Address address;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-//    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "company_ids", columnDefinition = "jsonb")
     List<UUID> companyIds;
 
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)

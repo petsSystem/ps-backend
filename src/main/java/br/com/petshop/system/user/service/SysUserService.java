@@ -4,6 +4,7 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.access.service.AccessGroupService;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.service.EmployeeService;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
@@ -50,6 +51,7 @@ public class SysUserService {
     @Autowired private EmployeeService employeeService;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private SysUserSpecification specification;
+    @Autowired private AccessGroupService accessGroupService;
 
     public SysUserResponse create (Principal authentication, SysUserCreateRequest request) {
         try {
@@ -227,18 +229,19 @@ public class SysUserService {
         try {
             SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
                     authentication).getPrincipal());
+            SysUserEntity entity = null;
 
-            if (systemUser.getRole() == Role.ADMIN) {
-                SysUserEntity entity = systemUserRepository.findById(userId).orElseThrow(GenericNotFoundException::new);
-                return convert.entityIntoResponse(entity);
+            if (systemUser.getRole() == Role.ADMIN)
+                entity = systemUserRepository.findById(userId).orElseThrow(GenericNotFoundException::new);
+
+            else {
+                entity =  systemUserRepository.findByIdAndActiveIsTrue(userId)
+                        .orElseThrow(GenericNotFoundException::new);
+
+                validateUserAccess(systemUser, entity);
             }
 
-            SysUserEntity entity = systemUserRepository.findByIdAndActiveIsTrue(userId)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            validateUserAccess(systemUser, entity);
-
-            return convert.entityIntoResponse(entity);
+            return setAccessGroupInfo(convert.entityIntoResponse(entity));
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
@@ -256,14 +259,23 @@ public class SysUserService {
     }
 
     private void validateUserAccess(SysUserEntity systemUser, SysUserEntity entity) {
+        List<UUID> systemUserCompanies = systemUser.getEmployee().getCompanyIds();
+        List<UUID> entityCompanies = entity.getEmployee().getCompanyIds();
 
-        //FAZER FOR PARA VERIFICAR LIST DE LIST SE CONTAINS
+        Optional<UUID> match = systemUserCompanies.stream()
+                .filter(l -> entityCompanies.contains(l)).findFirst();
 
-
-        if (systemUser.getRole() != Role.ADMIN) {
-            if (!systemUser.getEmployee().getCompanyIds().contains(entity.getEmployee().getCompanyIds().get(0)))
+        if (match.isEmpty())
                 throw new GenericForbiddenException();
+    }
+
+    private SysUserResponse setAccessGroupInfo(SysUserResponse response) {
+        if (response.getAccessGroupIds() != null) {
+            response.setAccessGroups(response.getAccessGroupIds().stream()
+                    .map(a -> accessGroupService.getById(a))
+                    .collect(Collectors.toList()));
         }
+        return response;
     }
 
     public void delete(UUID userId) {

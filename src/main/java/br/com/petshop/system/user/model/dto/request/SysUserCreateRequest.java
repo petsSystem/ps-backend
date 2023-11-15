@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,4 +26,5 @@ public class SysUserCreateRequest implements Serializable {
     private Boolean changePassword = false;
     @Builder.Default
     private Boolean active = true;
+    private List<UUID> accessGroupIds;
 }

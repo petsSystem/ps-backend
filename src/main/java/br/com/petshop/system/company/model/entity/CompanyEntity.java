@@ -1,6 +1,7 @@
 package br.com.petshop.system.company.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
+import br.com.petshop.system.company.model.enums.Category;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.model.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,9 +24,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,11 +48,14 @@ public class CompanyEntity extends AuditorBaseEntity implements Serializable {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    @Basic(fetch = FetchType.LAZY)
     private Address address;
 
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point geom;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<Category> categories;
 
 //
 //
