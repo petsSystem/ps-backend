@@ -1,21 +1,14 @@
 package br.com.petshop.system.employee.service;
 
-import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericParamMissingException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.service.CompanyService;
-import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeFilterRequest;
-import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.employee.model.enums.Message;
 import br.com.petshop.system.employee.repository.EmployeeRepository;
 import br.com.petshop.system.employee.repository.EmployeeSpecification;
-import br.com.petshop.system.user.model.entity.SysUserEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,12 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,55 +37,26 @@ public class EmployeeService {
     @Autowired private CompanyService companyService;
     @Autowired private ObjectMapper objectMapper;
 
-    public EmployeeResponse create(Principal authentication, EmployeeCreateRequest request) {
-        try {
-            Optional<EmployeeEntity> entity = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
+    public EmployeeEntity create(EmployeeEntity request, UUID companyId) {
+        Optional<EmployeeEntity> entity = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
 
-            if (entity.isPresent())
-                throw new GenericAlreadyRegisteredException();
+        if (entity.isPresent())
+            throw new GenericAlreadyRegisteredException();
 
-            CompanyEntity companyEntity = companyService.findByIdAndActiveIsTrue(request.getCompanyId());
+        CompanyEntity companyEntity = companyService.findByIdAndActiveIsTrue(companyId);
 
-            EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-            employeeEntity.setCompanyIds(List.of(request.getCompanyId()));
-            employeeRepository.save(employeeEntity);
+        request.setCompanyIds(List.of(companyId));
 
-            return convert.entityIntoResponse(employeeEntity);
-
-        } catch (GenericAlreadyRegisteredException ex) {
-            log.error(Message.EMPLOYEE_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.EMPLOYEE_ALREADY_REGISTERED.get(), ex);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_ERROR_CREATE_COMPANY.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_ERROR_CREATE_COMPANY.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_CREATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_CREATE.get(), ex);
-        }
+        return employeeRepository.save(request);
     }
 
-    public EmployeeResponse partialUpdate(UUID employeeId, JsonPatch patch) {
-        try {
-            EmployeeEntity entity = employeeRepository.findById(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
+    public EmployeeEntity partialUpdate(UUID employeeId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        EmployeeEntity entity = employeeRepository.findById(employeeId)
+                .orElseThrow(GenericNotFoundException::new);
 
-            entity = applyPatch(patch, entity);
-            entity = employeeRepository.save(entity);
+        entity = applyPatch(patch, entity);
 
-            return  convert.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_PARTIAL.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_PARTIAL.get(), ex);
-        }
+        return employeeRepository.save(entity);
     }
 
     private EmployeeEntity applyPatch(JsonPatch patch, EmployeeEntity entity) throws JsonPatchException, JsonProcessingException {
@@ -104,34 +64,7 @@ public class EmployeeService {
         return objectMapper.treeToValue(patched, EmployeeEntity.class);
     }
 
-    public  Page<EmployeeResponse> get(Principal authentication, Pageable pageable, EmployeeFilterRequest filter) {
-        try {
-            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
-                    authentication).getPrincipal());
-
-            if (systemUser.getRole() == Role.ADMIN)
-                return get(pageable, filter);
-
-            filter = validateCompanyIds(systemUser, filter);
-
-            return get(pageable, filter);
-
-        } catch (GenericParamMissingException ex) {
-            log.error(Message.EMPLOYEE_ERROR_COMPANY_ID_SELECT.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.EMPLOYEE_ERROR_COMPANY_ID_SELECT.get(), ex);
-        } catch (GenericForbiddenException ex) {
-            log.error(Message.EMPLOYEE_ERROR_COMPANY_ID_FORBIDDEN.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, Message.EMPLOYEE_ERROR_COMPANY_ID_FORBIDDEN.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
-        }
-    }
-
-    private  Page<EmployeeResponse> get(Pageable pageable, EmployeeFilterRequest filter) {
+    public  Page<EmployeeResponse> get(Pageable pageable, EmployeeFilterRequest filter) {
             Specification<EmployeeEntity> filters = specification.filter(filter);
 
             Page<EmployeeEntity> entities = employeeRepository.findAll(filters, pageable);
@@ -143,116 +76,26 @@ public class EmployeeService {
             return new PageImpl<>(response);
     }
 
-    private EmployeeFilterRequest validateCompanyIds(SysUserEntity systemUser, EmployeeFilterRequest filter) {
-        List<UUID> companyIds = systemUser.getEmployee().getCompanyIds();
-
-        if (filter.getCompanyId() == null) {
-            if (companyIds.size() > 1) //para casos de owner
-                throw new GenericParamMissingException();
-
-            filter.setCompanyId(companyIds.get(0));
-        } else { //checar se o employee pertence ao companyId
-            if (!companyIds.contains(filter.getCompanyId()))
-                throw new GenericForbiddenException();
-        }
-        return filter;
+    public EmployeeEntity findById(UUID employeeId) {
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(GenericNotFoundException::new);
     }
 
-    public EmployeeResponse getById(Principal authentication, UUID employeeId) {
-        try {
-            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
-                    authentication).getPrincipal());
-
-            if (systemUser.getRole() == Role.ADMIN) {
-                EmployeeEntity entity = employeeRepository.findById(employeeId).orElseThrow(GenericNotFoundException::new);
-                return convert.entityIntoResponse(entity);
-            }
-
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            validateUserAccess(systemUser, entity);
-
-            return convert.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
-        } catch (GenericForbiddenException ex) {
-            log.error(Message.EMPLOYEE_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, Message.EMPLOYEE_ERROR_FORBIDDEN.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_GET.get(), ex);
-        }
+    public EmployeeEntity findByIdAndActiveIsTrue(UUID employeeId) {
+        return employeeRepository.findByIdAndActiveIsTrue(employeeId)
+                .orElseThrow(GenericNotFoundException::new);
     }
 
-    private void validateUserAccess(SysUserEntity systemUser, EmployeeEntity entity) {
-        if (systemUser.getRole() != Role.ADMIN) {
-            if (!systemUser.getEmployee().getCompanyIds().contains(entity.getCompanyIds().get(0)))
-                throw new GenericForbiddenException();
-        }
-    }
+    public EmployeeEntity updateById(EmployeeEntity request, EmployeeEntity entity) {
+        entity = convert.updateRequestIntoEntity(request, entity);
 
-    public EmployeeResponse updateById(Principal authentication, UUID employeeId, EmployeeUpdateRequest request) {
-        try {
-            EmployeeEntity entity = employeeRepository.findByIdAndActiveIsTrue(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
-                    authentication).getPrincipal());
-
-            if (systemUser.getRole() != Role.ADMIN) {
-                List<UUID> companyIds = systemUser.getEmployee().getCompanyIds();
-                Boolean contains = false;
-                for (UUID companyId : companyIds) {
-                    if (entity.getCompanyIds().contains(companyId)) {
-                        contains = true;
-                        break;
-                    }
-                }
-                if (!contains)
-                    throw new GenericForbiddenException();
-            }
-
-            entity = convert.updateRequestIntoEntity(request, entity);
-            entity = employeeRepository.save(entity);
-
-            return convert.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
-        } catch (GenericForbiddenException ex) {
-            log.error(Message.EMPLOYEE_ERROR_COMPANY_ID_FORBIDDEN.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, Message.EMPLOYEE_ERROR_COMPANY_ID_FORBIDDEN.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_UPDATE.get(), ex);
-        }
+        return employeeRepository.save(entity);
     }
 
     public void delete(UUID employeeId) {
-        try {
-            EmployeeEntity entity = employeeRepository.findById(employeeId)
-                    .orElseThrow(GenericNotFoundException::new);
-            employeeRepository.delete(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.EMPLOYEE_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.EMPLOYEE_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.EMPLOYEE_ERROR_DELETE.get(), ex);
-        }
+        EmployeeEntity entity = employeeRepository.findById(employeeId)
+                .orElseThrow(GenericNotFoundException::new);
+        employeeRepository.delete(entity);
     }
 
     public EmployeeEntity findByIdAndActive(UUID employeeId) {

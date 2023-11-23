@@ -1,9 +1,9 @@
 package br.com.petshop.system.company.controller;
 
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
-import br.com.petshop.system.company.service.CompanyService;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
+import br.com.petshop.system.company.service.CompanyValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,7 +38,7 @@ import java.util.UUID;
 @Tag(name = "SYS - Companies Services")
 public class CompanyController {
 
-    @Autowired private CompanyService companyService;
+    @Autowired private CompanyValidateService validateService;
 
     //ACESSO: ADMIN e OWNER
     @Operation(summary = "Serviço de inclusão da empresa no sistema.",
@@ -70,9 +70,10 @@ public class CompanyController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER')")
-    public CompanyResponse create(Principal authentication,
-                                  @RequestBody CompanyCreateRequest request) {
-        return companyService.create(authentication, request);
+    public CompanyResponse create(
+            Principal authentication,
+            @RequestBody CompanyCreateRequest request) {
+        return validateService.create(authentication, request);
     }
     //ACESSO ADMIN
     @Operation(summary = "Serviço de ativação do cadastro da empresa no sistema.",
@@ -105,6 +106,7 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public CompanyResponse partialUpdate(
+            Principal authentication,
             @PathVariable("companyId") UUID companyId,
             @Schema(example = "[\n" +
                     "    {\n" +
@@ -114,7 +116,7 @@ public class CompanyController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return companyService.partialUpdate(companyId, patch);
+        return validateService.partialUpdate(authentication, companyId, patch);
     }
 
     //ACESSO: ALL
@@ -140,7 +142,7 @@ public class CompanyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable paging = PageRequest.of(page, size);
-        return companyService.get(authentication, paging);
+        return validateService.get(authentication, paging);
     }
 
     //ACESSO: ALL
@@ -186,7 +188,7 @@ public class CompanyController {
     public CompanyResponse getById (
             Principal authentication,
             @PathVariable("companyId") UUID companyId) {
-        return companyService.getById(authentication, companyId);
+        return validateService.getById(authentication, companyId);
     }
 
     //ACESSO: ADMIN, OWNER, MANAGER
@@ -222,7 +224,7 @@ public class CompanyController {
             Principal authentication,
             @PathVariable("companyId") UUID companyId,
             @RequestBody CompanyUpdateRequest request) {
-        return companyService.updateById(authentication, companyId, request);
+        return validateService.updateById(authentication, companyId, request);
     }
 
     //ACESSO: ADMIN
@@ -256,7 +258,8 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete (
+            Principal authentication,
             @PathVariable("companyId") UUID companyId) {
-        companyService.delete(companyId);
+        validateService.delete(authentication, companyId);
     }
 }

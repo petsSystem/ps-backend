@@ -2,10 +2,7 @@ package br.com.petshop.system.access.controller;
 
 import br.com.petshop.system.access.model.dto.request.AccessGroupCreateRequest;
 import br.com.petshop.system.access.model.dto.response.AccessGroupResponse;
-import br.com.petshop.system.access.service.AccessGroupService;
-import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
-import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
-import br.com.petshop.system.user.model.dto.response.SysUserResponse;
+import br.com.petshop.system.access.service.AccessGroupValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +37,7 @@ import java.util.UUID;
 @Tag(name = "System Profile Services")
 public class AccessGroupController {
 
-    @Autowired private AccessGroupService accessGroupService;
+    @Autowired private AccessGroupValidateService accessGroupValidateService;
 
     //ACESSO: 'ADMIN'
     @Operation(summary = "Serviço de criação de grupo de acesso no sistema.",
@@ -70,8 +67,10 @@ public class AccessGroupController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public AccessGroupResponse create(@RequestBody AccessGroupCreateRequest request) {
-        return accessGroupService.create(request);
+    public AccessGroupResponse create(
+            Principal authentication,
+            @RequestBody AccessGroupCreateRequest request) {
+        return accessGroupValidateService.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização parcial de grupo de acesso no sistema.",
@@ -104,6 +103,7 @@ public class AccessGroupController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<AccessGroupResponse> partialUpdate(
+            Principal authentication,
             @PathVariable("accessGroupId") UUID accessGroupId,
             @Schema(example = "[\n" +
                     "    {\n" +
@@ -113,11 +113,38 @@ public class AccessGroupController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return accessGroupService.partialUpdate(accessGroupId, patch);
+        return accessGroupValidateService.partialUpdate(authentication, accessGroupId, patch);
     }
 
-    //ACESSO: ALL (COM FILTROS)
-    @Operation(summary = "Serviço de recuperação de todos os grupos de acesso do sistema.",
+    //ACESSO: ADMIN
+    @Operation(summary = "Serviço de recuperação de grupos de acesso do sistema.",
+            description = "Acesso: ADMIN")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar grupos de acesso. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/accesses\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<AccessGroupResponse> getAll(
+            Principal authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return accessGroupValidateService.getAll(authentication, pageable);
+    }
+
+    @Operation(summary = "Serviço de recuperação dos grupos de acesso do sistema do usuário logado.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
@@ -134,13 +161,10 @@ public class AccessGroupController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<AccessGroupResponse> get(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public List<AccessGroupResponse> get(
+            Principal authentication) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        return accessGroupService.getAll(pageable);
+        return accessGroupValidateService.get(authentication);
     }
 
     //ACESSO: ALL
@@ -174,8 +198,9 @@ public class AccessGroupController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public AccessGroupResponse getById(
+            Principal authentication,
             @PathVariable("accessGroupId") UUID accessGroupId) {
-        return accessGroupService.getById(accessGroupId);
+        return accessGroupValidateService.getById(authentication, accessGroupId);
     }
 
     //ACESSO: 'ADMIN'
@@ -209,7 +234,8 @@ public class AccessGroupController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete (
+            Principal authentication,
             @PathVariable("accessGroupId") UUID accessGroupId) {
-        accessGroupService.delete(accessGroupId);
+        accessGroupValidateService.delete(authentication, accessGroupId);
     }
 }

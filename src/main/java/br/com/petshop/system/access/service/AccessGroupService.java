@@ -41,54 +41,25 @@ public class AccessGroupService {
 
     @Autowired private ObjectMapper objectMapper;
 
-    public AccessGroupResponse create (AccessGroupCreateRequest request) {
-        try {
-            AccessGroupEntity accessGroupEntity = accessGroupRepository.findByName(request.getName())
-                    .orElse(null);
+    public AccessGroupEntity create (AccessGroupCreateRequest request) {
+        AccessGroupEntity accessGroupEntity = accessGroupRepository.findByName(request.getName())
+                .orElse(null);
 
-            if (accessGroupEntity != null)
-                throw new GenericAlreadyRegisteredException();
+        if (accessGroupEntity != null)
+            throw new GenericAlreadyRegisteredException();
 
-            accessGroupEntity = convert.createRequestIntoEntity(request);
-            accessGroupRepository.save(accessGroupEntity);
+        accessGroupEntity = convert.createRequestIntoEntity(request);
 
-            return convert.entityIntoResponse(accessGroupEntity);
-        } catch (GenericAlreadyRegisteredException ex) {
-            log.error(Message.ACCESS_GROUP_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.ACCESS_GROUP_ALREADY_REGISTERED.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.ACCESS_GROUP_ERROR_CREATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.ACCESS_GROUP_ERROR_CREATE.get(), ex);
-        }
+        return accessGroupRepository.save(accessGroupEntity);
     }
 
-    public  List<AccessGroupResponse> partialUpdate(UUID accessGroupId, JsonPatch patch) {
-        try {
-            JsonNode jsonPatchList = objectMapper.convertValue(patch, JsonNode.class);
-            List<AccessGroupResponse> responses = new ArrayList<>();
-            for(int i = 0; i < jsonPatchList.size(); i++) {
+    public  AccessGroupEntity partialUpdate(UUID accessGroupId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        AccessGroupEntity entity = accessGroupRepository.findById(accessGroupId)
+                .orElseThrow(GenericNotFoundException::new);
 
-                AccessGroupEntity entity = accessGroupRepository.findById(accessGroupId)
-                        .orElseThrow(GenericNotFoundException::new);
+        entity = applyPatch(patch, entity);
 
-                entity = applyPatch(patch, entity);
-                entity = accessGroupRepository.save(entity);
-
-                responses.add(convert.entityIntoResponse(entity));
-            }
-            return responses;
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.ACCESS_GROUP_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.ACCESS_GROUP_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.ACCESS_GROUP_ERROR_PARTIAL.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.ACCESS_GROUP_ERROR_PARTIAL.get(), ex);
-        }
+        return accessGroupRepository.save(entity);
     }
 
     private AccessGroupEntity applyPatch(JsonPatch patch, AccessGroupEntity entity) throws JsonPatchException, JsonProcessingException {
@@ -96,55 +67,18 @@ public class AccessGroupService {
         return objectMapper.treeToValue(patched, AccessGroupEntity.class);
     }
 
-    public Page<AccessGroupResponse> getAll(Pageable pageable) {
-        try {
-            Page<AccessGroupEntity> entities = accessGroupRepository.findAll(pageable);
-
-            List<AccessGroupResponse> response = entities.stream()
-                    .map(c -> convert.entityIntoResponse(c))
-                    .collect(Collectors.toList());
-
-            return new PageImpl<>(response);
-
-        } catch (Exception ex) {
-            log.error(Message.ACCESS_GROUP_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.ACCESS_GROUP_ERROR_GET.get(), ex);
-        }
+    public AccessGroupEntity findById(UUID accessGroupId) {
+        return accessGroupRepository.findById(accessGroupId)
+                .orElseThrow(GenericNotFoundException::new);
     }
 
-    public AccessGroupResponse getById(UUID accessGroupId) {
-        try {
-            AccessGroupEntity entity = accessGroupRepository.findById(accessGroupId)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            return convert.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.ACCESS_GROUP_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.ACCESS_GROUP_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.ACCESS_GROUP_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.ACCESS_GROUP_ERROR_GET.get(), ex);
-        }
+    public Page<AccessGroupEntity> getAll(Pageable pageable) {
+        return accessGroupRepository.findAll(pageable);
     }
 
     public void delete(UUID accessGroupId) {
-        try {
-            AccessGroupEntity entity = accessGroupRepository.findById(accessGroupId)
-                    .orElseThrow(GenericNotFoundException::new);
-            accessGroupRepository.delete(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.ACCESS_GROUP_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.ACCESS_GROUP_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.ACCESS_GROUP_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.ACCESS_GROUP_ERROR_DELETE.get(), ex);
-        }
+        AccessGroupEntity entity = accessGroupRepository.findById(accessGroupId)
+                .orElseThrow(GenericNotFoundException::new);
+        accessGroupRepository.delete(entity);
     }
 }

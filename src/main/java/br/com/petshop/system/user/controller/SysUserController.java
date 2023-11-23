@@ -1,12 +1,11 @@
 package br.com.petshop.system.user.controller;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
 import br.com.petshop.system.user.model.dto.response.SysUserResponse;
-import br.com.petshop.system.user.service.SysUserService;
+import br.com.petshop.system.user.service.SysUserValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +39,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/sys/users")
 @Tag(name = "SYS - Users Services")
 public class SysUserController {
-    @Autowired private SysUserService systemUserService;
+    @Autowired private SysUserValidateService systemUserValidateService;
 
     //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
     @Operation(summary = "Serviço de criação de usuário no sistema.",
@@ -91,9 +90,10 @@ public class SysUserController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public SysUserResponse create(Principal authentication,
-                                   @RequestBody SysUserCreateRequest request) {
-        return systemUserService.create(authentication, request);
+    public SysUserResponse create(
+            Principal authentication,
+            @RequestBody SysUserCreateRequest request) {
+        return systemUserValidateService.create(authentication, request);
     }
 
     @Operation(summary = "Serviço que envia nova senha por email no Sistema Petshop.",
@@ -125,8 +125,9 @@ public class SysUserController {
     @PostMapping("/forget")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void forget (
+            Principal authentication,
             @RequestBody SysUserForgetRequest request) {
-        systemUserService.forget(request);
+        systemUserValidateService.forget(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização parcial de usuário no sistema.",
@@ -168,7 +169,7 @@ public class SysUserController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return systemUserService.partialUpdate(authentication, userId, patch);
+        return systemUserValidateService.partialUpdate(authentication, userId, patch);
     }
 
     //ACESSO: ALL (COM FILTROS)
@@ -201,7 +202,7 @@ public class SysUserController {
 
         Pageable pageable = PageRequest.of(page, size);
         SysUserFilterRequest filter = new SysUserFilterRequest(email, employeeId, accessGroupId, role, active, null);
-        return systemUserService.get(authentication, pageable, filter);
+        return systemUserValidateService.get(authentication, pageable, filter);
     }
 
     //ACESSO: ALL
@@ -247,7 +248,7 @@ public class SysUserController {
     public SysUserResponse getById(
             Principal authentication,
             @PathVariable("userId") UUID userId) {
-        return systemUserService.getById(authentication, userId);
+        return systemUserValidateService.getById(authentication, userId);
     }
 
     //ACESSO: 'ADMIN'
@@ -281,7 +282,8 @@ public class SysUserController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete (
+            Principal authentication,
             @PathVariable("userId") UUID userId) {
-        systemUserService.delete(userId);
+        systemUserValidateService.delete(authentication, userId);
     }
 }

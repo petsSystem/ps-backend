@@ -20,10 +20,13 @@ public class CompanyConverterService {
         return mapper.map(request, CompanyEntity.class);
     }
 
-    public CompanyEntity updateRequestIntoEntity(CompanyUpdateRequest request, CompanyEntity entity) {
-        CompanyEntity newEntity = mapper.map(request, CompanyEntity.class);
+    public CompanyEntity updateRequestIntoEntity(CompanyUpdateRequest request) {
+        return mapper.map(request, CompanyEntity.class);
+    }
+
+    public CompanyEntity updateRequestIntoEntity(CompanyEntity request, CompanyEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-        mapper.map(newEntity, entity);
+        mapper.map(request, entity);
         if (request.getCategories() != null)
             entity.setCategories(request.getCategories());
         return entity;

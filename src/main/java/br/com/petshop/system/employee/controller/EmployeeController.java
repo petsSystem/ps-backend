@@ -5,7 +5,7 @@ import br.com.petshop.system.employee.model.dto.request.EmployeeFilterRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.enums.EmployeeType;
-import br.com.petshop.system.employee.service.EmployeeService;
+import br.com.petshop.system.employee.service.EmployeeValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +40,7 @@ import java.util.UUID;
 @Tag(name = "SYS - Employees Services")
 public class EmployeeController {
 
-    @Autowired private EmployeeService employeeService;
+    @Autowired private EmployeeValidateService validateService;
 
     //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
     @Operation(summary = "Serviço de inclusão da funcionário no sistema.",
@@ -81,9 +81,10 @@ public class EmployeeController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public EmployeeResponse create(Principal authentication,
-                                   @RequestBody EmployeeCreateRequest request) {
-        return employeeService.create(authentication, request);
+    public EmployeeResponse create(
+            Principal authentication,
+            @RequestBody EmployeeCreateRequest request) {
+        return validateService.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização parcial de funcionário no sistema.",
@@ -116,6 +117,7 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public EmployeeResponse partialUpdate(
+            Principal authentication,
             @PathVariable("employeeId") UUID employeeId,
             @Schema(example = "[\n" +
                     "    {\n" +
@@ -125,7 +127,7 @@ public class EmployeeController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return employeeService.partialUpdate(employeeId, patch);
+        return validateService.partialUpdate(authentication, employeeId, patch);
     }
 
     //ACESSO: ALL (COM FILTROS)
@@ -178,7 +180,7 @@ public class EmployeeController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         EmployeeFilterRequest filter = new EmployeeFilterRequest(companyId, cpf, email, type, active);
-        return employeeService.get(authentication, pageable, filter);
+        return validateService.get(authentication, pageable, filter);
     }
 
     //ACESSO: ALL
@@ -224,7 +226,7 @@ public class EmployeeController {
     public EmployeeResponse getById(
             Principal authentication,
             @PathVariable("employeeId") UUID employeeId) {
-        return employeeService.getById(authentication, employeeId);
+        return validateService.getById(authentication, employeeId);
     }
 
     //ACESSO: ALL
@@ -271,7 +273,7 @@ public class EmployeeController {
             Principal authentication,
             @PathVariable("employeeId") UUID employeeId,
             @RequestBody EmployeeUpdateRequest request) {
-        return employeeService.updateById(authentication, employeeId, request);
+        return validateService.updateById(authentication, employeeId, request);
     }
 
     //ACESSO: 'ADMIN'
@@ -305,7 +307,8 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete (
+            Principal authentication,
             @PathVariable("employeeId") UUID employeeId) {
-        employeeService.delete(employeeId);
+        validateService.delete(authentication, employeeId);
     }
 }

@@ -19,10 +19,13 @@ public class EmployeeConverterService {
         return mapper.map(request, EmployeeEntity.class);
     }
 
-    public EmployeeEntity updateRequestIntoEntity(EmployeeUpdateRequest request, EmployeeEntity entity) {
-        EmployeeEntity newEntity = mapper.map(request, EmployeeEntity.class);
+    public EmployeeEntity updateRequestIntoEntity(EmployeeUpdateRequest request) {
+        return mapper.map(request, EmployeeEntity.class);
+    }
+
+    public EmployeeEntity updateRequestIntoEntity(EmployeeEntity request, EmployeeEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-        mapper.map(newEntity, entity);
+        mapper.map(request, entity);
         return entity;
     }
 
