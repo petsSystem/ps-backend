@@ -5,6 +5,8 @@ import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.repository.CompanyRepository;
+import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.employee.service.EmployeeService;
 import br.com.petshop.utils.PetGeometry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,7 @@ public class CompanyService {
     @Autowired private CompanyConverterService convert;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private PetGeometry geometry;
+    @Autowired private EmployeeService employeeService;
 
     public CompanyEntity create(CompanyEntity request) {
         Optional<CompanyEntity> company = companyRepository.findByCnpj(request.getCnpj());
@@ -57,7 +61,12 @@ public class CompanyService {
     }
 
     public Page<CompanyEntity> findByEmployeeId(UUID employeeId, Pageable paging) {
-        return companyRepository.findCompaniesFromEmployeeId(employeeId, paging);
+        EmployeeEntity employee = employeeService.findById(employeeId);
+        List<CompanyEntity> companies = employee.getCompanyIds().stream()
+                .map(c -> findByIdAndActiveIsTrue(c))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(companies);
     }
 
     public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {

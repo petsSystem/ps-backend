@@ -25,6 +25,6 @@ public interface CompanyRepository extends JpaRepository<CompanyEntity, Integer>
     @Query(value = "SELECT ST_DistanceSphere(geom, :p) from sys_company where id = :id AND active is true", nativeQuery = true)
     Double getDistance(Point p, UUID id);
     Page<CompanyEntity> findAll(Specification<CompanyEntity> filter, Pageable paging);
-    @Query(value = "SELECT * FROM public.sys_company sc JOIN public.sys_company_employee sce ON sc.id = sce.company_id WHERE sce.employee_id = :employeeId", nativeQuery = true)
-    Page<CompanyEntity> findCompaniesFromEmployeeId(UUID employeeId, Pageable paging);
+//    @Query(value = "SELECT * FROM public.sys_company sc JOIN public.sys_company_employee sce ON sc.id = sce.company_id WHERE sce.employee_id = :employeeId", nativeQuery = true)
+//    Page<CompanyEntity> findCompaniesFromEmployeeId(UUID employeeId, Pageable paging);
 }

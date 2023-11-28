@@ -251,6 +251,40 @@ public class SysUserController {
         return systemUserValidateService.getById(authentication, userId);
     }
 
+    //ACESSO: ALL
+    @Operation(summary = "Serviço de recuperação de dados do perfil do usuário logado.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/users/{userId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro de usuário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro de usuário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    public SysUserResponse getProfile(
+            Principal authentication) {
+        return systemUserValidateService.getProfile(authentication);
+    }
+
     //ACESSO: 'ADMIN'
     @Operation(summary = "Serviço de exclusão do usuário do sistema.",
             description = "Acesso: 'ADMIN'")

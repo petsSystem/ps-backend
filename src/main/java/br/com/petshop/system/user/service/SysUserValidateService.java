@@ -223,6 +223,24 @@ public class SysUserValidateService {
         return response;
     }
 
+    public SysUserResponse getProfile(Principal authentication) {
+        try {
+
+            SysUserEntity entity = service.findByIdAndActiveIsTrue(getAuthUser(authentication).getId());
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
+        }
+    }
+
     public void delete(Principal authentication, UUID userId) {
         try {
 
