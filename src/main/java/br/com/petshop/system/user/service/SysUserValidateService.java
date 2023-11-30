@@ -161,7 +161,7 @@ public class SysUserValidateService {
             Page<SysUserEntity> entities = service.get(pageable, filter);
 
             List<SysUserResponse> response = entities.stream()
-                    .map(c -> convert.entityIntoResponse(c))
+                    .map(c -> setAccessGroupInfo(authentication, convert.entityIntoResponse(c)))
                     .collect(Collectors.toList());
 
             return new PageImpl<>(response);
@@ -228,7 +228,7 @@ public class SysUserValidateService {
 
             SysUserEntity entity = service.findByIdAndActiveIsTrue(getAuthUser(authentication).getId());
 
-            return convert.entityIntoResponse(entity);
+            return setAccessGroupInfo(authentication, convert.entityIntoResponse(entity));
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
