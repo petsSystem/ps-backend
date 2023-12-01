@@ -34,7 +34,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/sys/accesses")
-@Tag(name = "System Profile Services")
+@Tag(name = "SYS - Access Group Services")
 public class AccessGroupController {
 
     @Autowired private AccessGroupValidateService accessGroupValidateService;
