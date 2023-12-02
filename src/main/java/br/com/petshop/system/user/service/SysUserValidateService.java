@@ -214,11 +214,11 @@ public class SysUserValidateService {
     }
 
     private SysUserResponse setAccessGroupInfo(Principal authentication, SysUserResponse response) {
-        if (response.getAccessGroupIds() != null) {
-            response.setAccessGroups(response.getAccessGroupIds().stream()
-                    .map(a -> accessGroupValidateService.getById(authentication, a))
-                    .collect(Collectors.toList()));
-        }
+//        if (response.getAccessGroupIds() != null) {
+//            response.setAccessGroups(response.getAccessGroupIds().stream()
+//                    .map(a -> accessGroupValidateService.getById(authentication, a))
+//                    .collect(Collectors.toList()));
+//        }
         return response;
     }
 
