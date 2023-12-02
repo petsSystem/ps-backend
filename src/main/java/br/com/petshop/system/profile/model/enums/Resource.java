@@ -1,4 +1,4 @@
-package br.com.petshop.system.access.model.enums;
+package br.com.petshop.system.profile.model.enums;
 
 public enum Resource {
     COMPANY,

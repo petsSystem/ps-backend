@@ -1,7 +1,7 @@
-package br.com.petshop.system.access.model.dto;
+package br.com.petshop.system.profile.model.dto;
 
-import br.com.petshop.system.access.model.enums.Action;
-import br.com.petshop.system.access.model.enums.Resource;
+import br.com.petshop.system.profile.model.enums.Action;
+import br.com.petshop.system.profile.model.enums.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

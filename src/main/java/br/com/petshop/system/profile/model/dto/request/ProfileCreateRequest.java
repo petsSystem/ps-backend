@@ -1,6 +1,7 @@
-package br.com.petshop.system.access.model.dto.request;
+package br.com.petshop.system.profile.model.dto.request;
 
-import br.com.petshop.system.access.model.dto.Permission;
+import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.system.profile.model.dto.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessGroupCreateRequest implements Serializable {
+public class ProfileCreateRequest implements Serializable {
     private String name;
+    private Role role;
     private List<Permission> permissions;
 }

@@ -1,8 +1,8 @@
-package br.com.petshop.system.access.controller;
+package br.com.petshop.system.profile.controller;
 
-import br.com.petshop.system.access.model.dto.request.AccessGroupCreateRequest;
-import br.com.petshop.system.access.model.dto.response.AccessGroupResponse;
-import br.com.petshop.system.access.service.AccessGroupValidateService;
+import br.com.petshop.system.profile.model.dto.request.ProfileCreateRequest;
+import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
+import br.com.petshop.system.profile.service.ProfileValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,14 +33,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sys/accesses")
-@Tag(name = "SYS - Access Group Services")
-public class AccessGroupController {
+@RequestMapping("/api/v1/sys/profiles")
+@Tag(name = "SYS - Profile Services")
+public class ProfileController {
 
-    @Autowired private AccessGroupValidateService accessGroupValidateService;
+    @Autowired private ProfileValidateService profileValidateService;
 
     //ACESSO: 'ADMIN'
-    @Operation(summary = "Serviço de criação de grupo de acesso no sistema.",
+    @Operation(summary = "Serviço de criação de perfil no sistema.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -50,31 +50,31 @@ public class AccessGroupController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao cadastrar grupo de acesso. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses\"\n" +
+                            "\"detail\": \"Erro ao cadastrar perfil. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/profiles\"\n" +
                             "}")})}),
             @ApiResponse(
                     responseCode = "422",
-                    description = "Grupo de acesso já cadastrado.",
+                    description = "Perfil já cadastrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
-                            "\"detail\": \"Grupo de acesso já cadastrado no sistema.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses\"\n" +
+                            "\"detail\": \"Perfil já cadastrado no sistema.\",\n" +
+                            "\"instance\": \"/api/v1/sys/profiles\"\n" +
                             "}")})})
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public AccessGroupResponse create(
+    public ProfileResponse create(
             Principal authentication,
-            @RequestBody AccessGroupCreateRequest request) {
-        return accessGroupValidateService.create(authentication, request);
+            @RequestBody ProfileCreateRequest request) {
+        return profileValidateService.create(authentication, request);
     }
 
-    @Operation(summary = "Serviço de atualização parcial de grupo de acesso no sistema.",
-            description = "Acesso: 'ALL'")
+    @Operation(summary = "Serviço de atualização parcial de perfil no sistema.",
+            description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -83,28 +83,28 @@ public class AccessGroupController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar parcialmente os dados do grupo de acesso. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses/{accessGroupId}\"\n" +
+                            "\"detail\": \"Erro ao atualizar parcialmente os dados do perfil. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/profiles/{profileId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro de funcionário não encontrado.",
+                    description = "Cadastro de perfil não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de usuário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/accesses/{accessGroupId}\"\n" +
+                            "    \"detail\": \"Cadastro de perfil não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/profiles/{profileId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @PatchMapping(path = "/{accessGroupId}", consumes = "application/json-patch+json")
+    @PatchMapping(path = "/{profileId}", consumes = "application/json-patch+json")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<AccessGroupResponse> partialUpdate(
+    public List<ProfileResponse> partialUpdate(
             Principal authentication,
-            @PathVariable("accessGroupId") UUID accessGroupId,
+            @PathVariable("profileId") UUID profileId,
             @Schema(example = "[\n" +
                     "    {\n" +
                     "        \"op\": \"replace\",\n" +
@@ -113,11 +113,11 @@ public class AccessGroupController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return accessGroupValidateService.partialUpdate(authentication, accessGroupId, patch);
+        return profileValidateService.partialUpdate(authentication, profileId, patch);
     }
 
     //ACESSO: ADMIN
-    @Operation(summary = "Serviço de recuperação de grupos de acesso do sistema.",
+    @Operation(summary = "Serviço de recuperação de todos os perfis cadastrados no sistema.",
             description = "Acesso: ADMIN")
     @ApiResponses(value = {
             @ApiResponse(
@@ -127,48 +127,24 @@ public class AccessGroupController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar grupos de acesso. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping("/all")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<AccessGroupResponse> getAll(
-            Principal authentication,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        return accessGroupValidateService.getAll(authentication, pageable);
-    }
-
-    @Operation(summary = "Serviço de recuperação dos grupos de acesso do sistema do usuário logado.",
-            description = "Acesso: ALL")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar grupos de acesso. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses\"\n" +
+                            "\"detail\": \"Erro ao recuperar dados do perfil. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/profiles\"\n" +
                             "}\n" +
                             "\n")})})
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<AccessGroupResponse> get(
-            Principal authentication) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<ProfileResponse> get(
+            Principal authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        return accessGroupValidateService.get(authentication);
+        Pageable pageable = PageRequest.of(page, size);
+        return profileValidateService.get(authentication, pageable);
     }
 
-    //ACESSO: ALL
-    @Operation(summary = "Serviço de recuperação das informações do grupo de acesso através do id.",
+    @Operation(summary = "Serviço de recuperação dos labels dos perfis do sistema.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
@@ -178,44 +154,32 @@ public class AccessGroupController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do grupo de acesso. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses/{accessGroupId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro de grupo de acesso não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de grupo de acesso não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/accesses/{accessGroupId}\"\n" +
+                            "\"detail\": \"Erro ao recuperar labels dos perfis do sistema. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/profiles/labels\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @GetMapping("/{accessGroupId}")
+    @GetMapping("/labels")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public AccessGroupResponse getById(
-            Principal authentication,
-            @PathVariable("accessGroupId") UUID accessGroupId) {
-        return accessGroupValidateService.getById(authentication, accessGroupId);
+    public List<String> getLabels(
+            Principal authentication) {
+
+        return profileValidateService.getLabels(authentication);
     }
 
     //ACESSO: 'ADMIN'
-    @Operation(summary = "Serviço de exclusão de grupo de acesso do sistema.",
+    @Operation(summary = "Serviço de exclusão de perfil do sistema.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
-                    description = "Cadastro do grupo de acesso não encontrado.",
+                    description = "Cadastro do perfil não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do grupo de acesso não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/accesses\"\n" +
+                            "    \"detail\": \"Cadastro do perfil não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/profiles\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -225,17 +189,17 @@ public class AccessGroupController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao excluir dados do grupo de acesso do sistema. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/accesses\"\n" +
+                            "\"detail\": \"Erro ao excluir dados do perfil. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/profiles\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @DeleteMapping("/{accessGroupId}")
+    @DeleteMapping("/{profileId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public void delete (
             Principal authentication,
-            @PathVariable("accessGroupId") UUID accessGroupId) {
-        accessGroupValidateService.delete(authentication, accessGroupId);
+            @PathVariable("profileId") UUID profileId) {
+        profileValidateService.delete(authentication, profileId);
     }
 }

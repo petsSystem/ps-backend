@@ -1,6 +1,7 @@
-package br.com.petshop.system.access.model.dto.response;
+package br.com.petshop.system.profile.model.dto.response;
 
-import br.com.petshop.system.access.model.dto.Permission;
+import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.system.profile.model.dto.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,9 +17,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessGroupResponse implements Serializable {
+public class ProfileResponse implements Serializable {
     private String id;
     private String name;
+    private Role role;
     private List<Permission> permissions;
     private LocalDateTime created;
 }

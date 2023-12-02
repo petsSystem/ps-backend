@@ -1,6 +1,6 @@
-package br.com.petshop.system.access.model.entity;
+package br.com.petshop.system.profile.model.entity;
 
-import br.com.petshop.system.access.model.dto.Permission;
+import br.com.petshop.system.profile.model.dto.Permission;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,10 +22,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_access_group")
-public class AccessGroupEntity extends AuditorBaseEntity implements Serializable {
+@Table(name = "sys_profile")
+public class ProfileEntity extends AuditorBaseEntity implements Serializable {
     @Column(unique = true)
     private String name;
+    private String role;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<Permission> permissions;
