@@ -4,8 +4,7 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.access.service.AccessGroupService;
-import br.com.petshop.system.access.service.AccessGroupValidateService;
+import br.com.petshop.system.profile.service.ProfileValidateService;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
@@ -40,7 +39,7 @@ public class SysUserValidateService {
     @Autowired private SysUserService service;
     @Autowired private SysUserConverterService convert;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AccessGroupValidateService accessGroupValidateService;
+    @Autowired private ProfileValidateService accessGroupValidateService;
 
     public SysUserResponse create (Principal authentication, SysUserCreateRequest request) {
         try {

@@ -1,6 +1,5 @@
 package br.com.petshop.system.user.service;
 
-import br.com.petshop.system.access.model.dto.response.AccessGroupResponse;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.entity.SysUserEntity;

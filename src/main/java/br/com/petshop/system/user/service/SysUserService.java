@@ -2,11 +2,10 @@ package br.com.petshop.system.user.service;
 
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.access.service.AccessGroupService;
+import br.com.petshop.system.profile.service.ProfileService;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.service.EmployeeService;
 import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
-import br.com.petshop.system.user.model.dto.response.SysUserResponse;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.system.user.repository.SysUserRepository;
 import br.com.petshop.system.user.repository.SysUserSpecification;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class SysUserService {
@@ -39,7 +37,7 @@ public class SysUserService {
     @Autowired private EmployeeService employeeService;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private SysUserSpecification specification;
-    @Autowired private AccessGroupService accessGroupService;
+    @Autowired private ProfileService accessGroupService;
 
     public SysUserEntity create (SysUserEntity request, UUID employeeId) {
         EmployeeEntity employeeEntity = employeeService.findByIdAndActive(employeeId);
