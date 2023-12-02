@@ -4,7 +4,6 @@ import br.com.petshop.system.employee.model.dto.request.EmployeeCreateRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeFilterRequest;
 import br.com.petshop.system.employee.model.dto.request.EmployeeUpdateRequest;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
-import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.employee.service.EmployeeValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
@@ -174,7 +173,7 @@ public class EmployeeController {
             @RequestParam(required = false) UUID companyId,
             @RequestParam(required = false) String cpf,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) EmployeeType type,
+            @RequestParam(required = false) String type,
             @RequestParam(required = false) Boolean active,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {

@@ -1,7 +1,5 @@
 package br.com.petshop.system.employee.model.dto.request;
 
-import br.com.petshop.system.company.model.enums.Category;
-import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,9 +21,11 @@ public class EmployeeCreateRequest implements Serializable {
     private String cpf;
     private String email;
     private String phone;
-    private EmployeeType type;
+    private List<String> profile;
     private Address address;
-    private UUID companyId;
+    private List<UUID> companyId;
     @Builder.Default
     private Boolean active = true;
+    @Builder.Default
+    private Boolean hasUser = false;
 }

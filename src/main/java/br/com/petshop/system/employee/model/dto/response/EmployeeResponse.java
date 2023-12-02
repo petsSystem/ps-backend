@@ -1,6 +1,5 @@
 package br.com.petshop.system.employee.model.dto.response;
 
-import br.com.petshop.system.employee.model.enums.EmployeeType;
 import br.com.petshop.system.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class EmployeeResponse implements Serializable {
     private UUID id;
-    private EmployeeType type;
+    private List<String> profiles;
     private String name;
     private String cpf;
     private String email;

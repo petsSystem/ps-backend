@@ -37,7 +37,7 @@ public class EmployeeValidateService {
         try {
 
             EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-            employeeEntity = service.create(employeeEntity, request.getCompanyId());
+//            employeeEntity = service.create(employeeEntity, request.getCompanyId());
 
             return convert.entityIntoResponse(employeeEntity);
 

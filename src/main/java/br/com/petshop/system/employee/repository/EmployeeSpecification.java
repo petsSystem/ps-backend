@@ -2,7 +2,6 @@ package br.com.petshop.system.employee.repository;
 
 import br.com.petshop.system.employee.model.dto.request.EmployeeFilterRequest;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.employee.model.enums.EmployeeType;
 import jakarta.persistence.criteria.Expression;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,7 +16,7 @@ public class EmployeeSpecification {
         Specification<EmployeeEntity> filters = Specification
                 .where(StringUtils.isBlank(filter.getCpf()) ? null : cpfEqual(filter.getCpf()))
                 .and(StringUtils.isBlank(filter.getEmail()) ? null : emailEqual(filter.getEmail()))
-                .and(filter.getType() == null ? null : typeEqual(filter.getType()))
+//                .and(filter.getType() == null ? null : typeEqual(filter.getType()))
                 .and(filter.getActive() == null ? null : activeEqual(filter.getActive()))
                 .and(filter.getCompanyId() == null ? null : companyIdInList(filter.getCompanyId()));
 
@@ -36,7 +35,7 @@ public class EmployeeSpecification {
         };
     }
 
-    public static Specification<EmployeeEntity> typeEqual(EmployeeType type) {
+    public static Specification<EmployeeEntity> typeEqual(String type) {
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.equal(root.get("type"), type);
         };
