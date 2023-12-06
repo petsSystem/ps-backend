@@ -21,7 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SysUserResponse implements Serializable {
     private UUID id;
-    private String email;
+    private String username;
     private Boolean changePassword;
     private Role role;
     private Boolean active;
