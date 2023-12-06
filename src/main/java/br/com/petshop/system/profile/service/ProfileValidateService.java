@@ -4,6 +4,7 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.profile.model.dto.request.ProfileCreateRequest;
+import br.com.petshop.system.profile.model.dto.response.LabelResponse;
 import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.system.profile.model.entity.ProfileEntity;
 import br.com.petshop.system.profile.model.enums.Message;
@@ -96,19 +97,21 @@ public class ProfileValidateService {
         }
     }
 
-    public List<String> getLabels(Principal authentication) {
+    public List<LabelResponse> getLabels(Principal authentication) {
         try {
 
-            List<String> labels = service.findAllLabels();
+            List<ProfileEntity> entities = service.findAllLabels();
 
             if (getRole(authentication) != Role.ADMIN) {
-                labels.remove("Administrador");
-                labels.remove("Proprietário");
+                entities = entities.stream()
+                        .filter(l -> !l.getName().equalsIgnoreCase("Administrador") ||
+                                !l.getName().equalsIgnoreCase("Proprietário"))
+                        .collect(Collectors.toList());
             }
 
-            Collections.sort(labels);
-
-            return labels;
+            return entities.stream().
+                    map(e -> convert.entityIntoLabelResponse(e))
+                    .collect(Collectors.toList());
 
         } catch (Exception ex) {
             log.error(Message.PROFILE_ERROR_GET.get() + " Error: " + ex.getMessage());

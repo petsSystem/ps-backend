@@ -1,6 +1,7 @@
 package br.com.petshop.system.profile.service;
 
 import br.com.petshop.system.profile.model.dto.request.ProfileCreateRequest;
+import br.com.petshop.system.profile.model.dto.response.LabelResponse;
 import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.system.profile.model.entity.ProfileEntity;
 import org.modelmapper.ModelMapper;
@@ -17,7 +18,10 @@ public class ProfileConverterService {
         return mapper.map(request, ProfileEntity.class);
     }
     public ProfileResponse entityIntoResponse(ProfileEntity entity) {
-        ProfileResponse response = mapper.map(entity, ProfileResponse.class);
-        return response;
+        return mapper.map(entity, ProfileResponse.class);
+    }
+
+    public LabelResponse entityIntoLabelResponse(ProfileEntity entity) {
+        return mapper.map(entity, LabelResponse.class);
     }
 }

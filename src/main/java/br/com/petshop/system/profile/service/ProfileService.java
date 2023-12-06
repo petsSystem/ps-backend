@@ -3,6 +3,7 @@ package br.com.petshop.system.profile.service;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.profile.model.dto.request.ProfileCreateRequest;
+import br.com.petshop.system.profile.model.dto.response.LabelResponse;
 import br.com.petshop.system.profile.model.entity.ProfileEntity;
 import br.com.petshop.system.profile.repository.ProfileRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,8 +66,8 @@ public class ProfileService {
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    public List<String> findAllLabels() {
-        return profileRepository.findAllNames();
+    public List<ProfileEntity> findAllLabels() {
+        return profileRepository.findAll();
     }
 
     public Page<ProfileEntity> getAll(Pageable pageable) {

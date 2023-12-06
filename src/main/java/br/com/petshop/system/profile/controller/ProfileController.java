@@ -1,6 +1,7 @@
 package br.com.petshop.system.profile.controller;
 
 import br.com.petshop.system.profile.model.dto.request.ProfileCreateRequest;
+import br.com.petshop.system.profile.model.dto.response.LabelResponse;
 import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.system.profile.service.ProfileValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
@@ -161,7 +162,7 @@ public class ProfileController {
     })
     @GetMapping("/labels")
     @ResponseStatus(HttpStatus.OK)
-    public List<String> getLabels(
+    public List<LabelResponse> getLabels(
             Principal authentication) {
 
         return profileValidateService.getLabels(authentication);
