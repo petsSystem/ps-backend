@@ -21,9 +21,9 @@ public class EmployeeCreateRequest implements Serializable {
     private String cpf;
     private String email;
     private String phone;
-    private List<String> profile;
+    private List<String> profiles;
     private Address address;
-    private List<UUID> companyId;
+    private List<UUID> companyIds;
     @Builder.Default
     private Boolean active = true;
     @Builder.Default

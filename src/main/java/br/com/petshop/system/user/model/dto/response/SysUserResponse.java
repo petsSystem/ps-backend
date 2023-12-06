@@ -1,7 +1,7 @@
 package br.com.petshop.system.user.model.dto.response;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
+import br.com.petshop.system.profile.model.dto.Permission;
 import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -29,5 +29,7 @@ public class SysUserResponse implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<UUID> accessGroupIds;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ProfileResponse> accessGroups;
+    private List<UUID> profiles;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Permission> permissions;
 }

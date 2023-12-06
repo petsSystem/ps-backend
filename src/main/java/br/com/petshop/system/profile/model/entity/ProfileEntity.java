@@ -1,5 +1,6 @@
 package br.com.petshop.system.profile.model.entity;
 
+import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.profile.model.dto.Permission;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import jakarta.persistence.Column;
@@ -26,7 +27,7 @@ import java.util.List;
 public class ProfileEntity extends AuditorBaseEntity implements Serializable {
     @Column(unique = true)
     private String name;
-    private String role;
+    private Role role;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<Permission> permissions;

@@ -1,7 +1,9 @@
 package br.com.petshop.system.user.service;
 
+import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.profile.model.entity.ProfileEntity;
 import br.com.petshop.system.profile.service.ProfileService;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.service.EmployeeService;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SysUserService {
@@ -37,21 +40,70 @@ public class SysUserService {
     @Autowired private EmployeeService employeeService;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private SysUserSpecification specification;
-    @Autowired private ProfileService accessGroupService;
+    @Autowired private ProfileService profileService;
 
-    public SysUserEntity create (SysUserEntity request, UUID employeeId) {
-        EmployeeEntity employeeEntity = employeeService.findByIdAndActive(employeeId);
-        request.setEmail(employeeEntity.getEmail());
+    public SysUserEntity create (EmployeeEntity employee) {
 
+        //pegar os dados do profile (role e ids) se mais de um, chegar num denominador comum
+        List<ProfileEntity> profiles = employee.getProfiles().stream()
+                .map(p -> profileService.findByName(p))
+                .collect(Collectors.toList());
+
+        Role finalRole = getRole(profiles);
+        List<UUID> profileIds = getProfileIds(profiles);
         String password = generatePassword();
 
-        request.setPassword(passwordEncoder.encode(password));
-        request.setEmployee(employeeEntity);
-        SysUserEntity entity = systemUserRepository.save(request);
+        SysUserEntity entity = SysUserEntity.builder()
+                .username(employee.getEmail())
+                .password(passwordEncoder.encode(password))
+                .changePassword(false)
+                .role(finalRole)
+                .active(true)
+                .employee(employee)
+                .profileIds(profileIds)
+                .build();
+
+        entity = systemUserRepository.save(entity);
 
         asyncService.sendNewPassword(entity, password);
 
         return entity;
+    }
+
+    public SysUserEntity save (SysUserEntity entity) {
+        return systemUserRepository.save(entity);
+    }
+
+    private Role getRole(List<ProfileEntity> profiles) {
+        List<Role> roles = profiles.stream()
+                .map(p -> p.getRole())
+                .collect(Collectors.toList());
+
+        Role finalRole = null;
+        for (int i = 0; i < roles.size(); i++) {
+            Role role = roles.get(i);
+            if (finalRole == null)
+                finalRole = role;
+
+            if (role == Role.ADMIN) {
+                finalRole = role;
+                break;
+            }
+
+            if (role == Role.OWNER && finalRole != Role.ADMIN)
+                finalRole = role;
+
+            if (role == Role.MANAGER && finalRole != Role.ADMIN && finalRole != Role.OWNER)
+                finalRole = role;
+        }
+
+        return finalRole;
+    }
+
+    private List<UUID> getProfileIds(List<ProfileEntity> profiles) {
+        return profiles.stream()
+                .map(p -> p.getId())
+                .collect(Collectors.toList());
     }
 
     private String generatePassword () {
@@ -59,21 +111,12 @@ public class SysUserService {
         return newPassword.substring(0,8);
     }
 
-    public  Optional<SysUserEntity> findByEmailAndActiveIsTrue(String email) {
-        return systemUserRepository.findByEmailAndActiveIsTrue(email);
-    }
+    public SysUserEntity activate(UUID userId, Boolean active) {
+        Optional<SysUserEntity> entity = systemUserRepository.findById(userId);
+        SysUserEntity userEntity = entity.get();
+        userEntity.setActive(active);
 
-    public void forget (String email) {
-        SysUserEntity entity = systemUserRepository.findByEmailAndActiveIsTrue(email)
-                .orElseThrow(GenericNotFoundException::new);
-
-        String newPassword = generatePassword();
-        entity.setPassword(passwordEncoder.encode(newPassword));
-        entity.setChangePassword(true);
-
-        entity = systemUserRepository.save(entity);
-
-        asyncService.sendNewPassword(entity, newPassword);
+        return systemUserRepository.save(userEntity);
     }
 
     public  SysUserEntity partialUpdate(UUID userId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
@@ -89,6 +132,27 @@ public class SysUserService {
     private SysUserEntity applyPatch(JsonPatch patch, SysUserEntity entity) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         return objectMapper.treeToValue(patched, SysUserEntity.class);
+    }
+
+    public  Optional<SysUserEntity> findByUsername(String email) {
+        return systemUserRepository.findByUsername(email);
+    }
+
+    public  Optional<SysUserEntity> findByUsernameAndActiveIsTrue(String email) {
+        return systemUserRepository.findByUsernameAndActiveIsTrue(email);
+    }
+
+    public void forget (String email) {
+        SysUserEntity entity = systemUserRepository.findByUsernameAndActiveIsTrue(email)
+                .orElseThrow(GenericNotFoundException::new);
+
+        String newPassword = generatePassword();
+        entity.setPassword(passwordEncoder.encode(newPassword));
+        entity.setChangePassword(true);
+
+        entity = systemUserRepository.save(entity);
+
+        asyncService.sendNewPassword(entity, newPassword);
     }
 
     public  Page<SysUserEntity> get(Pageable pageable, SysUserFilterRequest filter) {
@@ -132,4 +196,6 @@ public class SysUserService {
                 .orElseThrow(GenericNotFoundException::new);
         systemUserRepository.delete(entity);
     }
+
+
 }

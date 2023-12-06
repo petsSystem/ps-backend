@@ -23,5 +23,6 @@ public class ScheduleResponse implements Serializable {
     private List<ScheduleDays> days;
     private String intervalMinutes;
     private String companyId;
+    private String active;
     private LocalDateTime createdAt;
 }

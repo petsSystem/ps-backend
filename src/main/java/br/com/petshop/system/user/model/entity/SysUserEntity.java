@@ -3,6 +3,7 @@ package br.com.petshop.system.user.model.entity;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.profile.model.dto.Permission;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +37,7 @@ import java.util.UUID;
 @Table(name = "sys_user")
 public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     @Column(unique = true)
-    private String email;
+    private String username;
     private String password;
     @Column(name = "change_password")
     private Boolean changePassword;
@@ -53,8 +54,8 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     private EmployeeEntity employee;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "access_group_ids", columnDefinition = "jsonb")
-    List<UUID> accessGroupIds;
+    @Column(name = "profile_ids", columnDefinition = "jsonb")
+    List<UUID> profileIds;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -63,8 +64,7 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        // email in our case
-        return email;
+        return username;
     }
 
     @Override

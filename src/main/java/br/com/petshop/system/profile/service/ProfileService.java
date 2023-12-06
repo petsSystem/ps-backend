@@ -60,6 +60,11 @@ public class ProfileService {
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    public ProfileEntity findByName(String name) {
+        return profileRepository.findByName(name)
+                .orElseThrow(GenericNotFoundException::new);
+    }
+
     public List<String> findAllLabels() {
         return profileRepository.findAllNames();
     }

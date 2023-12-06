@@ -12,6 +12,7 @@ import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.model.enums.Message;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
+import br.com.petshop.system.user.service.SysUserService;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +33,13 @@ public class EmployeeValidateService {
     Logger log = LoggerFactory.getLogger(EmployeeValidateService.class);
     @Autowired private EmployeeService service;
     @Autowired private EmployeeConverterService convert;
+    @Autowired private SysUserService userService;
 
     public EmployeeResponse create(Principal authentication, EmployeeCreateRequest request) {
         try {
 
             EmployeeEntity employeeEntity = convert.createRequestIntoEntity(request);
-//            employeeEntity = service.create(employeeEntity, request.getCompanyId());
+            employeeEntity = service.create(employeeEntity);
 
             return convert.entityIntoResponse(employeeEntity);
 
@@ -56,10 +58,13 @@ public class EmployeeValidateService {
         }
     }
 
-    public EmployeeResponse partialUpdate(Principal authentication, UUID employeeId, JsonPatch patch) {
+    public EmployeeResponse activate(Principal authentication, UUID employeeId, JsonPatch patch) {
         try {
 
             EmployeeEntity entity = service.partialUpdate(employeeId, patch);
+
+            if (entity.getHasUser())
+                userService.activate(entity.getUserId(), entity.getActive());
 
             return  convert.entityIntoResponse(entity);
 

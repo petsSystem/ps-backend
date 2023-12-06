@@ -23,7 +23,7 @@ public class UserService {
                     return appUserRepository.findByEmailAndActiveIsTrue(username)
                         .orElseThrow(() -> new UsernameNotFoundException(Message.AUTH_NOT_FOUND.get()));
                 else
-                    return systemUserRepository.findByEmailAndActiveIsTrue(username)
+                    return systemUserRepository.findByUsernameAndActiveIsTrue(username)
                             .orElseThrow(() -> new UsernameNotFoundException(Message.AUTH_NOT_FOUND.get()));
             }
         };

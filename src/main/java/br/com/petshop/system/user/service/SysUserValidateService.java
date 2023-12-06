@@ -4,7 +4,11 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.profile.service.ProfileValidateService;
+import br.com.petshop.system.employee.model.entity.EmployeeEntity;
+import br.com.petshop.system.employee.service.EmployeeService;
+import br.com.petshop.system.profile.model.dto.Permission;
+import br.com.petshop.system.profile.model.entity.ProfileEntity;
+import br.com.petshop.system.profile.service.ProfileService;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
@@ -36,46 +40,53 @@ import java.util.stream.Collectors;
 public class SysUserValidateService {
 
     Logger log = LoggerFactory.getLogger(SysUserValidateService.class);
+    @Autowired private EmployeeService employeeService;
     @Autowired private SysUserService service;
     @Autowired private SysUserConverterService convert;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private ProfileValidateService accessGroupValidateService;
+    @Autowired private ProfileService profileService;
 
     public SysUserResponse create (Principal authentication, SysUserCreateRequest request) {
         try {
+            //valida se o employee existe
+            EmployeeEntity employee = employeeService.findById(request.getEmployeeId());
 
-            Optional<SysUserEntity> userEntity = service.findByEmailAndActiveIsTrue(request.getEmail());
-
-            if ((request.getRole() == Role.ADMIN || request.getRole() == Role.OWNER) &&
-                    getRole(authentication) != Role.ADMIN)
-                throw new GenericForbiddenException();
-
-            if (userEntity.isPresent())
+            if (employee.getHasUser())
                 throw new GenericAlreadyRegisteredException();
 
-            if (request.getEmployeeId() == null) {
-                if (getRole(authentication) != Role.ADMIN)
-                    throw new GenericForbiddenException();
+            //valida se o user já existe
+            Optional<SysUserEntity> user = service.findByUsername(employee.getEmail());
+
+            SysUserEntity entity = null;
+
+            if (user.isPresent()) {
+                entity = user.get();
+                if (!entity.getActive()) {
+                    entity.setActive(true);
+                    entity = service.save(entity);
+                }
+            } else {
+                entity = service.create(employee);
             }
 
-            SysUserEntity entity = convert.createRequestIntoEntity(request);
-
-            entity = service.create(entity, request.getEmployeeId());
+            employee.setUserId(entity.getId());
+            employee.setHasUser(true);
+            employeeService.save(employee);
 
             return convert.entityIntoResponse(entity);
 
-        } catch (GenericAlreadyRegisteredException ex) {
-            log.error(Message.USER_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.USER_ALREADY_REGISTERED.get(), ex);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_EMPLOYEE_NOT_FOUND.get(), ex);
         } catch (GenericForbiddenException ex) {
             log.error(Message.USER_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, Message.USER_ERROR_FORBIDDEN.get(), ex);
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_EMPLOYEE_NOT_FOUND.get(), ex);
+        } catch (GenericAlreadyRegisteredException ex) {
+            log.error(Message.USER_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY, Message.USER_ALREADY_REGISTERED.get(), ex);
         } catch (Exception ex) {
             log.error(Message.USER_ERROR_CREATE.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -86,7 +97,7 @@ public class SysUserValidateService {
     public void forget (Principal authentication, SysUserForgetRequest request) {
         try {
 
-           service.forget(request.email());
+            service.forget(request.email());
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
@@ -153,19 +164,19 @@ public class SysUserValidateService {
         try {
 
             if (getRole(authentication) == Role.USER)
-                filter.setEmail(getAuthUser(authentication).getEmail());
+                filter.setEmail(getAuthUser(authentication).getUsername());
             else if (getRole(authentication) == Role.OWNER || getRole(authentication) == Role.MANAGER)
                 filter.setCompanyIds(getAuthUser(authentication).getEmployee().getCompanyIds());
 
             Page<SysUserEntity> entities = service.get(pageable, filter);
 
             List<SysUserResponse> response = entities.stream()
-                    .map(c -> setAccessGroupInfo(authentication, convert.entityIntoResponse(c)))
+                    .map(c -> setPermissions(c))
                     .collect(Collectors.toList());
 
             return new PageImpl<>(response);
 
-       } catch (Exception ex) {
+        } catch (Exception ex) {
             log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
@@ -185,7 +196,7 @@ public class SysUserValidateService {
                 validateUserAccess(getAuthUser(authentication), entity);
             }
 
-            return setAccessGroupInfo(authentication, convert.entityIntoResponse(entity));
+            return setPermissions(entity);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
@@ -210,15 +221,21 @@ public class SysUserValidateService {
                 .filter(l -> entityCompanies.contains(l)).findFirst();
 
         if (match.isEmpty())
-                throw new GenericForbiddenException();
+            throw new GenericForbiddenException();
     }
 
-    private SysUserResponse setAccessGroupInfo(Principal authentication, SysUserResponse response) {
-//        if (response.getAccessGroupIds() != null) {
-//            response.setAccessGroups(response.getAccessGroupIds().stream()
-//                    .map(a -> accessGroupValidateService.getById(authentication, a))
-//                    .collect(Collectors.toList()));
-//        }
+    private SysUserResponse setPermissions(SysUserEntity entity) {
+        List<Permission> allPermissions = new ArrayList<>();
+
+        entity.getProfileIds().stream()
+                .forEach(p -> {
+                    ProfileEntity profile = profileService.findById(p);
+                    allPermissions.addAll(profile.getPermissions());
+                });
+
+        SysUserResponse response = convert.entityIntoResponse(entity);
+        response.setPermissions(allPermissions);
+
         return response;
     }
 
@@ -227,7 +244,7 @@ public class SysUserValidateService {
 
             SysUserEntity entity = service.findByIdAndActiveIsTrue(getAuthUser(authentication).getId());
 
-            return setAccessGroupInfo(authentication, convert.entityIntoResponse(entity));
+            return setPermissions(entity);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());

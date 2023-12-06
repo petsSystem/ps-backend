@@ -9,6 +9,7 @@ import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.model.enums.Message;
+import br.com.petshop.system.schedule.service.ScheduleService;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
@@ -32,13 +33,19 @@ public class CompanyValidateService {
     Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired CompanyService service;
     @Autowired private CompanyConverterService convert;
+    @Autowired private ScheduleService scheduleService;
 
     public CompanyResponse create(Principal authentication, CompanyCreateRequest request) {
         try {
 
-            CompanyEntity entityRequest= convert.createRequestIntoEntity(request);
+            CompanyEntity entityRequest = convert.createRequestIntoEntity(request);
 
             CompanyEntity entity = service.create(entityRequest);
+
+            List<UUID> scheduleIds = scheduleService.create(entity);
+            entity.setScheduleIds(scheduleIds);
+
+            service.save(entity);
 
             return convert.entityIntoResponse(entity);
 
@@ -53,10 +60,10 @@ public class CompanyValidateService {
         }
     }
 
-    public CompanyResponse partialUpdate(Principal authentication, UUID companyId, JsonPatch patch) {
+    public CompanyResponse activate (Principal authentication, UUID companyId, JsonPatch patch) {
         try {
 
-            CompanyEntity entity = service.partialUpdate(companyId, patch);
+            CompanyEntity entity = service.activate(companyId, patch);
 
             return  convert.entityIntoResponse(entity);
 
@@ -139,21 +146,21 @@ public class CompanyValidateService {
         }
     }
 
-    public void delete(Principal authentication, UUID companyId) {
-        try {
-
-            service.delete(companyId);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.COMPANY_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_DELETE.get(), ex);
-        }
-    }
+//    public void delete(Principal authentication, UUID companyId) {
+//        try {
+//
+//            service.delete(companyId);
+//
+//        } catch (GenericNotFoundException ex) {
+//            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+//            throw new ResponseStatusException(
+//                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
+//        } catch (Exception ex) {
+//            log.error(Message.COMPANY_ERROR_DELETE.get() + " Error: " + ex.getMessage());
+//            throw new ResponseStatusException(
+//                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_DELETE.get(), ex);
+//        }
+//    }
 
     private SysUserEntity getAuthUser(Principal authentication) {
         return ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
@@ -166,4 +173,6 @@ public class CompanyValidateService {
 
         return systemUser.getRole();
     }
+
+
 }

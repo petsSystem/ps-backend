@@ -57,6 +57,10 @@ public class CompanyEntity extends AuditorBaseEntity implements Serializable {
     @Column(columnDefinition = "jsonb")
     private List<Category> categories;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb", name = "schedule_ids")
+    private List<UUID> scheduleIds;
+
 //
 //
 //    @JsonIgnore

@@ -3,7 +3,9 @@ package br.com.petshop.system.employee.model.entity;
 import br.com.petshop.system.audit.AuditorBaseEntity;
 import br.com.petshop.system.model.Address;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +33,7 @@ public class EmployeeEntity extends AuditorBaseEntity implements Serializable {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private List<String> profile;
+    private List<String> profiles;
 
     @Column(unique = true)
     private String email;
@@ -46,7 +48,7 @@ public class EmployeeEntity extends AuditorBaseEntity implements Serializable {
     @Column(name = "company_ids", columnDefinition = "jsonb")
     private List<UUID> companyIds;
 
-    private String userId;
+    private UUID userId;
 
     private Boolean hasUser;
 

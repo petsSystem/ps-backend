@@ -28,4 +28,6 @@ public class EmployeeResponse implements Serializable {
     private Boolean active;
     private List<UUID> companyIds;
     private LocalDateTime createdAt;
+    private Boolean hasUser;
+    private UUID userId;
 }

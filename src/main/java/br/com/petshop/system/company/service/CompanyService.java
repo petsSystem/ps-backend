@@ -36,18 +36,23 @@ public class CompanyService {
     @Autowired private PetGeometry geometry;
     @Autowired private EmployeeService employeeService;
 
-    public CompanyEntity create(CompanyEntity request) {
-        Optional<CompanyEntity> company = companyRepository.findByCnpj(request.getCnpj());
+
+    public CompanyEntity create(CompanyEntity entity) {
+        Optional<CompanyEntity> company = companyRepository.findByCnpj(entity.getCnpj());
         if (company.isPresent())
             throw new GenericAlreadyRegisteredException();
 
-        request.setGeom((Point)
-                geometry.getPoint(request.getAddress().getLat(), request.getAddress().getLon()));
+        entity.setGeom((Point)
+                geometry.getPoint(entity.getAddress().getLat(), entity.getAddress().getLon()));
 
-        return companyRepository.save(request);
+        return save(entity);
     }
 
-    public CompanyEntity partialUpdate(UUID companyId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+    public CompanyEntity save(CompanyEntity entity) {
+        return companyRepository.save(entity);
+    }
+
+    public CompanyEntity activate (UUID companyId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         CompanyEntity entity = companyRepository.findById(companyId)
                 .orElseThrow(GenericNotFoundException::new);
 
@@ -81,11 +86,11 @@ public class CompanyService {
         return companyRepository.save(entity);
     }
 
-    public void delete(UUID companyId) {
-        CompanyEntity entity = companyRepository.findById(companyId)
-                .orElseThrow(GenericNotFoundException::new);
-        companyRepository.delete(entity);
-    }
+//    public void delete(UUID companyId) {
+//        CompanyEntity entity = companyRepository.findById(companyId)
+//                .orElseThrow(GenericNotFoundException::new);
+//        companyRepository.delete(entity);
+//    }
 
     private CompanyEntity applyPatch(JsonPatch patch, CompanyEntity entity) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));

@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -18,12 +19,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyResponse implements Serializable {
-    private String id;
+    private UUID id;
     private String name;
     private String cnpj;
     private String phone;
     private Address address;
     private Boolean active;
     private List<Category> categories;
+    private List<UUID> scheduleIds;
     private LocalDateTime createdAt;
 }

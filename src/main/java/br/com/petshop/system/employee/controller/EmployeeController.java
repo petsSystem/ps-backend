@@ -78,7 +78,7 @@ public class EmployeeController {
                             "}")})})
     })
     @PostMapping()
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public EmployeeResponse create(
             Principal authentication,
@@ -87,7 +87,7 @@ public class EmployeeController {
     }
 
     @Operation(summary = "Serviço de atualização parcial de funcionário no sistema.",
-            description = "Acesso: 'ADMIN'")
+            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -114,8 +114,8 @@ public class EmployeeController {
     })
     @PatchMapping(path = "/{employeeId}", consumes = "application/json-patch+json")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public EmployeeResponse partialUpdate(
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public EmployeeResponse activate(
             Principal authentication,
             @PathVariable("employeeId") UUID employeeId,
             @Schema(example = "[\n" +
@@ -126,7 +126,7 @@ public class EmployeeController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return validateService.partialUpdate(authentication, employeeId, patch);
+        return validateService.activate(authentication, employeeId, patch);
     }
 
     //ACESSO: ALL (COM FILTROS)

@@ -1,7 +1,7 @@
 package br.com.petshop.system.company.controller;
 
-import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
+import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
 import br.com.petshop.system.company.service.CompanyValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +40,7 @@ public class CompanyController {
     @Autowired private CompanyValidateService validateService;
 
     //ACESSO: ADMIN e OWNER
-    @Operation(summary = "Serviço de inclusão da empresa no sistema.",
+    @Operation(summary = "Serviço de inclusão de loja no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -51,24 +50,24 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao cadastrar empresa. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao cadastrar loja. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "422",
-                    description = "Empresa já cadastrada.",
+                    description = "Loja já cadastrada.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
-                            "\"detail\": \"Empresa já cadastrada no sistema.\",\n" +
+                            "\"detail\": \"Loja já cadastrada no sistema.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})}),
     })
     @PostMapping()
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER')")
     public CompanyResponse create(
             Principal authentication,
@@ -76,7 +75,7 @@ public class CompanyController {
         return validateService.create(authentication, request);
     }
     //ACESSO ADMIN
-    @Operation(summary = "Serviço de ativação do cadastro da empresa no sistema.",
+    @Operation(summary = "Serviço de ativação/desativação de loja no sistema.",
             description = "Acesso: 'ADMIN'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -86,7 +85,51 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao ativar/desativar loja. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/companies/{companyId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cadastro da loja não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Cadastro da loja não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/companies/{companyId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping(path = "/{companyId}", consumes = "application/json-patch+json")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public CompanyResponse activate (
+            Principal authentication,
+            @PathVariable("companyId") UUID companyId,
+            @Schema(example = "[\n" +
+                    "    {\n" +
+                    "        \"op\": \"replace\",\n" +
+                    "        \"path\": \"/active\",\n" +
+                    "        \"value\": \"true\"\n" +
+                    "    }\n" +
+                    "]")
+            @RequestBody JsonPatch patch) {
+        return validateService.activate(authentication, companyId, patch);
+    }
+
+    //ACESSO: ADMIN, OWNER, MANAGER
+    @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
+            description = "Acesso: 'ALL'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -102,25 +145,17 @@ public class CompanyController {
                             "}\n" +
                             "\n")})})
     })
-    @PatchMapping(path = "/{companyId}", consumes = "application/json-patch+json")
+    @PutMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public CompanyResponse partialUpdate(
+    public CompanyResponse updateById(
             Principal authentication,
             @PathVariable("companyId") UUID companyId,
-            @Schema(example = "[\n" +
-                    "    {\n" +
-                    "        \"op\": \"replace\",\n" +
-                    "        \"path\": \"/active\",\n" +
-                    "        \"value\": \"true\"\n" +
-                    "    }\n" +
-                    "]")
-            @RequestBody JsonPatch patch) {
-        return validateService.partialUpdate(authentication, companyId, patch);
+            @RequestBody CompanyUpdateRequest request) {
+        return validateService.updateById(authentication, companyId, request);
     }
 
     //ACESSO: ALL
-    @Operation(summary = "Serviço de recuperação das informações da empresa do login.",
+    @Operation(summary = "Serviço de recuperação das informações da(s) loja(s) do usuário autenticado.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
@@ -130,7 +165,7 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar dados da(s) loja(s). Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})})
@@ -191,75 +226,41 @@ public class CompanyController {
         return validateService.getById(authentication, companyId);
     }
 
-    //ACESSO: ADMIN, OWNER, MANAGER
-    @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
-            description = "Acesso: 'ALL'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PutMapping("/{companyId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CompanyResponse updateById(
-            Principal authentication,
-            @PathVariable("companyId") UUID companyId,
-            @RequestBody CompanyUpdateRequest request) {
-        return validateService.updateById(authentication, companyId, request);
-    }
 
-    //ACESSO: ADMIN
-    @Operation(summary = "Serviço de exclusão do cadastro da empresa no sistema.",
-            description = "Acesso: 'ADMIN'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao excluir empresa. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @DeleteMapping("/{companyId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void delete (
-            Principal authentication,
-            @PathVariable("companyId") UUID companyId) {
-        validateService.delete(authentication, companyId);
-    }
+
+//    //ACESSO: ADMIN
+//    @Operation(summary = "Serviço de exclusão do cadastro da empresa no sistema.",
+//            description = "Acesso: 'ADMIN'")
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Erro no sistema.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "\"type\": \"about:blank\",\n" +
+//                            "\"title\": \"Bad Request\",\n" +
+//                            "\"status\": 400,\n" +
+//                            "\"detail\": \"Erro ao excluir empresa. Tente novamente mais tarde.\",\n" +
+//                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
+//                            "}\n" +
+//                            "\n")})}),
+//            @ApiResponse(
+//                    responseCode = "404",
+//                    description = "Cadastro da empresa não encontrado.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "    \"type\": \"about:blank\",\n" +
+//                            "    \"title\": \"Not Found\",\n" +
+//                            "    \"status\": 404,\n" +
+//                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+//                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
+//                            "}\n" +
+//                            "\n")})})
+//    })
+//    @DeleteMapping("/{companyId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public void delete (
+//            Principal authentication,
+//            @PathVariable("companyId") UUID companyId) {
+//        validateService.delete(authentication, companyId);
+//    }
 }

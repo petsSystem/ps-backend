@@ -6,6 +6,7 @@ import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,12 @@ public class EmployeeConverterService {
     private ModelMapper mapper;
 
     public EmployeeEntity createRequestIntoEntity(EmployeeCreateRequest request) {
-        return mapper.map(request, EmployeeEntity.class);
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        EmployeeEntity entity = mapper.map(request, EmployeeEntity.class);
+        entity.setCompanyIds(request.getCompanyIds());
+        entity.setProfiles(request.getProfiles());
+
+        return entity;
     }
 
     public EmployeeEntity updateRequestIntoEntity(EmployeeUpdateRequest request) {

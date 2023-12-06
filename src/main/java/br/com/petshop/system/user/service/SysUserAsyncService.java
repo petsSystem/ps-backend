@@ -16,7 +16,7 @@ public class SysUserAsyncService {
         String subject = "Nova senha - Pet System";
         String body = "Sua nova senha é: " + newPassword;
 
-        mailNotificationService.send(userEntity.getEmail(), subject, body);
+        mailNotificationService.send(userEntity.getUsername(), subject, body);
     }
 
     @Async
@@ -25,6 +25,6 @@ public class SysUserAsyncService {
         String subject = "Validação de email - Pet System";
         String body = "Seu token de validação é: " + userEntity.getEmailToken();
 
-        mailNotificationService.send(userEntity.getEmail(), subject, body);
+        mailNotificationService.send(userEntity.getUsername(), subject, body);
     }
 }

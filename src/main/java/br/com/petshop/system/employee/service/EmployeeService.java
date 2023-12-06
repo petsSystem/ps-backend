@@ -9,11 +9,14 @@ import br.com.petshop.system.employee.model.dto.response.EmployeeResponse;
 import br.com.petshop.system.employee.model.entity.EmployeeEntity;
 import br.com.petshop.system.employee.repository.EmployeeRepository;
 import br.com.petshop.system.employee.repository.EmployeeSpecification;
+import br.com.petshop.system.user.service.SysUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.github.fge.jsonpatch.JsonPatchOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +38,17 @@ public class EmployeeService {
     @Autowired private EmployeeSpecification specification;
     @Autowired private EmployeeConverterService convert;
     @Autowired private CompanyService companyService;
+    @Autowired private SysUserService sysUserService;
     @Autowired private ObjectMapper objectMapper;
 
-    public EmployeeEntity create(EmployeeEntity request, UUID companyId) {
+    public EmployeeEntity create(EmployeeEntity request) {
         Optional<EmployeeEntity> entity = employeeRepository.findByCpfAndActiveIsTrue(request.getCpf());
 
         if (entity.isPresent())
             throw new GenericAlreadyRegisteredException();
 
-        CompanyEntity companyEntity = companyService.findByIdAndActiveIsTrue(companyId);
-
-        request.setCompanyIds(List.of(companyId));
+        for(UUID companyId : request.getCompanyIds())
+            companyService.findByIdAndActiveIsTrue(companyId);
 
         return employeeRepository.save(request);
     }
@@ -89,6 +92,10 @@ public class EmployeeService {
     public EmployeeEntity updateById(EmployeeEntity request, EmployeeEntity entity) {
         entity = convert.updateRequestIntoEntity(request, entity);
 
+        return employeeRepository.save(entity);
+    }
+
+    public EmployeeEntity save(EmployeeEntity entity) {
         return employeeRepository.save(entity);
     }
 

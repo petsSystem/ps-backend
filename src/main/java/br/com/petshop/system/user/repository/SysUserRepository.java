@@ -13,7 +13,8 @@ import java.util.UUID;
 @Repository
 public interface SysUserRepository extends JpaRepository<SysUserEntity, Integer> {
     Optional<SysUserEntity> findById(UUID userId);
-    Optional<SysUserEntity> findByEmailAndActiveIsTrue(String email);
+    Optional<SysUserEntity> findByUsername(String email);
+    Optional<SysUserEntity> findByUsernameAndActiveIsTrue(String email);
     Optional<SysUserEntity> findByIdAndActiveIsTrue(UUID id);
     Page<SysUserEntity> findAll(Specification<SysUserEntity> filter, Pageable pageable);
 }
