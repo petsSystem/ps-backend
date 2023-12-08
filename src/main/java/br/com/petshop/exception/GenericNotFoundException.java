@@ -1,6 +1,5 @@
 package br.com.petshop.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

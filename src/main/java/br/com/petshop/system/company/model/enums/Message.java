@@ -1,14 +1,18 @@
 package br.com.petshop.system.company.model.enums;
 
 public enum Message {
-    COMPANY_ALREADY_REGISTERED("Empresa já cadastrada no sistema."),
-    COMPANY_NOT_FOUND("Cadastro da empresa não encontrado."),
-    COMPANY_ERROR_FORBIDDEN("Acesso negado."),
-    COMPANY_ERROR_CREATE("Erro ao cadastrar empresa. Tente novamente mais tarde."),
-    COMPANY_ERROR_UPDATE("Erro ao atualizar dados da empresa. Tente novamente mais tarde."),
-    COMPANY_ERROR_GET("Erro ao recuperar dados da empresa. Tente novamente mais tarde."),
-    COMPANY_ERROR_PARTIAL("Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde."),
-    COMPANY_ERROR_DELETE("Erro ao excluir empresa. Tente novamente mais tarde."),;
+    COMPANY_CREATE_ERROR("Erro ao cadastrar loja. Tente novamente mais tarde."),
+    COMPANY_ALREADY_REGISTERED_ERROR("Loja já cadastrada no sistema."),
+    COMPANY_ACTIVATE_ERROR("Erro ao ativar/desativar loja. Tente novamente mais tarde."),
+    COMPANY_NOT_FOUND_ERROR("Loja não encontrada."),
+    COMPANY_UPDATE_ERROR("Erro ao atualizar loja. Tente novamente mais tarde."),
+    COMPANY_NOT_ACTIVE_ERROR("Loja inativa."),
+    COMPANY_GET_ERROR("Erro ao recuperar dados da(s) loja(s). Tente novamente mais tarde."),
+    COMPANY_FORBIDDEN_ERROR("Acesso negado."),
+
+
+
+    COMPANY_PARTIAL_ERROR("Erro ao atualizar parcialmente os dados da empresa. Tente novamente mais tarde.");
 
     private String message;
 

@@ -1,6 +1,7 @@
 package br.com.petshop.system.company.service;
 
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
@@ -53,8 +54,7 @@ public class CompanyService {
     }
 
     public CompanyEntity activate (UUID companyId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        CompanyEntity entity = companyRepository.findById(companyId)
-                .orElseThrow(GenericNotFoundException::new);
+        CompanyEntity entity = findById(companyId);
 
         entity = applyPatch(patch, entity);
 
@@ -68,15 +68,25 @@ public class CompanyService {
     public Page<CompanyEntity> findByEmployeeId(UUID employeeId, Pageable paging) {
         EmployeeEntity employee = employeeService.findById(employeeId);
         List<CompanyEntity> companies = employee.getCompanyIds().stream()
-                .map(c -> findByIdAndActiveIsTrue(c))
+                .map(c -> findById(c))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(companies);
     }
 
-    public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {
-        return companyRepository.findByIdAndActiveIsTrue(companyId)
+    public CompanyEntity findById(UUID companyId) {
+        return companyRepository.findById(companyId)
                 .orElseThrow(GenericNotFoundException::new);
+    }
+
+    public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {
+        CompanyEntity company = companyRepository.findById(companyId)
+                .orElseThrow(GenericNotFoundException::new);
+
+        if (!company.getActive())
+            throw new GenericNotActiveException();
+
+        return company;
     }
 
     public CompanyEntity updateById(UUID companyId, CompanyEntity request) {

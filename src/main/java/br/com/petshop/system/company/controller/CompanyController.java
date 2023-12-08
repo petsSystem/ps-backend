@@ -85,13 +85,13 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao ativar/desativar loja. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao atualizar loja. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies/{companyId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro da loja não encontrado.",
+                    description = "Loja não encontrada.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
@@ -131,6 +131,17 @@ public class CompanyController {
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Loja inativa.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Bad Request\",\n" +
+                            "    \"status\": 400,\n" +
+                            "    \"detail\": \"Loja inativa.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/companies/{companyId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -181,7 +192,7 @@ public class CompanyController {
     }
 
     //ACESSO: ALL
-    @Operation(summary = "Serviço de recuperação das informações da empresa pelo id.",
+    @Operation(summary = "Serviço de recuperação das informações da(s) loja(s) pelo id.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
@@ -191,7 +202,7 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar dados da(s) loja(s). Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -208,12 +219,12 @@ public class CompanyController {
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
+                    description = "Loja não encontrada.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"detail\": \"Loja não encontrada.\",\n" +
                             "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})
@@ -225,42 +236,4 @@ public class CompanyController {
             @PathVariable("companyId") UUID companyId) {
         return validateService.getById(authentication, companyId);
     }
-
-
-
-//    //ACESSO: ADMIN
-//    @Operation(summary = "Serviço de exclusão do cadastro da empresa no sistema.",
-//            description = "Acesso: 'ADMIN'")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao excluir empresa. Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "404",
-//                    description = "Cadastro da empresa não encontrado.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "    \"type\": \"about:blank\",\n" +
-//                            "    \"title\": \"Not Found\",\n" +
-//                            "    \"status\": 404,\n" +
-//                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
-//                            "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @DeleteMapping("/{companyId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    public void delete (
-//            Principal authentication,
-//            @PathVariable("companyId") UUID companyId) {
-//        validateService.delete(authentication, companyId);
-//    }
 }

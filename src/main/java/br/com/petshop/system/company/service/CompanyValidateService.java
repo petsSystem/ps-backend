@@ -3,6 +3,7 @@ package br.com.petshop.system.company.service;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
+import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
@@ -50,13 +51,13 @@ public class CompanyValidateService {
             return convert.entityIntoResponse(entity);
 
         } catch (GenericAlreadyRegisteredException ex) {
-            log.error( Message.COMPANY_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
+            log.error( Message.COMPANY_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.COMPANY_ALREADY_REGISTERED.get(), ex);
+                    HttpStatus.UNPROCESSABLE_ENTITY, Message.COMPANY_ALREADY_REGISTERED_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.COMPANY_ERROR_CREATE.get() + " Error: " + ex.getMessage());
+            log.error(Message.COMPANY_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_CREATE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_CREATE_ERROR.get(), ex);
         }
     }
 
@@ -68,13 +69,37 @@ public class CompanyValidateService {
             return  convert.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
-            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            log.error(Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.COMPANY_ERROR_PARTIAL.get() + " Error: " + ex.getMessage());
+            log.error(Message.COMPANY_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_PARTIAL.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_ACTIVATE_ERROR.get(), ex);
+        }
+    }
+
+    public CompanyResponse updateById(Principal authentication, UUID companyId, CompanyUpdateRequest request) {
+        try {
+
+            CompanyEntity entityRequest = convert.updateRequestIntoEntity(request);
+
+            CompanyEntity entity = service.updateById(companyId, entityRequest);
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND_ERROR.get(), ex);
+        } catch (GenericNotActiveException ex) {
+            log.error(Message.COMPANY_NOT_ACTIVE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_ACTIVE_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.COMPANY_UPDATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_UPDATE_ERROR.get(), ex);
         }
     }
 
@@ -93,10 +118,14 @@ public class CompanyValidateService {
 
             return new PageImpl<>(response);
 
-        } catch (Exception ex) {
-            log.error(Message.COMPANY_ERROR_GET.get() + " Error: " + ex.getMessage());
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_GET.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.COMPANY_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_GET_ERROR.get(), ex);
         }
     }
 
@@ -108,59 +137,23 @@ public class CompanyValidateService {
                     throw new GenericForbiddenException();
             }
 
-            CompanyEntity entity = service.findByIdAndActiveIsTrue(companyId);
+            CompanyEntity entity = service.findById(companyId);
             return convert.entityIntoResponse(entity);
 
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
         } catch (GenericForbiddenException ex) {
-            log.error(Message.COMPANY_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
+            log.error(Message.COMPANY_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, Message.COMPANY_ERROR_FORBIDDEN.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.COMPANY_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_GET.get(), ex);
-        }
-    }
-
-    public CompanyResponse updateById(Principal authentication, UUID companyId, CompanyUpdateRequest request) {
-        try {
-
-            CompanyEntity entityRequest = convert.updateRequestIntoEntity(request);
-
-            CompanyEntity entity = service.updateById(companyId, entityRequest);
-
-            return convert.entityIntoResponse(entity);
-
+                    HttpStatus.FORBIDDEN, Message.COMPANY_FORBIDDEN_ERROR.get(), ex);
         } catch (GenericNotFoundException ex) {
-            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            log.error(Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.COMPANY_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
+            log.error(Message.COMPANY_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_UPDATE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_GET_ERROR.get(), ex);
         }
     }
-
-//    public void delete(Principal authentication, UUID companyId) {
-//        try {
-//
-//            service.delete(companyId);
-//
-//        } catch (GenericNotFoundException ex) {
-//            log.error(Message.COMPANY_NOT_FOUND.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND.get(), ex);
-//        } catch (Exception ex) {
-//            log.error(Message.COMPANY_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, Message.COMPANY_ERROR_DELETE.get(), ex);
-//        }
-//    }
 
     private SysUserEntity getAuthUser(Principal authentication) {
         return ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
@@ -173,6 +166,4 @@ public class CompanyValidateService {
 
         return systemUser.getRole();
     }
-
-
 }
