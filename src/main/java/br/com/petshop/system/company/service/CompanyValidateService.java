@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -115,6 +117,9 @@ public class CompanyValidateService {
             List<CompanyResponse> response = entities.stream()
                     .map(c -> convert.entityIntoResponse(c))
                     .collect(Collectors.toList());
+
+            Collections.sort(response, Comparator.comparing(CompanyResponse::getActive).reversed()
+                    .thenComparing(CompanyResponse::getName));
 
             return new PageImpl<>(response);
 
