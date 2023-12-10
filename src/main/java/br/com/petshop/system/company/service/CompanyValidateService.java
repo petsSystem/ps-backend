@@ -8,6 +8,7 @@ import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
+import br.com.petshop.system.company.model.dto.response.CompanyTableResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.model.enums.Message;
 import br.com.petshop.system.schedule.service.ScheduleService;
@@ -105,21 +106,21 @@ public class CompanyValidateService {
         }
     }
 
-    public Page<CompanyResponse> get(Principal authentication, Pageable paging) {
+    public Page<CompanyTableResponse> get(Principal authentication, Pageable paging) {
         try {
             Page<CompanyEntity> entities;
 
             if (getRole(authentication) == Role.ADMIN)
                 entities = service.findAll(paging);
             else
-                entities = service.findByEmployeeId(getAuthUser(authentication).getEmployee().getId(), paging);
+                entities = service.findByEmployeeId(getAuthUser(authentication).getEmployeeId(), paging);
 
-            List<CompanyResponse> response = entities.stream()
-                    .map(c -> convert.entityIntoResponse(c))
+            List<CompanyTableResponse> response = entities.stream()
+                    .map(c -> convert.entityIntoTableResponse(c))
                     .collect(Collectors.toList());
 
-            Collections.sort(response, Comparator.comparing(CompanyResponse::getActive).reversed()
-                    .thenComparing(CompanyResponse::getName));
+            Collections.sort(response, Comparator.comparing(CompanyTableResponse::getActive).reversed()
+                    .thenComparing(CompanyTableResponse::getName));
 
             return new PageImpl<>(response);
 
@@ -138,7 +139,7 @@ public class CompanyValidateService {
         try {
 
             if (getRole(authentication) != Role.ADMIN) {
-                if (!getAuthUser(authentication).getEmployee().getCompanyIds().contains(companyId))
+                if (!getAuthUser(authentication).getCompanyIds().contains(companyId))
                     throw new GenericForbiddenException();
             }
 

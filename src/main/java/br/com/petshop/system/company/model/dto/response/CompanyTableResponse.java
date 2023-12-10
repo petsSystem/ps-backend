@@ -1,4 +1,4 @@
-package br.com.petshop.system.employee.model.dto.request;
+package br.com.petshop.system.company.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,10 +14,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeFilterRequest implements Serializable {
-    private UUID companyId;
-    private String cpf;
-    private String email;
-    private String profile;
+public class CompanyTableResponse implements Serializable {
+    private UUID id;
+    private String name;
+    private String cnpj;
+    private String phone;
     private Boolean active;
 }
