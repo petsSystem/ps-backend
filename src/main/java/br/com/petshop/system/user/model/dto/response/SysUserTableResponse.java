@@ -20,5 +20,4 @@ public class SysUserTableResponse implements Serializable {
     private String cpf;
     private String email;
     private Boolean active;
-    private Boolean hasUser;
 }

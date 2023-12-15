@@ -120,6 +120,19 @@ public class ProfileValidateService {
         }
     }
 
+    public ProfileResponse getById(UUID profileId) {
+        try {
+            ProfileEntity entity = service.findById(profileId);
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (Exception ex) {
+            log.error(Message.PROFILE_ERROR_GET.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_GET.get(), ex);
+        }
+    }
+
     public void delete(Principal authentication, UUID profileId) {
         try {
 

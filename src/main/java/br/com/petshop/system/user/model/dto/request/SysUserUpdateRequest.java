@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -16,7 +18,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class SysUserUpdateRequest implements Serializable {
     private String name;
+    private String cpf;
+    private String email;
     private String phone;
-    private String type;
+    private List<UUID> profileIds;
+    private List<UUID> companyIds;
     private Address address;
 }

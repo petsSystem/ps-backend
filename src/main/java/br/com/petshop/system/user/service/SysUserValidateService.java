@@ -7,7 +7,7 @@ import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.profile.model.dto.Permission;
-import br.com.petshop.system.profile.model.entity.ProfileEntity;
+import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
 import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
@@ -123,7 +123,7 @@ public class SysUserValidateService {
             SysUserEntity entity = getAuthUser(authentication);
             entity = service.findById(entity.getId());
 
-            List<ProfileEntity> profiles = service.getProfiles(entity);
+            List<ProfileResponse> profiles = service.getProfiles(entity);
             List<Permission> permissions = profiles.stream()
                     .flatMap(p -> p.getPermissions().stream())
                     .collect(Collectors.toList());
@@ -162,20 +162,10 @@ public class SysUserValidateService {
         try {
             SysUserEntity entity = service.findByIdAndActiveIsTrue(userId);
 
-            if (getRole(authentication) != Role.ADMIN) {
-                List<UUID> companyIds = getAuthUser(authentication).getCompanyIds();
-                Boolean contains = false;
-                for (UUID companyId : companyIds) {
-                    if (entity.getCompanyIds().contains(companyId)) {
-                        contains = true;
-                        break;
-                    }
-                }
-                if (!contains)
-                    throw new GenericForbiddenException();
-            }
+            if (getRole(authentication) != Role.ADMIN)
+                validateUserAccess(getAuthUser(authentication), entity);
 
-            SysUserEntity entityRequest =  convert.updateRequestIntoEntity(request);
+            SysUserEntity entityRequest = convert.updateRequestIntoEntity(request);
 
             entity = service.updateById(entityRequest, entity);
 
@@ -231,7 +221,12 @@ public class SysUserValidateService {
             if (getRole(authentication) != Role.ADMIN)
                 validateUserAccess(getAuthUser(authentication), entity);
 
-            return convert.entityIntoResponse(entity);
+            List<ProfileResponse> profiles = service.getProfiles(entity);
+
+            SysUserResponse response = convert.entityIntoResponse(entity);
+            response.setProfiles(profiles);
+
+            return response;
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -248,20 +243,18 @@ public class SysUserValidateService {
         }
     }
 
-    private void validateUserAccess(br.com.petshop.system.user.model.entity.SysUserEntity systemUser, SysUserEntity entity) {
+    private void validateUserAccess(SysUserEntity systemUser, SysUserEntity entity) {
         if (!systemUser.getCompanyIds().contains(entity.getCompanyIds().get(0)))
             throw new GenericForbiddenException();
     }
 
-
-
-    private br.com.petshop.system.user.model.entity.SysUserEntity getAuthUser(Principal authentication) {
-        return ((br.com.petshop.system.user.model.entity.SysUserEntity) ((UsernamePasswordAuthenticationToken)
+    private SysUserEntity getAuthUser(Principal authentication) {
+        return ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
                 authentication).getPrincipal());
     }
 
     private Role getRole(Principal authentication) {
-        br.com.petshop.system.user.model.entity.SysUserEntity systemUser = ((br.com.petshop.system.user.model.entity.SysUserEntity) ((UsernamePasswordAuthenticationToken)
+        SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
                 authentication).getPrincipal());
 
         return systemUser.getRole();

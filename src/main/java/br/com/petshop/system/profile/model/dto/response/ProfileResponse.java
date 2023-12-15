@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -18,9 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileResponse implements Serializable {
-    private String id;
+    private UUID id;
     private String name;
     private Role role;
     private List<Permission> permissions;
-    private LocalDateTime created;
 }

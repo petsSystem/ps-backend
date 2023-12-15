@@ -5,12 +5,11 @@ import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.service.CompanyService;
-import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
+import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
+import br.com.petshop.system.profile.service.ProfileValidateService;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.system.user.repository.SysUserRepository;
 import br.com.petshop.system.user.repository.SysUserSpecification;
-import br.com.petshop.system.profile.model.entity.ProfileEntity;
-import br.com.petshop.system.profile.service.ProfileService;
 import br.com.petshop.system.user.model.dto.request.SysUserPasswordRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +43,7 @@ public class SysUserService {
     @Autowired private CompanyService companyService;
     @Autowired private br.com.petshop.system.user.service.SysUserService sysUserService;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private ProfileService profileService;
+    @Autowired private ProfileValidateService profileService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private SysUserAsyncService asyncService;
 
@@ -57,7 +56,7 @@ public class SysUserService {
         //verifica se companies existem e estao ativas
         checkCompanyIds(request);
 
-        List<ProfileEntity> profiles = getProfiles(request);
+        List<ProfileResponse> profiles = getProfiles(request);
         String password = generatePassword();
 
         request.setUsername(request.getEmail());
@@ -72,7 +71,6 @@ public class SysUserService {
         asyncService.sendNewPassword(user, password);
 
         return user;
-
     }
 
     private void checkCompanyIds(SysUserEntity request) {
@@ -80,9 +78,9 @@ public class SysUserService {
             companyService.findByIdAndActiveIsTrue(companyId);
     }
 
-    public List<ProfileEntity> getProfiles(SysUserEntity request) {
+    public List<ProfileResponse> getProfiles(SysUserEntity request) {
         return request.getProfileIds().stream()
-                .map(p -> profileService.findById(p))
+                .map(p -> profileService.getById(p))
                 .collect(Collectors.toList());
     }
 
@@ -91,7 +89,7 @@ public class SysUserService {
         return newPassword.substring(0,8);
     }
 
-    private Role getRole(List<ProfileEntity> profiles) {
+    private Role getRole(List<ProfileResponse> profiles) {
         List<Role> roles = profiles.stream()
                 .map(p -> p.getRole())
                 .collect(Collectors.toList());
@@ -117,7 +115,7 @@ public class SysUserService {
         return finalRole;
     }
 
-    private List<UUID> getProfileIds(List<ProfileEntity> profiles) {
+    private List<UUID> getProfileIds(List<ProfileResponse> profiles) {
         return profiles.stream()
                 .map(p -> p.getId())
                 .collect(Collectors.toList());
@@ -163,6 +161,19 @@ public class SysUserService {
     }
 
     public SysUserEntity updateById(SysUserEntity request, SysUserEntity entity) {
+        if (request.getCompanyIds() != null && !request.getCompanyIds().isEmpty())
+            for (UUID companyId : request.getCompanyIds())
+                if (!entity.getCompanyIds().contains(companyId)) {
+                    entity.getCompanyIds().add(companyId);
+                    request.setCompanyIds(null);
+                }
+
+        if (request.getProfileIds() != null && !request.getProfileIds().isEmpty())
+            for (UUID profileId : request.getProfileIds())
+                if (!entity.getProfileIds().contains(profileId)) {
+                    entity.getProfileIds().add(profileId);
+                    request.setProfileIds(null);
+                }
 
         entity = convert.updateRequestIntoEntity(request, entity);
 

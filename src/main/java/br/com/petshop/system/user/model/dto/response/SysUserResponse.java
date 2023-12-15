@@ -2,20 +2,14 @@ package br.com.petshop.system.user.model.dto.response;
 
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.model.Address;
-import br.com.petshop.system.profile.model.dto.Permission;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,5 +31,5 @@ public class SysUserResponse implements Serializable {
     private Role role;
     private String username;
     private Boolean changePassword;
-    private List<Permission> permissions;
+    private List<ProfileResponse> profiles;
 }
