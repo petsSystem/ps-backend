@@ -1,30 +1,35 @@
 package br.com.petshop.system.user.service;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.exception.GenericForbiddenException;
+import br.com.petshop.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.profile.model.entity.ProfileEntity;
-import br.com.petshop.system.profile.service.ProfileService;
-import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.employee.service.EmployeeService;
-import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
+import br.com.petshop.system.company.service.CompanyService;
+import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.system.user.repository.SysUserRepository;
 import br.com.petshop.system.user.repository.SysUserSpecification;
+import br.com.petshop.system.profile.model.entity.ProfileEntity;
+import br.com.petshop.system.profile.service.ProfileService;
+import br.com.petshop.system.user.model.dto.request.SysUserPasswordRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,46 +37,58 @@ import java.util.stream.Collectors;
 
 @Service
 public class SysUserService {
-
     Logger log = LoggerFactory.getLogger(SysUserService.class);
-    @Autowired private SysUserRepository systemUserRepository;
+    @Autowired private SysUserRepository repository;
+    @Autowired private SysUserSpecification specification;
+    @Autowired private SysUserConverterService convert;
+    @Autowired private CompanyService companyService;
+    @Autowired private br.com.petshop.system.user.service.SysUserService sysUserService;
+    @Autowired private ObjectMapper objectMapper;
+    @Autowired private ProfileService profileService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private SysUserAsyncService asyncService;
-    @Autowired private EmployeeService employeeService;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private SysUserSpecification specification;
-    @Autowired private ProfileService profileService;
 
-    public SysUserEntity create (EmployeeEntity employee) {
+    public SysUserEntity create(SysUserEntity request) {
+        Optional<SysUserEntity> entity = repository.findByCpf(request.getCpf());
 
-        //pegar os dados do profile (role e ids) se mais de um, chegar num denominador comum
-        List<ProfileEntity> profiles = employee.getProfiles().stream()
-                .map(p -> profileService.findByName(p))
-                .collect(Collectors.toList());
+        if (entity.isPresent())
+            throw new GenericAlreadyRegisteredException();
 
-        Role finalRole = getRole(profiles);
-        List<UUID> profileIds = getProfileIds(profiles);
+        //verifica se companies existem e estao ativas
+        checkCompanyIds(request);
+
+        List<ProfileEntity> profiles = getProfiles(request);
         String password = generatePassword();
 
-        SysUserEntity entity = SysUserEntity.builder()
-                .username(employee.getEmail())
-                .password(passwordEncoder.encode(password))
-                .changePassword(false)
-                .role(finalRole)
-                .active(true)
-                .employee(employee)
-                .profileIds(profileIds)
-                .build();
+        request.setUsername(request.getEmail());
+        request.setPassword(passwordEncoder.encode(password));
+        request.setChangePassword(true);
+        request.setRole(getRole(profiles));
+        request.setActive(true);
+        request.setProfileIds(getProfileIds(profiles));
 
-        entity = systemUserRepository.save(entity);
+        SysUserEntity user = repository.save(request);
 
-        asyncService.sendNewPassword(entity, password);
+        asyncService.sendNewPassword(user, password);
 
-        return entity;
+        return user;
+
     }
 
-    public SysUserEntity save (SysUserEntity entity) {
-        return systemUserRepository.save(entity);
+    private void checkCompanyIds(SysUserEntity request) {
+        for(UUID companyId : request.getCompanyIds())
+            companyService.findByIdAndActiveIsTrue(companyId);
+    }
+
+    public List<ProfileEntity> getProfiles(SysUserEntity request) {
+        return request.getProfileIds().stream()
+                .map(p -> profileService.findById(p))
+                .collect(Collectors.toList());
+    }
+
+    private String generatePassword() {
+        String newPassword = UUID.randomUUID().toString();
+        return newPassword.substring(0,8);
     }
 
     private Role getRole(List<ProfileEntity> profiles) {
@@ -106,96 +123,83 @@ public class SysUserService {
                 .collect(Collectors.toList());
     }
 
-    private String generatePassword () {
-        String newPassword = UUID.randomUUID().toString();
-        return newPassword.substring(0,8);
-    }
-
-    public SysUserEntity activate(UUID userId, Boolean active) {
-        Optional<SysUserEntity> entity = systemUserRepository.findById(userId);
-        SysUserEntity userEntity = entity.get();
-        userEntity.setActive(active);
-
-        return systemUserRepository.save(userEntity);
-    }
-
-    public  SysUserEntity partialUpdate(UUID userId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        SysUserEntity entity = systemUserRepository.findByIdAndActiveIsTrue(userId)
-                .orElseThrow(GenericNotFoundException::new);
-
-        entity = applyPatch(patch, entity);
-        entity = systemUserRepository.save(entity);
-
-        return entity;
-    }
-
-    private SysUserEntity applyPatch(JsonPatch patch, SysUserEntity entity) throws JsonPatchException, JsonProcessingException {
-        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        return objectMapper.treeToValue(patched, SysUserEntity.class);
-    }
-
-    public  Optional<SysUserEntity> findByUsername(String email) {
-        return systemUserRepository.findByUsername(email);
-    }
-
-    public  Optional<SysUserEntity> findByUsernameAndActiveIsTrue(String email) {
-        return systemUserRepository.findByUsernameAndActiveIsTrue(email);
-    }
-
     public void forget (String email) {
-        SysUserEntity entity = systemUserRepository.findByUsernameAndActiveIsTrue(email)
+        SysUserEntity entity = repository.findByUsernameAndActiveIsTrue(email)
                 .orElseThrow(GenericNotFoundException::new);
 
         String newPassword = generatePassword();
         entity.setPassword(passwordEncoder.encode(newPassword));
         entity.setChangePassword(true);
 
-        entity = systemUserRepository.save(entity);
+        entity = repository.save(entity);
 
         asyncService.sendNewPassword(entity, newPassword);
     }
 
-    public  Page<SysUserEntity> get(Pageable pageable, SysUserFilterRequest filter) {
-        Specification<SysUserEntity> filters = specification.filter(filter);
+    public SysUserEntity changePassword(UUID userId, SysUserPasswordRequest request) {
+        SysUserEntity entity = repository.findByIdAndActiveIsTrue(userId)
+                .orElseThrow(GenericNotFoundException::new);
 
-        return systemUserRepository.findAll(filters, pageable);
+        if (!(BCrypt.checkpw(request.getOldPassword(), entity.getPassword())))
+            throw new GenericIncorrectPasswordException();
+
+        entity.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        entity = repository.save(entity);
+
+        return entity;
+    }
+
+    public SysUserEntity active(UUID userId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        SysUserEntity entity = repository.findById(userId)
+                .orElseThrow(GenericNotFoundException::new);
+
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        Boolean activeValue = ((ObjectNode) patched).get("active").asBoolean();
+
+        entity.setActive(activeValue);
+
+        return repository.save(entity);
+    }
+
+    public SysUserEntity updateById(SysUserEntity request, SysUserEntity entity) {
+
+        entity = convert.updateRequestIntoEntity(request, entity);
+
+        return repository.save(entity);
+    }
+
+    public Page<SysUserEntity> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public Page<SysUserEntity> findByCompanyId(SysUserEntity user, Pageable pageable) {
+        Page<SysUserEntity> response = new PageImpl<>(new ArrayList<>());
+
+        for(UUID companyId : user.getCompanyIds()) {
+            Specification<SysUserEntity> filters = specification.filter(companyId);
+            response = repository.findAll(filters, pageable);
+        }
+        return new PageImpl<>(new ArrayList<>());
     }
 
     public SysUserEntity findById(UUID userId) {
-        return systemUserRepository.findById(userId)
+        return repository.findById(userId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
     public SysUserEntity findByIdAndActiveIsTrue(UUID userId) {
-        return systemUserRepository.findByIdAndActiveIsTrue(userId)
+        return repository.findByIdAndActiveIsTrue(userId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    private void validateUserAccess(SysUserEntity systemUser, SysUserEntity entity) {
-        List<UUID> systemUserCompanies = systemUser.getEmployee().getCompanyIds();
-        List<UUID> entityCompanies = entity.getEmployee().getCompanyIds();
-
-        Optional<UUID> match = systemUserCompanies.stream()
-                .filter(l -> entityCompanies.contains(l)).findFirst();
-
-        if (match.isEmpty())
-            throw new GenericForbiddenException();
+    public SysUserEntity save(SysUserEntity entity) {
+        return repository.save(entity);
     }
 
-//    private SysUserResponse setAccessGroupInfo(SysUserResponse response) {
-//        if (response.getAccessGroupIds() != null) {
-//            response.setAccessGroups(response.getAccessGroupIds().stream()
-//                    .map(a -> accessGroupService.getById(a))
-//                    .collect(Collectors.toList()));
-//        }
-//        return response;
-//    }
-
-    public void delete(UUID userId) {
-        SysUserEntity entity = systemUserRepository.findById(userId)
-                .orElseThrow(GenericNotFoundException::new);
-        systemUserRepository.delete(entity);
+    public SysUserEntity findByIdAndActive(UUID userId) {
+        Optional<SysUserEntity> entity = repository.findByIdAndActiveIsTrue(userId);
+        if (entity.isEmpty())
+            throw new GenericNotFoundException();
+        return entity.get();
     }
-
-
 }

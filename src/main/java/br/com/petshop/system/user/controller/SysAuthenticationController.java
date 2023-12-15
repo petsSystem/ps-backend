@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/sys/auth")
 @Tag(name = "SYS - Authentication Services")
 public class SysAuthenticationController {
-    @Autowired private AuthenticationService authenticationService;
+    @Autowired
+    private AuthenticationService service;
 
     @Operation(summary = "Serviço que efetua login no sistema Pet System.")
     @ApiResponses(value = {
@@ -53,6 +54,6 @@ public class SysAuthenticationController {
     public AuthenticationResponse login(
             @RequestBody AuthenticationRequest request) {
         request.setEmail("sys_".concat(request.getEmail()));
-        return authenticationService.login(request);
+        return service.login(request);
     }
 }

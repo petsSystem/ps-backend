@@ -3,20 +3,20 @@ package br.com.petshop.system.user.service;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
+import br.com.petshop.exception.GenericIncorrectPasswordException;
+import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.employee.service.EmployeeService;
 import br.com.petshop.system.profile.model.dto.Permission;
 import br.com.petshop.system.profile.model.entity.ProfileEntity;
-import br.com.petshop.system.profile.service.ProfileService;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
-import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
-import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
+import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserResponse;
+import br.com.petshop.system.user.model.dto.response.SysUserTableResponse;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
 import br.com.petshop.system.user.model.enums.Message;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserPasswordRequest;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,66 +31,42 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class SysUserValidateService {
-
     Logger log = LoggerFactory.getLogger(SysUserValidateService.class);
-    @Autowired private EmployeeService employeeService;
     @Autowired private SysUserService service;
     @Autowired private SysUserConverterService convert;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private ProfileService profileService;
 
-    public SysUserResponse create (Principal authentication, SysUserCreateRequest request) {
+
+    public SysUserResponse create(Principal authentication, SysUserCreateRequest request) {
         try {
-            //valida se o employee existe
-            EmployeeEntity employee = employeeService.findById(request.getEmployeeId());
+            SysUserEntity employeeEntity = convert.createRequestIntoEntity(request);
+            employeeEntity = service.create(employeeEntity);
 
-            if (employee.getHasUser())
-                throw new GenericAlreadyRegisteredException();
+            return convert.entityIntoResponse(employeeEntity);
 
-            //valida se o user já existe
-            Optional<SysUserEntity> user = service.findByUsername(employee.getEmail());
-
-            SysUserEntity entity = null;
-
-            if (user.isPresent()) {
-                entity = user.get();
-                if (!entity.getActive()) {
-                    entity.setActive(true);
-                    entity = service.save(entity);
-                }
-            } else {
-                entity = service.create(employee);
-            }
-
-            employee.setUserId(entity.getId());
-            employee.setHasUser(true);
-            employeeService.save(employee);
-
-            return convert.entityIntoResponse(entity);
-
-        } catch (GenericForbiddenException ex) {
-            log.error(Message.USER_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, Message.USER_ERROR_FORBIDDEN.get(), ex);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_EMPLOYEE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_EMPLOYEE_NOT_FOUND.get(), ex);
         } catch (GenericAlreadyRegisteredException ex) {
-            log.error(Message.USER_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.USER_ALREADY_REGISTERED.get(), ex);
+                    HttpStatus.UNPROCESSABLE_ENTITY, Message.USER_ALREADY_REGISTERED_ERROR.get(), ex);
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_COMPANY_NOT_FOUND_ERROR.get(), ex);
+        } catch (GenericNotActiveException ex) {
+            log.error(Message.USER_COMPANY_NOT_ACTIVE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_COMPANY_NOT_ACTIVE_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.USER_ERROR_CREATE.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_CREATE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.USER_CREATE_ERROR.get(), ex);
         }
     }
 
@@ -100,186 +76,192 @@ public class SysUserValidateService {
             service.forget(request.email());
 
         } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.USER_ERROR_SENDING_PASSWORD.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_SENDING_PASSWORD_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_SENDING_PASSWORD.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.USER_SENDING_PASSWORD_ERROR.get(), ex);
         }
     }
 
-    public  List<SysUserResponse> partialUpdate(Principal authentication, UUID userId, JsonPatch patch) {
+    public SysUserResponse changePassword(Principal authentication,SysUserPasswordRequest request) {
         try {
+            SysUserEntity user = getAuthUser(authentication);
+            SysUserEntity entity = service.changePassword(user.getId(), request);
 
-            JsonNode jsonPatchList = objectMapper.convertValue(patch, JsonNode.class);
-            List<SysUserResponse> responses = new ArrayList<>();
+            return convert.entityIntoResponse(entity);
 
-            for(int i = 0; i < jsonPatchList.size(); i++) {
-                validatePartialUpdateAccess(authentication, userId, jsonPatchList, i);
-
-                SysUserEntity entity = service.partialUpdate(userId, patch);
-
-                responses.add(convert.entityIntoResponse(entity));
-            }
-
-            return responses;
-
-        } catch (GenericForbiddenException ex) {
-            log.error(Message.USER_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
+        } catch (GenericIncorrectPasswordException ex) {
+            log.error(br.com.petshop.system.user.model.enums.Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_ERROR_FORBIDDEN.get(), ex);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
+                    HttpStatus.NOT_FOUND, br.com.petshop.system.user.model.enums.Message.USER_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.USER_ERROR_PARTIAL.get() + " Error: " + ex.getMessage());
+            log.error(br.com.petshop.system.user.model.enums.Message.USER_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_PARTIAL.get(), ex);
+                    HttpStatus.BAD_REQUEST, br.com.petshop.system.user.model.enums.Message.USER_ACTIVATE_ERROR.get(), ex);
         }
-    }
-
-    private void validatePartialUpdateAccess(Principal authentication,  UUID userId, JsonNode jsonPatchList, Integer i) {
-        if (getRole(authentication) != Role.ADMIN) { //admin pode fazer qq coisa
-
-            if (userId != getAuthUser(authentication).getId())
-                throw new GenericForbiddenException();
-
-            String op = jsonPatchList.get(i).get("op").toString();
-            String path = jsonPatchList.get(i).get("path").toString();
-
-            if (!op.equalsIgnoreCase("add") ||
-                    !op.equalsIgnoreCase("replace"))
-                throw new GenericForbiddenException();
-
-            if (!path.equalsIgnoreCase("password"))
-                throw new GenericForbiddenException();
-        }
-    }
-
-    public Page<SysUserResponse> get(Principal authentication, Pageable pageable, SysUserFilterRequest filter) {
-        try {
-
-            if (getRole(authentication) == Role.USER)
-                filter.setEmail(getAuthUser(authentication).getUsername());
-            else if (getRole(authentication) == Role.OWNER || getRole(authentication) == Role.MANAGER)
-                filter.setCompanyIds(getAuthUser(authentication).getEmployee().getCompanyIds());
-
-            Page<SysUserEntity> entities = service.get(pageable, filter);
-
-            List<SysUserResponse> response = entities.stream()
-                    .map(c -> setPermissions(c))
-                    .collect(Collectors.toList());
-
-            return new PageImpl<>(response);
-
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
-        }
-    }
-
-    public SysUserResponse getById(Principal authentication, UUID userId) {
-        try {
-
-            SysUserEntity entity = null;
-            if (getRole(authentication) == Role.ADMIN)
-                entity = service.findById(userId);
-
-            else {
-                entity =  service.findByIdAndActiveIsTrue(userId);
-
-                validateUserAccess(getAuthUser(authentication), entity);
-            }
-
-            return setPermissions(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
-        } catch (GenericForbiddenException ex) {
-            log.error(Message.USER_ERROR_FORBIDDEN.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, Message.USER_ERROR_FORBIDDEN.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
-        }
-    }
-
-    private void validateUserAccess(SysUserEntity systemUser, SysUserEntity entity) {
-        List<UUID> systemUserCompanies = systemUser.getEmployee().getCompanyIds();
-        List<UUID> entityCompanies = entity.getEmployee().getCompanyIds();
-
-        Optional<UUID> match = systemUserCompanies.stream()
-                .filter(l -> entityCompanies.contains(l)).findFirst();
-
-        if (match.isEmpty())
-            throw new GenericForbiddenException();
-    }
-
-    private SysUserResponse setPermissions(SysUserEntity entity) {
-        List<Permission> allPermissions = new ArrayList<>();
-
-        entity.getProfileIds().stream()
-                .forEach(p -> {
-                    ProfileEntity profile = profileService.findById(p);
-                    allPermissions.addAll(profile.getPermissions());
-                });
-
-        SysUserResponse response = convert.entityIntoResponse(entity);
-        response.setPermissions(allPermissions);
-
-        return response;
     }
 
     public SysUserResponse getProfile(Principal authentication) {
         try {
+            SysUserEntity entity = getAuthUser(authentication);
+            entity = service.findById(entity.getId());
 
-            SysUserEntity entity = service.findByIdAndActiveIsTrue(getAuthUser(authentication).getId());
+            return convert.entityIntoResponse(entity);
 
-            return setPermissions(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.USER_GET_ERROR.get(), ex);
         }
     }
 
-    public void delete(Principal authentication, UUID userId) {
+    public SysUserMeResponse getMeInfo(Principal authentication) {
+        try {
+            SysUserEntity entity = getAuthUser(authentication);
+            entity = service.findById(entity.getId());
+
+            List<ProfileEntity> profiles = service.getProfiles(entity);
+            List<Permission> permissions = profiles.stream()
+                    .flatMap(p -> p.getPermissions().stream())
+                    .collect(Collectors.toList());
+
+            SysUserMeResponse response = convert.entityIntoMeResponse(entity);
+            response.setPermissions(permissions);
+
+            return response;
+
+        } catch (Exception ex) {
+            log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_GET_ERROR.get(), ex);
+        }
+    }
+
+    public SysUserResponse activate(Principal authentication, UUID userId, JsonPatch patch) {
         try {
 
-            service.delete(userId);
+            SysUserEntity entity = service.active(userId, patch);
+
+            return  convert.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.USER_ERROR_DELETE.get() + " Error: " + ex.getMessage());
+            log.error(Message.USER_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_DELETE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.USER_ACTIVATE_ERROR.get(), ex);
         }
     }
 
-    private SysUserEntity getAuthUser(Principal authentication) {
-        return ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
+    public SysUserResponse updateById(Principal authentication, UUID userId, SysUserUpdateRequest request) {
+        try {
+            SysUserEntity entity = service.findByIdAndActiveIsTrue(userId);
+
+            if (getRole(authentication) != Role.ADMIN) {
+                List<UUID> companyIds = getAuthUser(authentication).getCompanyIds();
+                Boolean contains = false;
+                for (UUID companyId : companyIds) {
+                    if (entity.getCompanyIds().contains(companyId)) {
+                        contains = true;
+                        break;
+                    }
+                }
+                if (!contains)
+                    throw new GenericForbiddenException();
+            }
+
+            SysUserEntity entityRequest =  convert.updateRequestIntoEntity(request);
+
+            entity = service.updateById(entityRequest, entity);
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.USER_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.USER_FORBIDDEN_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_UPDATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_UPDATE_ERROR.get(), ex);
+        }
+    }
+
+    public  Page<SysUserTableResponse> get(Principal authentication, Pageable pageable) {
+        try {
+            Page<SysUserEntity> entities = new PageImpl<>(new ArrayList<>());
+
+            if (getRole(authentication) == Role.ADMIN)
+                entities = service.findAll(pageable);
+
+            else {
+                br.com.petshop.system.user.model.entity.SysUserEntity user = getAuthUser(authentication);
+                entities = service.findByCompanyId(user, pageable);
+            }
+
+            List<SysUserTableResponse> response = entities.stream()
+                    .map(c -> convert.entityIntoTableResponse(c))
+                    .collect(Collectors.toList());
+
+            Collections.sort(response, Comparator.comparing(SysUserTableResponse::getActive).reversed()
+                    .thenComparing(SysUserTableResponse::getName));
+
+            return new PageImpl<>(response);
+
+        } catch (Exception ex) {
+            log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_GET_ERROR.get(), ex);
+        }
+    }
+
+    public SysUserResponse getById(Principal authentication, UUID employeeId) {
+        try {
+            SysUserEntity entity = service.findById(employeeId);
+
+            if (getRole(authentication) != Role.ADMIN)
+                validateUserAccess(getAuthUser(authentication), entity);
+
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.USER_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.USER_FORBIDDEN_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_GET_ERROR.get(), ex);
+        }
+    }
+
+    private void validateUserAccess(br.com.petshop.system.user.model.entity.SysUserEntity systemUser, SysUserEntity entity) {
+        if (!systemUser.getCompanyIds().contains(entity.getCompanyIds().get(0)))
+            throw new GenericForbiddenException();
+    }
+
+
+
+    private br.com.petshop.system.user.model.entity.SysUserEntity getAuthUser(Principal authentication) {
+        return ((br.com.petshop.system.user.model.entity.SysUserEntity) ((UsernamePasswordAuthenticationToken)
                 authentication).getPrincipal());
     }
 
     private Role getRole(Principal authentication) {
-        SysUserEntity systemUser = ((SysUserEntity) ((UsernamePasswordAuthenticationToken)
+        br.com.petshop.system.user.model.entity.SysUserEntity systemUser = ((br.com.petshop.system.user.model.entity.SysUserEntity) ((UsernamePasswordAuthenticationToken)
                 authentication).getPrincipal());
 
         return systemUser.getRole();

@@ -2,15 +2,11 @@ package br.com.petshop.system.user.model.entity;
 
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.audit.AuditorBaseEntity;
-import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.profile.model.dto.Permission;
-import jakarta.persistence.CascadeType;
+import br.com.petshop.system.model.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,26 +32,37 @@ import java.util.UUID;
 @Entity
 @Table(name = "sys_user")
 public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
+    private String name;
+    @Column(unique = true)
+    private String cpf;
+    private String email;
+    private String phone;
+    private Boolean active;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Address address;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "company_ids", columnDefinition = "jsonb")
+    private List<UUID> companyIds;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "profile_ids", columnDefinition = "jsonb")
+    private List<UUID> profileIds;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Column(unique = true)
     private String username;
     private String password;
     @Column(name = "change_password")
     private Boolean changePassword;
-    @Enumerated(EnumType.STRING)
-    private Role role;
-    private Boolean active;
     @Column(name = "email_token")
     private String emailToken;
     @Column(name = "email_token_time")
     private LocalDateTime emailTokenTime;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = true)
-    private EmployeeEntity employee;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "profile_ids", columnDefinition = "jsonb")
-    List<UUID> profileIds;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

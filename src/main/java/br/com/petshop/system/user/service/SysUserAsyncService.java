@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SysUserAsyncService {
-    @Autowired private MailNotificationService mailNotificationService;
+    @Autowired
+    private MailNotificationService mailNotificationService;
 
     @Async
     public void sendNewPassword(SysUserEntity userEntity, String newPassword) {
@@ -28,3 +29,4 @@ public class SysUserAsyncService {
         mailNotificationService.send(userEntity.getUsername(), subject, body);
     }
 }
+

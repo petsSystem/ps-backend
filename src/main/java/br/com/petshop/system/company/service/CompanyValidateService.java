@@ -113,7 +113,7 @@ public class CompanyValidateService {
             if (getRole(authentication) == Role.ADMIN)
                 entities = service.findAll(paging);
             else
-                entities = service.findByEmployeeId(getAuthUser(authentication).getEmployeeId(), paging);
+                entities = service.findByEmployeeId(getAuthUser(authentication).getId(), paging);
 
             List<CompanyTableResponse> response = entities.stream()
                     .map(c -> convert.entityIntoTableResponse(c))

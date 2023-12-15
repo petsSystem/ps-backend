@@ -1,11 +1,13 @@
 package br.com.petshop.system.user.controller;
 
-import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
-import br.com.petshop.system.user.model.dto.request.SysUserFilterRequest;
-import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
+import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserResponse;
+import br.com.petshop.system.user.model.dto.response.SysUserTableResponse;
 import br.com.petshop.system.user.service.SysUserValidateService;
+import br.com.petshop.system.user.model.dto.request.SysUserForgetRequest;
+import br.com.petshop.system.user.model.dto.request.SysUserPasswordRequest;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,11 +22,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,17 +34,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/sys/users")
 @Tag(name = "SYS - Users Services")
 public class SysUserController {
-    @Autowired private SysUserValidateService systemUserValidateService;
 
-    //ACESSO: 'ADMIN', 'OWNER', 'MANAGER'
-    @Operation(summary = "Serviço de criação de usuário no sistema.",
+    @Autowired private SysUserValidateService validateService;
+
+    @Operation(summary = "Serviço de inclusão de usuário no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -56,29 +57,30 @@ public class SysUserController {
                             "\"instance\": \"/api/v1/system/users\"\n" +
                             "}")})}),
             @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso proibido.",
+                    responseCode = "400",
+                    description = "Loja inativa.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Forbidden\",\n" +
-                            "\"status\": 403,\n" +
-                            "\"detail\": \"Acesso proibido.\",\n" +
-                            "\"instance\": \"/api/v1/system/users\"\n" +
-                            "}")})}),
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Bad Request\",\n" +
+                            "    \"status\": 400,\n" +
+                            "    \"detail\": \"Loja inativa.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users\"\n" +
+                            "}\n" +
+                            "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Funcionário não existe.",
+                    description = "Loja não encontrada.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Funcionário não existe.\",\n" +
+                            "    \"detail\": \"Loja não encontrada.\",\n" +
                             "    \"instance\": \"/api/v1/system/users\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "422",
-                    description = "Usuário já cadastrado.",
+                    description = "Usuário já cadastrado no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Unprocessable Entity\",\n" +
@@ -88,15 +90,15 @@ public class SysUserController {
                             "}")})})
     })
     @PostMapping()
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public SysUserResponse create(
             Principal authentication,
             @RequestBody SysUserCreateRequest request) {
-        return systemUserValidateService.create(authentication, request);
+        return validateService.create(authentication, request);
     }
 
-    @Operation(summary = "Serviço que envia nova senha por email no Sistema Petshop.",
+    @Operation(summary = "Serviço 'esqueci minha senha'. Envio de email com nova senha.",
             description = "Acesso: 'ALL'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -106,18 +108,18 @@ public class SysUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao enviar email com reset de senha. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao enviar email com nova senha. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys//users/forget\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Usuário não cadastrado.",
+                    description = "Usuário não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Usuário não cadastrado.\",\n" +
+                            "    \"detail\": \"Usuário não encontrado.\",\n" +
                             "    \"instance\": \"/api/v1/sys/users/forget\"\n" +
                             "}\n" +
                             "\n")})})
@@ -127,11 +129,45 @@ public class SysUserController {
     public void forget (
             Principal authentication,
             @RequestBody SysUserForgetRequest request) {
-        systemUserValidateService.forget(authentication, request);
+        validateService.forget(authentication, request);
     }
 
-    @Operation(summary = "Serviço de atualização parcial de usuário no sistema.",
+    @Operation(summary = "Serviço de alteração de senha no sistema.",
             description = "Acesso: 'ALL'")
+    @ApiResponses(value = {
+            @ApiResponse (
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao atualizar senha do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/users/password\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Senha atual está incorreta.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Bad Request\",\n" +
+                            "    \"status\": 400,\n" +
+                            "    \"detail\": \"Senha atual está incorreta.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users/{userId}/password\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping("/password")
+    @ResponseStatus(HttpStatus.OK)
+    public SysUserResponse changePassword (
+            Principal authentication,
+            @RequestBody SysUserPasswordRequest request) {
+        return validateService.changePassword(authentication, request);
+    }
+
+    @Operation(summary = "Serviço de recuperação dos dados do usuário logado no sistema.",
+            description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -140,25 +176,70 @@ public class SysUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar parcialmente os dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    public SysUserResponse getProfile(
+            Principal authentication) {
+        return validateService.getProfile(authentication);
+    }
+
+    @Operation(summary = "Serviço de recuperação dos dados do usuário logado no sistema.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public SysUserMeResponse me(
+            Principal authentication) {
+        return validateService.getMeInfo(authentication);
+    }
+
+    @Operation(summary = "Serviço de ativação/desativação de usuário no sistema.",
+            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao ativar/desativar usuário. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/users/{userId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro de funcionário não encontrado.",
+                    description = "Usuário não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de usuário não encontrado.\",\n" +
+                            "    \"detail\": \"Usuário não encontrado.\",\n" +
                             "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
     @PatchMapping(path = "/{userId}", consumes = "application/json-patch+json")
     @ResponseStatus(HttpStatus.OK)
-    public List<SysUserResponse> partialUpdate(
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public SysUserResponse activate(
             Principal authentication,
             @PathVariable("userId") UUID userId,
             @Schema(example = "[\n" +
@@ -169,155 +250,126 @@ public class SysUserController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return systemUserValidateService.partialUpdate(authentication, userId, patch);
+        return validateService.activate(authentication, userId, patch);
     }
 
-    //ACESSO: ALL (COM FILTROS)
-    @Operation(summary = "Serviço de recuperação das informações do usuário no sistema.",
-            description = "Acesso: ALL")
+    @Operation(summary = "Serviço de atualização de qualquer usuário no sistema.",
+            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
     @ApiResponses(value = {
-            @ApiResponse(
+            @ApiResponse (
                     responseCode = "400",
                     description = "Erro no sistema.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/users\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public Page<SysUserResponse> get(
-            Principal authentication,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) UUID employeeId,
-            @RequestParam(required = false) UUID accessGroupId,
-            @RequestParam(required = false) Role role,
-            @RequestParam(required = false) Boolean active,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        SysUserFilterRequest filter = new SysUserFilterRequest(email, employeeId, accessGroupId, role, active, null);
-        return systemUserValidateService.get(authentication, pageable, filter);
-    }
-
-    //ACESSO: ALL
-    @Operation(summary = "Serviço de recuperação das informações do usuário através do id.",
-            description = "Acesso: ALL")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao atualizar dados do usuário. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/users/{userId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Usuário não pertence a mesma empresa/loja do usuário logado.",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso negado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Usuário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PutMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public SysUserResponse updateById(
+            Principal authentication,
+            @PathVariable("userId") UUID userId,
+            @RequestBody SysUserUpdateRequest request) {
+        return validateService.updateById(authentication, userId, request);
+    }
+
+    @Operation(summary = "Serviço de recuperação das informações de funcionários do sistema.",
+            description = "Acesso: ADMIN, OWNER, MANAGER")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar dados dos funcionários. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/employees\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public Page<SysUserTableResponse> get(
+            Principal authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return validateService.get(authentication, pageable);
+    }
+
+    @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema através do id.",
+            description = "Acesso: ADMIN, OWNER, MANAGER")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Funcionário não pertence a mesma empresa/loja do usuário logado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Forbidden\",\n" +
                             "    \"status\": 403,\n" +
                             "    \"detail\": \"Acesso proibido.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro de usuário não encontrado.",
+                    description = "Cadastro de funcionário não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de usuário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
+                            "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @GetMapping("/{userId}")
+    @GetMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public SysUserResponse getById(
             Principal authentication,
-            @PathVariable("userId") UUID userId) {
-        return systemUserValidateService.getById(authentication, userId);
+            @PathVariable("employeeId") UUID employeeId) {
+        return validateService.getById(authentication, employeeId);
     }
 
-    //ACESSO: ALL
-    @Operation(summary = "Serviço de recuperação de dados do perfil do usuário logado.",
-            description = "Acesso: ALL")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/users/{userId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro de usuário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de usuário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping("/profile")
-    @ResponseStatus(HttpStatus.OK)
-    public SysUserResponse getProfile(
-            Principal authentication) {
-        return systemUserValidateService.getProfile(authentication);
-    }
-
-    //ACESSO: 'ADMIN'
-    @Operation(summary = "Serviço de exclusão do usuário do sistema.",
-            description = "Acesso: 'ADMIN'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadastro do usuário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do usuário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/users\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao excluir dados do usuário do sistema. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/users\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @DeleteMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void delete (
-            Principal authentication,
-            @PathVariable("userId") UUID userId) {
-        systemUserValidateService.delete(authentication, userId);
-    }
 }

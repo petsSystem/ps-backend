@@ -12,9 +12,10 @@ import java.util.UUID;
 
 @Repository
 public interface SysUserRepository extends JpaRepository<SysUserEntity, Integer> {
-    Optional<SysUserEntity> findById(UUID userId);
-    Optional<SysUserEntity> findByUsername(String email);
+
+    Optional<SysUserEntity> findById(UUID employeeId);
     Optional<SysUserEntity> findByUsernameAndActiveIsTrue(String email);
-    Optional<SysUserEntity> findByIdAndActiveIsTrue(UUID id);
+    Optional<SysUserEntity> findByIdAndActiveIsTrue(UUID employeeId);
+    Optional<SysUserEntity> findByCpf(String cpf);
     Page<SysUserEntity> findAll(Specification<SysUserEntity> filter, Pageable pageable);
 }

@@ -6,8 +6,8 @@ import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.repository.CompanyRepository;
-import br.com.petshop.system.employee.model.entity.EmployeeEntity;
-import br.com.petshop.system.employee.service.EmployeeService;
+import br.com.petshop.system.user.model.entity.SysUserEntity;
+import br.com.petshop.system.user.service.SysUserService;
 import br.com.petshop.utils.PetGeometry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,7 +35,7 @@ public class CompanyService {
     @Autowired private CompanyConverterService convert;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private PetGeometry geometry;
-    @Autowired private EmployeeService employeeService;
+    @Autowired private SysUserService employeeService;
 
 
     public CompanyEntity create(CompanyEntity entity) {
@@ -66,7 +66,7 @@ public class CompanyService {
     }
 
     public Page<CompanyEntity> findByEmployeeId(UUID employeeId, Pageable paging) {
-        EmployeeEntity employee = employeeService.findById(employeeId);
+        SysUserEntity employee = employeeService.findById(employeeId);
         List<CompanyEntity> companies = employee.getCompanyIds().stream()
                 .map(c -> findById(c))
                 .collect(Collectors.toList());
