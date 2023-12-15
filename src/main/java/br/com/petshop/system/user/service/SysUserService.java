@@ -144,6 +144,7 @@ public class SysUserService {
             throw new GenericIncorrectPasswordException();
 
         entity.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        entity.setChangePassword(false);
         entity = repository.save(entity);
 
         return entity;
