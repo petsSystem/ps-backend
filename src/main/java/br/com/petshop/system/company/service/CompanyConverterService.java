@@ -18,6 +18,7 @@ public class CompanyConverterService {
     private ModelMapper mapper;
 
     public CompanyEntity createRequestIntoEntity(CompanyCreateRequest request) {
+        request.setCnpj(request.getCnpj().replaceAll("[^0-9]", ""));
         return mapper.map(request, CompanyEntity.class);
     }
 

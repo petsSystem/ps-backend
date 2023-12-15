@@ -19,6 +19,7 @@ public class SysUserConverterService {
     private ModelMapper mapper;
 
     public SysUserEntity createRequestIntoEntity(SysUserCreateRequest request) {
+        request.setCpf(request.getCpf().replaceAll("[^0-9]", ""));
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         SysUserEntity entity = mapper.map(request, SysUserEntity.class);
         entity.setCompanyIds(request.getCompanyIds());
