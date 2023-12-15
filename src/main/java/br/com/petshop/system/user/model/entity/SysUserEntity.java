@@ -93,4 +93,5 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    
 }
