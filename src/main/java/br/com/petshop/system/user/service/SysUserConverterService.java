@@ -3,6 +3,7 @@ package br.com.petshop.system.user.service;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
 import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
+import br.com.petshop.system.user.model.dto.response.SysUserProfileResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserTableResponse;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
@@ -44,6 +45,10 @@ public class SysUserConverterService {
 
     public SysUserTableResponse entityIntoTableResponse(SysUserEntity entity) {
         return mapper.map(entity, SysUserTableResponse.class);
+    }
+
+    public SysUserProfileResponse entityIntoProfileResponse(SysUserEntity entity) {
+        return mapper.map(entity, SysUserProfileResponse.class);
     }
 
     public SysUserMeResponse entityIntoMeResponse(SysUserEntity entity) {

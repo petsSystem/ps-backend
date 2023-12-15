@@ -3,6 +3,7 @@ package br.com.petshop.system.user.controller;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
 import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
+import br.com.petshop.system.user.model.dto.response.SysUserProfileResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserTableResponse;
 import br.com.petshop.system.user.service.SysUserValidateService;
@@ -149,7 +150,7 @@ public class SysUserController {
     })
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    public SysUserResponse getProfile(
+    public SysUserProfileResponse getProfile(
             Principal authentication) {
         return validateService.getProfile(authentication);
     }

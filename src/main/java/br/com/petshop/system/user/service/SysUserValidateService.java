@@ -11,6 +11,7 @@ import br.com.petshop.system.profile.model.entity.ProfileEntity;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
 import br.com.petshop.system.user.model.dto.request.SysUserUpdateRequest;
 import br.com.petshop.system.user.model.dto.response.SysUserMeResponse;
+import br.com.petshop.system.user.model.dto.response.SysUserProfileResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserResponse;
 import br.com.petshop.system.user.model.dto.response.SysUserTableResponse;
 import br.com.petshop.system.user.model.entity.SysUserEntity;
@@ -103,12 +104,12 @@ public class SysUserValidateService {
         }
     }
 
-    public SysUserResponse getProfile(Principal authentication) {
+    public SysUserProfileResponse getProfile(Principal authentication) {
         try {
             SysUserEntity entity = getAuthUser(authentication);
             entity = service.findById(entity.getId());
 
-            return convert.entityIntoResponse(entity);
+            return convert.entityIntoProfileResponse(entity);
 
         } catch (Exception ex) {
             log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
