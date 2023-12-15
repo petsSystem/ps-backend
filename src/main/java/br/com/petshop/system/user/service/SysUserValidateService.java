@@ -70,9 +70,8 @@ public class SysUserValidateService {
         }
     }
 
-    public void forget (Principal authentication, SysUserForgetRequest request) {
+    public void forget (SysUserForgetRequest request) {
         try {
-
             service.forget(request.email());
 
         } catch (GenericNotFoundException ex) {

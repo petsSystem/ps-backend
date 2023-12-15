@@ -15,6 +15,8 @@ public class AuditorAwareImpl implements AuditorAware<SysUserEntity> {
 
         if (auth == null || !auth.isAuthenticated()) {
             return Optional.empty();
+        } else if (auth.getPrincipal().toString().equalsIgnoreCase("anonymousUser")) {
+            return Optional.empty();
         }
         return Optional.ofNullable((SysUserEntity) auth.getPrincipal());
     }

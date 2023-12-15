@@ -98,40 +98,6 @@ public class SysUserController {
         return validateService.create(authentication, request);
     }
 
-    @Operation(summary = "Serviço 'esqueci minha senha'. Envio de email com nova senha.",
-            description = "Acesso: 'ALL'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao enviar email com nova senha. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys//users/forget\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Usuário não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Usuário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/users/forget\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PostMapping("/forget")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void forget (
-            Principal authentication,
-            @RequestBody SysUserForgetRequest request) {
-        validateService.forget(authentication, request);
-    }
-
     @Operation(summary = "Serviço de alteração de senha no sistema.",
             description = "Acesso: 'ALL'")
     @ApiResponses(value = {
