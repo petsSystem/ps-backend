@@ -9,8 +9,8 @@ public enum Message {
     USER_NOT_FOUND_ERROR ("Usuário não encontrado."),
     USER_SENDING_PASSWORD_ERROR ("Erro ao enviar email com nova senha. Tente novamente mais tarde."),
     USER_FORBIDDEN_ERROR("Acesso negado."),
-    USER_UPDATE_ERROR("Erro ao atualizar dados do funcionário. Tente novamente mais tarde."),
-    USER_GET_ERROR("Erro ao recuperar dados do funcionário. Tente novamente mais tarde.");
+    USER_UPDATE_ERROR("Erro ao atualizar dados do usuário. Tente novamente mais tarde."),
+    USER_GET_ERROR("Erro ao recuperar dados do usuário. Tente novamente mais tarde.");
 
     private String message;
 

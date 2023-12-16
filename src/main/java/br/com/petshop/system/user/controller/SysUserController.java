@@ -267,7 +267,7 @@ public class SysUserController {
         return validateService.updateById(authentication, userId, request);
     }
 
-    @Operation(summary = "Serviço de recuperação das informações de funcionários do sistema.",
+    @Operation(summary = "Serviço de recuperação das informações de usuários do sistema.",
             description = "Acesso: ADMIN, OWNER, MANAGER")
     @ApiResponses(value = {
             @ApiResponse(
@@ -277,8 +277,8 @@ public class SysUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados dos funcionários. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/employees\"\n" +
+                            "\"detail\": \"Erro ao recuperar dados dos usuários. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/users\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -293,7 +293,7 @@ public class SysUserController {
         return validateService.get(authentication, pageable);
     }
 
-    @Operation(summary = "Serviço de recuperação das informações do funcionário no sistema através do id.",
+    @Operation(summary = "Serviço de recuperação das informações do usuário no sistema através do id.",
             description = "Acesso: ADMIN, OWNER, MANAGER")
     @ApiResponses(value = {
             @ApiResponse(
@@ -303,40 +303,40 @@ public class SysUserController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar dados do funcionário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "\"detail\": \"Erro ao recuperar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/employees/{userId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "403",
-                    description = "Funcionário não pertence a mesma empresa/loja do usuário logado.",
+                    description = "Acesso negado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Forbidden\",\n" +
                             "    \"status\": 403,\n" +
-                            "    \"detail\": \"Acesso proibido.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "    \"detail\": \"Acesso negado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users/{userId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro de funcionário não encontrado.",
+                    description = "Usuário não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de funcionário não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/employees/{employeeId}\"\n" +
+                            "    \"detail\": \"usuário não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users/{employeeId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @GetMapping("/{employeeId}")
+    @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public SysUserResponse getById(
             Principal authentication,
-            @PathVariable("employeeId") UUID employeeId) {
-        return validateService.getById(authentication, employeeId);
+            @PathVariable("userId") UUID userId) {
+        return validateService.getById(authentication, userId);
     }
 
 }

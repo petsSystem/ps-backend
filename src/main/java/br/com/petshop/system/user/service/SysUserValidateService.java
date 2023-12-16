@@ -47,10 +47,15 @@ public class SysUserValidateService {
 
     public SysUserResponse create(Principal authentication, SysUserCreateRequest request) {
         try {
-            SysUserEntity employeeEntity = convert.createRequestIntoEntity(request);
-            employeeEntity = service.create(employeeEntity);
+            SysUserEntity entity = convert.createRequestIntoEntity(request);
+            entity = service.create(entity);
 
-            return convert.entityIntoResponse(employeeEntity);
+            List<ProfileResponse> profiles = service.getProfiles(entity);
+
+            SysUserResponse response = convert.entityIntoResponse(entity);
+            response.setProfiles(profiles);
+
+            return response;
 
         } catch (GenericAlreadyRegisteredException ex) {
             log.error(Message.USER_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
@@ -145,7 +150,12 @@ public class SysUserValidateService {
 
             SysUserEntity entity = service.active(userId, patch);
 
-            return  convert.entityIntoResponse(entity);
+            List<ProfileResponse> profiles = service.getProfiles(entity);
+
+            SysUserResponse response = convert.entityIntoResponse(entity);
+            response.setProfiles(profiles);
+
+            return response;
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -169,7 +179,12 @@ public class SysUserValidateService {
 
             entity = service.updateById(entityRequest, entity);
 
-            return convert.entityIntoResponse(entity);
+            List<ProfileResponse> profiles = service.getProfiles(entity);
+
+            SysUserResponse response = convert.entityIntoResponse(entity);
+            response.setProfiles(profiles);
+
+            return response;
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -214,9 +229,9 @@ public class SysUserValidateService {
         }
     }
 
-    public SysUserResponse getById(Principal authentication, UUID employeeId) {
+    public SysUserResponse getById(Principal authentication, UUID userId) {
         try {
-            SysUserEntity entity = service.findById(employeeId);
+            SysUserEntity entity = service.findById(userId);
 
             if (getRole(authentication) != Role.ADMIN)
                 validateUserAccess(getAuthUser(authentication), entity);
