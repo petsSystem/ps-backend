@@ -61,12 +61,12 @@ public class ProfileController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
-                            "\"detail\": \"Perfil já cadastrado no sistema.\",\n" +
+                            "\"detail\": \"Perfil já cadastrado.\",\n" +
                             "\"instance\": \"/api/v1/sys/profiles\"\n" +
                             "}")})})
     })
     @PostMapping()
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ProfileResponse create(
             Principal authentication,
@@ -84,18 +84,18 @@ public class ProfileController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar parcialmente os dados do perfil. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao atualizar perfil. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/profiles/{profileId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro de perfil não encontrado.",
+                    description = "Perfil não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro de perfil não encontrado.\",\n" +
+                            "    \"detail\": \"Perfil não encontrado.\",\n" +
                             "    \"instance\": \"/api/v1/sys/profiles/{profileId}\"\n" +
                             "}\n" +
                             "\n")})})
@@ -155,7 +155,7 @@ public class ProfileController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar labels dos perfis do sistema. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar dados do perfil. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/profiles/labels\"\n" +
                             "}\n" +
                             "\n")})})
@@ -166,41 +166,5 @@ public class ProfileController {
             Principal authentication) {
 
         return profileValidateService.getLabels(authentication);
-    }
-
-    //ACESSO: 'ADMIN'
-    @Operation(summary = "Serviço de exclusão de perfil do sistema.",
-            description = "Acesso: 'ADMIN'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Cadastro do perfil não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro do perfil não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/profiles\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao excluir dados do perfil. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/profiles\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @DeleteMapping("/{profileId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void delete (
-            Principal authentication,
-            @PathVariable("profileId") UUID profileId) {
-        profileValidateService.delete(authentication, profileId);
     }
 }

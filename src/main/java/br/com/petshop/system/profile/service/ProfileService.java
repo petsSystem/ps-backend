@@ -3,7 +3,6 @@ package br.com.petshop.system.profile.service;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.profile.model.dto.request.ProfileCreateRequest;
-import br.com.petshop.system.profile.model.dto.response.LabelResponse;
 import br.com.petshop.system.profile.model.entity.ProfileEntity;
 import br.com.petshop.system.profile.repository.ProfileRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +26,6 @@ public class ProfileService {
     Logger log = LoggerFactory.getLogger(ProfileService.class);
     @Autowired private ProfileRepository profileRepository;
     @Autowired private ProfileConverterService convert;
-
     @Autowired private ObjectMapper objectMapper;
 
     public ProfileEntity create (ProfileCreateRequest request) {
@@ -72,11 +70,5 @@ public class ProfileService {
 
     public Page<ProfileEntity> getAll(Pageable pageable) {
         return profileRepository.findAll(pageable);
-    }
-
-    public void delete(UUID profileId) {
-        ProfileEntity entity = profileRepository.findById(profileId)
-                .orElseThrow(GenericNotFoundException::new);
-        profileRepository.delete(entity);
     }
 }

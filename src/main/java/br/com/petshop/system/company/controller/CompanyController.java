@@ -62,7 +62,7 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
-                            "\"detail\": \"Loja já cadastrada no sistema.\",\n" +
+                            "\"detail\": \"Loja já cadastrada.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -86,7 +86,7 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar loja. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao ativar/desativar loja. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies/{companyId}\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -97,7 +97,7 @@ public class CompanyController {
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da loja não encontrado.\",\n" +
+                            "    \"detail\": \"Loja não encontrada.\",\n" +
                             "    \"instance\": \"/api/v1/sys/companies/{companyId}\"\n" +
                             "}\n" +
                             "\n")})})
@@ -120,7 +120,7 @@ public class CompanyController {
     }
 
     //ACESSO: ADMIN, OWNER, MANAGER
-    @Operation(summary = "Serviço de atualização da empresa no sistema pelo id.",
+    @Operation(summary = "Serviço de atualização de loja pelo id.",
             description = "Acesso: 'ALL'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -130,7 +130,7 @@ public class CompanyController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar dados da empresa. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao atualizar loja. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -147,12 +147,12 @@ public class CompanyController {
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro da empresa não encontrado.",
+                    description = "Loja não encontrada.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
-                            "    \"detail\": \"Cadastro da empresa não encontrado.\",\n" +
+                            "    \"detail\": \"Loja não encontrada.\",\n" +
                             "    \"instance\": \"/api/v1/sys/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})})

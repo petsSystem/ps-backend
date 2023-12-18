@@ -25,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,13 +45,13 @@ public class ProfileValidateService {
             return convert.entityIntoResponse(accessGroupEntity);
 
         } catch (GenericAlreadyRegisteredException ex) {
-            log.error(Message.PROFILE_ALREADY_REGISTERED.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, Message.PROFILE_ALREADY_REGISTERED.get(), ex);
+                    HttpStatus.UNPROCESSABLE_ENTITY, Message.PROFILE_ALREADY_REGISTERED_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.PROFILE_ERROR_CREATE.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_CREATE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_CREATE_ERROR.get(), ex);
         }
     }
 
@@ -70,13 +69,13 @@ public class ProfileValidateService {
             return responses;
 
         } catch (GenericNotFoundException ex) {
-            log.error(Message.PROFILE_NOT_FOUND.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.PROFILE_NOT_FOUND.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.PROFILE_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.PROFILE_ERROR_PARTIAL.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_UPDATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_PARTIAL.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_UPDATE_ERROR.get(), ex);
         }
     }
 
@@ -91,9 +90,9 @@ public class ProfileValidateService {
             return new PageImpl<>(response);
 
         } catch (Exception ex) {
-            log.error(Message.PROFILE_ERROR_GET.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_GET.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_GET_ERROR.get(), ex);
         }
     }
 
@@ -114,9 +113,9 @@ public class ProfileValidateService {
                     .collect(Collectors.toList());
 
         } catch (Exception ex) {
-            log.error(Message.PROFILE_ERROR_GET.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_GET.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_GET_ERROR.get(), ex);
         }
     }
 
@@ -127,25 +126,9 @@ public class ProfileValidateService {
             return convert.entityIntoResponse(entity);
 
         } catch (Exception ex) {
-            log.error(Message.PROFILE_ERROR_GET.get() + " Error: " + ex.getMessage());
+            log.error(Message.PROFILE_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_GET.get(), ex);
-        }
-    }
-
-    public void delete(Principal authentication, UUID profileId) {
-        try {
-
-            service.delete(profileId);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.PROFILE_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.PROFILE_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.PROFILE_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.PROFILE_ERROR_DELETE.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_GET_ERROR.get(), ex);
         }
     }
 

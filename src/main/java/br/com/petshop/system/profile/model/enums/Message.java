@@ -1,12 +1,11 @@
 package br.com.petshop.system.profile.model.enums;
 
 public enum Message {
-    PROFILE_ALREADY_REGISTERED("Perfil já cadastrado no sistema."),
-    PROFILE_NOT_FOUND("Perfil não cadastrado."),
-    PROFILE_ERROR_CREATE("Erro ao cadastrar perfil. Tente novamente mais tarde."),
-    PROFILE_ERROR_PARTIAL("Erro ao atualizar parcialmente o perfil. Tente novamente mais tarde."),
-    PROFILE_ERROR_GET("Erro ao recuperar dados do perfil. Tente novamente mais tarde."),
-    PROFILE_ERROR_DELETE("Erro ao excluir dados do perfil. Tente novamente mais tarde.");
+    PROFILE_CREATE_ERROR("Erro ao cadastrar perfil. Tente novamente mais tarde."),
+    PROFILE_ALREADY_REGISTERED_ERROR("Perfil já cadastrado."),
+    PROFILE_NOT_FOUND_ERROR("Perfil não encontrado."),
+    PROFILE_UPDATE_ERROR("Erro ao atualizar o perfil. Tente novamente mais tarde."),
+    PROFILE_GET_ERROR("Erro ao recuperar dados do perfil. Tente novamente mais tarde.");
 
     private String message;
 
