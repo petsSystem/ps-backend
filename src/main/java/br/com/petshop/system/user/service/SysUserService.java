@@ -4,6 +4,7 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.service.CompanyService;
 import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.system.profile.service.ProfileValidateService;
@@ -41,7 +42,6 @@ public class SysUserService {
     @Autowired private SysUserSpecification specification;
     @Autowired private SysUserConverterService convert;
     @Autowired private CompanyService companyService;
-    @Autowired private br.com.petshop.system.user.service.SysUserService sysUserService;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private ProfileValidateService profileService;
     @Autowired private PasswordEncoder passwordEncoder;
@@ -180,23 +180,23 @@ public class SysUserService {
         return repository.save(entity);
     }
 
-    public Page<SysUserEntity> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
-    }
-
-    public Page<SysUserEntity> findByCompanyId(SysUserEntity user, Pageable pageable) {
-        Page<SysUserEntity> response = new PageImpl<>(new ArrayList<>());
-
-        for(UUID companyId : user.getCompanyIds()) {
-            Specification<SysUserEntity> filters = specification.filter(companyId);
-            response = repository.findAll(filters, pageable);
-        }
-        return new PageImpl<>(new ArrayList<>());
+    public Page<SysUserEntity> findAllByCompanyId(UUID companyId, Pageable pageable) {
+        Specification<SysUserEntity> filters = specification.filter(companyId);
+        return repository.findAll(filters, pageable);
     }
 
     public SysUserEntity findById(UUID userId) {
         return repository.findById(userId)
                 .orElseThrow(GenericNotFoundException::new);
+    }
+
+    public CompanyEntity getFirstCompany(SysUserEntity entity) {
+        for(UUID companyID : entity.getCompanyIds()) {
+            CompanyEntity company = companyService.findById(companyID);
+            if (company.getActive())
+                return company;
+        }
+        return new CompanyEntity();
     }
 
     public SysUserEntity findByIdAndActiveIsTrue(UUID userId) {

@@ -1,7 +1,6 @@
 package br.com.petshop.system.company.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
-import br.com.petshop.system.company.model.enums.Category;
 import br.com.petshop.system.model.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +15,6 @@ import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
 
 @Builder
 @Getter
@@ -40,13 +37,13 @@ public class CompanyEntity extends AuditorBaseEntity implements Serializable {
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point geom;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private List<Category> categories;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb", name = "schedule_ids")
-    private List<UUID> scheduleIds;
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    @Column(columnDefinition = "jsonb")
+//    private List<Category> categories;
+//
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    @Column(columnDefinition = "jsonb", name = "schedule_ids")
+//    private List<UUID> scheduleIds;
 
 //
 //

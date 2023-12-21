@@ -47,7 +47,7 @@ public class CompanyValidateService {
             CompanyEntity entity = service.create(entityRequest);
 
             List<UUID> scheduleIds = scheduleService.create(entity);
-            entity.setScheduleIds(scheduleIds);
+//            entity.setScheduleIds(scheduleIds);
 
             service.save(entity);
 

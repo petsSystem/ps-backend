@@ -6,6 +6,7 @@ import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.profile.model.dto.Permission;
 import br.com.petshop.system.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.system.user.model.dto.request.SysUserCreateRequest;
@@ -128,6 +129,8 @@ public class SysUserValidateService {
             SysUserEntity entity = getAuthUser(authentication);
             entity = service.findById(entity.getId());
 
+            CompanyEntity companyEntity = service.getFirstCompany(entity);
+
             List<ProfileResponse> profiles = service.getProfiles(entity);
             List<Permission> permissions = profiles.stream()
                     .flatMap(p -> p.getPermissions().stream())
@@ -135,6 +138,8 @@ public class SysUserValidateService {
 
             SysUserMeResponse response = convert.entityIntoMeResponse(entity);
             response.setPermissions(permissions);
+            response.setCompanyId(companyEntity.getId());
+            response.setCompanyName(companyEntity.getName());
 
             return response;
 
@@ -172,8 +177,7 @@ public class SysUserValidateService {
         try {
             SysUserEntity entity = service.findByIdAndActiveIsTrue(userId);
 
-            if (getRole(authentication) != Role.ADMIN)
-                validateUserAccess(getAuthUser(authentication), entity);
+            validateUserAccess(getRole(authentication), getAuthUser(authentication), entity);
 
             SysUserEntity entityRequest = convert.updateRequestIntoEntity(request);
 
@@ -201,17 +205,14 @@ public class SysUserValidateService {
         }
     }
 
-    public  Page<SysUserTableResponse> get(Principal authentication, Pageable pageable) {
+    public  Page<SysUserTableResponse> get(Principal authentication, UUID companyId, Pageable pageable) {
         try {
-            Page<SysUserEntity> entities = new PageImpl<>(new ArrayList<>());
+            SysUserEntity user = getAuthUser(authentication);
 
-            if (getRole(authentication) == Role.ADMIN)
-                entities = service.findAll(pageable);
+            if (getRole(authentication) != Role.ADMIN)
+                validateCompanyIdsAccess(user.getCompanyIds(), companyId);
 
-            else {
-                br.com.petshop.system.user.model.entity.SysUserEntity user = getAuthUser(authentication);
-                entities = service.findByCompanyId(user, pageable);
-            }
+            Page<SysUserEntity> entities = service.findAllByCompanyId(companyId, pageable);
 
             List<SysUserTableResponse> response = entities.stream()
                     .map(c -> convert.entityIntoTableResponse(c))
@@ -233,8 +234,7 @@ public class SysUserValidateService {
         try {
             SysUserEntity entity = service.findById(userId);
 
-            if (getRole(authentication) != Role.ADMIN)
-                validateUserAccess(getAuthUser(authentication), entity);
+            validateUserAccess(getRole(authentication), getAuthUser(authentication), entity);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
 
@@ -258,8 +258,17 @@ public class SysUserValidateService {
         }
     }
 
-    private void validateUserAccess(SysUserEntity systemUser, SysUserEntity entity) {
-        if (!systemUser.getCompanyIds().contains(entity.getCompanyIds().get(0)))
+    private void validateUserAccess(Role role, SysUserEntity systemUser, SysUserEntity entity) {
+        if (role != Role.ADMIN) {
+            validateCompanyIdsAccess(systemUser.getCompanyIds(), entity.getCompanyIds().get(0));
+
+            if (role == Role.USER && (systemUser.getId() != entity.getId()))
+                throw new GenericForbiddenException();
+        }
+    }
+
+    private void validateCompanyIdsAccess(List<UUID> companyIds, UUID companyId) {
+        if (!companyIds.contains(companyId))
             throw new GenericForbiddenException();
     }
 

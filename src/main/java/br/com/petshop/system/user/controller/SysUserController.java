@@ -220,8 +220,8 @@ public class SysUserController {
         return validateService.activate(authentication, userId, patch);
     }
 
-    @Operation(summary = "Serviço de atualização de qualquer usuário no sistema.",
-            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+    @Operation(summary = "Serviço de atualização de usuário no sistema.",
+            description = "Acesso: 'ALL'")
     @ApiResponses(value = {
             @ApiResponse (
                     responseCode = "400",
@@ -259,7 +259,6 @@ public class SysUserController {
     })
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public SysUserResponse updateById(
             Principal authentication,
             @PathVariable("userId") UUID userId,
@@ -267,7 +266,7 @@ public class SysUserController {
         return validateService.updateById(authentication, userId, request);
     }
 
-    @Operation(summary = "Serviço de recuperação das informações de usuários do sistema.",
+    @Operation(summary = "Serviço de recuperação das informações de usuários do sistema, de acordo com o companyId informado.",
             description = "Acesso: ADMIN, OWNER, MANAGER")
     @ApiResponses(value = {
             @ApiResponse(
@@ -287,10 +286,11 @@ public class SysUserController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public Page<SysUserTableResponse> get(
             Principal authentication,
+            @RequestParam("companyId") UUID companyId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return validateService.get(authentication, pageable);
+        return validateService.get(authentication, companyId, pageable);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do usuário no sistema através do id.",

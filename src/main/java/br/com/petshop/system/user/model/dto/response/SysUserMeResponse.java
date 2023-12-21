@@ -23,5 +23,7 @@ public class SysUserMeResponse implements Serializable {
     private String username;
     private Boolean changePassword;
     private Role role;
+    private UUID companyId;
+    private String companyName;
     private List<Permission> permissions;
 }
