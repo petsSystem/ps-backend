@@ -23,16 +23,17 @@ public class ScheduleService {
     public List<UUID> create(CompanyEntity company) {
         try {
             final UUID companyId = company.getId();
-            return company.getCategories().stream()
-                    .map(c -> {
-                        ScheduleEntity entity = ScheduleEntity.builder()
-                                .category(c)
-                                .companyId(companyId)
-                                .active(true)
-                                .build();
-                        entity = scheduleRepository.save(entity);
-                        return entity.getId();
-                    }).collect(Collectors.toList());
+//            return company.getCategories().stream()
+//                    .map(c -> {
+//                        ScheduleEntity entity = ScheduleEntity.builder()
+//                                .category(c)
+//                                .companyId(companyId)
+//                                .active(true)
+//                                .build();
+//                        entity = scheduleRepository.save(entity);
+//                        return entity.getId();
+//                    }).collect(Collectors.toList());
+            return null;
 
         } catch (Exception ex) {
             log.error(Message.SCHEDULE_ERROR_CREATE.get() + " Error: " + ex.getMessage());
