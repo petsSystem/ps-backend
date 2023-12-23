@@ -27,8 +27,6 @@ public class CategoryConverterService {
     public CategoryEntity updateRequestIntoEntity(CategoryEntity request, CategoryEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
-//        if (request.getCategories() != null)
-//            entity.setCategories(request.getCategories());
         return entity;
     }
 
@@ -39,8 +37,4 @@ public class CategoryConverterService {
     public CategoryTableResponse entityIntoTableResponse(CategoryEntity entity) {
         return mapper.map(entity, CategoryTableResponse.class);
     }
-//
-//    public CompanySummaryResponse entityIntoAppResponse(CategoryEntity entity) {
-//        return mapper.map(entity, CompanySummaryResponse.class);
-//    }
 }
