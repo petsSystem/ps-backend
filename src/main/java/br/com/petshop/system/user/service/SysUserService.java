@@ -160,6 +160,18 @@ public class SysUserService {
         return repository.save(entity);
     }
 
+    public SysUserEntity updateCurrentCompany(SysUserEntity user, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        SysUserEntity entity = repository.findById(user.getId())
+                .orElseThrow(GenericNotFoundException::new);
+
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        String currentCompanyValue = ((ObjectNode) patched).get("currentCompanyId").asText();
+
+        entity.setCurrentCompanyId(UUID.fromString(currentCompanyValue));
+
+        return repository.save(entity);
+    }
+
     public SysUserEntity updateById(SysUserEntity request, SysUserEntity entity) {
         if (request.getCompanyIds() != null && !request.getCompanyIds().isEmpty())
             for (UUID companyId : request.getCompanyIds())

@@ -39,6 +39,9 @@ public class SysUserEntity extends AuditorBaseEntity implements UserDetails {
     private String phone;
     private Boolean active;
 
+    @Column(name = "current_company_id")
+    private UUID currentCompanyId;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Address address;

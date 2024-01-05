@@ -220,6 +220,36 @@ public class SysUserController {
         return validateService.activate(authentication, userId, patch);
     }
 
+    @Operation(summary = "Serviço de marcação de último Petshop acessado.",
+            description = "Acesso: 'ALL'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao marcar último petshop acessado. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/users/current?companyId=\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping(path = "/current", consumes = "application/json-patch+json")
+    @ResponseStatus(HttpStatus.OK)
+    public SysUserResponse currentCompany(
+            Principal authentication,
+            @Schema(example = "[\n" +
+                    "    {\n" +
+                    "        \"op\": \"replace\",\n" +
+                    "        \"path\": \"/currentCompany\",\n" +
+                    "        \"value\": \"c025e626-5f75-4116-997d-8baeef1335e5\"\n" +
+                    "    }\n" +
+                    "]")
+            @RequestBody JsonPatch patch) {
+        return validateService.updateCurrentCompany(authentication, patch);
+    }
+
     @Operation(summary = "Serviço de atualização de usuário no sistema.",
             description = "Acesso: 'ALL'")
     @ApiResponses(value = {

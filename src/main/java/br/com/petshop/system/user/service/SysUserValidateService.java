@@ -173,6 +173,30 @@ public class SysUserValidateService {
         }
     }
 
+    public SysUserResponse updateCurrentCompany(Principal authentication, JsonPatch patch) {
+        try {
+            SysUserEntity user = getAuthUser(authentication);
+
+            SysUserEntity entity = service.updateCurrentCompany(user, patch);
+
+            List<ProfileResponse> profiles = service.getProfiles(entity);
+
+            SysUserResponse response = convert.entityIntoResponse(entity);
+            response.setProfiles(profiles);
+
+            return response;
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_ACTIVATE_ERROR.get(), ex);
+        }
+    }
+
     public SysUserResponse updateById(Principal authentication, UUID userId, SysUserUpdateRequest request) {
         try {
             SysUserEntity entity = service.findByIdAndActiveIsTrue(userId);

@@ -31,5 +31,6 @@ public class SysUserResponse implements Serializable {
     private Role role;
     private String username;
     private Boolean changePassword;
+    private UUID currentCompanyId;
     private List<ProfileResponse> profiles;
 }
