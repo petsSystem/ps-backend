@@ -129,7 +129,7 @@ public class SysUserValidateService {
             SysUserEntity entity = getAuthUser(authentication);
             entity = service.findById(entity.getId());
 
-            CompanyEntity companyEntity = service.getFirstCompany(entity);
+            CompanyEntity companyEntity = service.getCompanyInfo(entity);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
             List<Permission> permissions = profiles.stream()
@@ -173,16 +173,13 @@ public class SysUserValidateService {
         }
     }
 
-    public SysUserResponse updateCurrentCompany(Principal authentication, JsonPatch patch) {
+    public SysUserMeResponse updateCurrentCompany(Principal authentication, JsonPatch patch) {
         try {
             SysUserEntity user = getAuthUser(authentication);
 
             SysUserEntity entity = service.updateCurrentCompany(user, patch);
 
-            List<ProfileResponse> profiles = service.getProfiles(entity);
-
-            SysUserResponse response = convert.entityIntoResponse(entity);
-            response.setProfiles(profiles);
+            SysUserMeResponse response = convert.entityIntoMeResponse(entity);
 
             return response;
 

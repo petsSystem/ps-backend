@@ -237,7 +237,7 @@ public class SysUserController {
     })
     @PatchMapping(path = "/current", consumes = "application/json-patch+json")
     @ResponseStatus(HttpStatus.OK)
-    public SysUserResponse currentCompany(
+    public SysUserMeResponse currentCompany(
             Principal authentication,
             @Schema(example = "[\n" +
                     "    {\n" +

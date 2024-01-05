@@ -202,13 +202,25 @@ public class SysUserService {
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    public CompanyEntity getCompanyInfo(SysUserEntity entity) {
+        if (entity.getCurrentCompanyId() == null)
+            return getFirstCompany(entity);
+        else
+            return getCurrentCompany(entity);
+    }
+
     public CompanyEntity getFirstCompany(SysUserEntity entity) {
-        for(UUID companyID : entity.getCompanyIds()) {
-            CompanyEntity company = companyService.findById(companyID);
+        for(UUID companyId : entity.getCompanyIds()) {
+            CompanyEntity company = companyService.findById(companyId);
             if (company.getActive())
                 return company;
         }
         return new CompanyEntity();
+    }
+
+    public CompanyEntity getCurrentCompany(SysUserEntity entity) {
+        UUID companyId = entity.getCurrentCompanyId();
+        return companyService.findById(companyId);
     }
 
     public SysUserEntity findByIdAndActiveIsTrue(UUID userId) {
