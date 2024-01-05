@@ -179,7 +179,17 @@ public class SysUserValidateService {
 
             SysUserEntity entity = service.updateCurrentCompany(user, patch);
 
+            CompanyEntity companyEntity = service.getCompanyInfo(entity);
+
+            List<ProfileResponse> profiles = service.getProfiles(entity);
+            List<Permission> permissions = profiles.stream()
+                    .flatMap(p -> p.getPermissions().stream())
+                    .collect(Collectors.toList());
+
             SysUserMeResponse response = convert.entityIntoMeResponse(entity);
+            response.setPermissions(permissions);
+            response.setCompanyId(companyEntity.getId());
+            response.setCompanyName(companyEntity.getName());
 
             return response;
 
