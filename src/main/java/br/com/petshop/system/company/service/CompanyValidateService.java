@@ -8,7 +8,6 @@ import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
-import br.com.petshop.system.company.model.dto.response.CompanyTableResponse;
 import br.com.petshop.system.company.model.entity.CompanyEntity;
 import br.com.petshop.system.company.model.enums.Message;
 import br.com.petshop.system.schedule.service.ScheduleService;
@@ -106,7 +105,7 @@ public class CompanyValidateService {
         }
     }
 
-    public Page<CompanyTableResponse> get(Principal authentication, Pageable paging) {
+    public Page<CompanyResponse> get(Principal authentication, Pageable paging) {
         try {
             Page<CompanyEntity> entities;
 
@@ -115,12 +114,12 @@ public class CompanyValidateService {
             else
                 entities = service.findByEmployeeId(getAuthUser(authentication).getId(), paging);
 
-            List<CompanyTableResponse> response = entities.stream()
-                    .map(c -> convert.entityIntoTableResponse(c))
+            List<CompanyResponse> response = entities.stream()
+                    .map(c -> convert.entityIntoResponse(c))
                     .collect(Collectors.toList());
 
-            Collections.sort(response, Comparator.comparing(CompanyTableResponse::getActive).reversed()
-                    .thenComparing(CompanyTableResponse::getName));
+            Collections.sort(response, Comparator.comparing(CompanyResponse::getActive).reversed()
+                    .thenComparing(CompanyResponse::getName));
 
             return new PageImpl<>(response);
 
