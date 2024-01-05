@@ -3,7 +3,6 @@ package br.com.petshop.system.company.controller;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
-import br.com.petshop.system.company.model.dto.response.CompanyTableResponse;
 import br.com.petshop.system.company.service.CompanyValidateService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
@@ -184,7 +183,7 @@ public class CompanyController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Page<CompanyTableResponse> get (
+    public Page<CompanyResponse> get (
             Principal authentication,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
