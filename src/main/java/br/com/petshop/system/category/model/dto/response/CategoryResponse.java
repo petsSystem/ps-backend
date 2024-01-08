@@ -21,6 +21,7 @@ public class CategoryResponse implements Serializable {
     private UUID id;
     private Category type;
     private String label;
+    private String description;
     private List<Day> days;
     private Boolean active;
 }
