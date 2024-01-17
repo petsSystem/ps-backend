@@ -1,5 +1,6 @@
 package br.com.petshop.system.category.model.dto.response;
 
+import br.com.petshop.system.category.model.enums.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CategoryTableResponse implements Serializable {
     private UUID id;
+    private Category type;
     private String label;
     private String description;
     private Boolean active;
