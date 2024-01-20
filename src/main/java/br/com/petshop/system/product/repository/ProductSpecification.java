@@ -11,14 +11,14 @@ public class ProductSpecification {
 
     public static Specification<ProductEntity> filter (UUID companyId) {
         Specification<ProductEntity> filters = Specification
-                .where(categoryIdEqual(companyId));
+                .where(companyIdEqual(companyId));
 
         return filters;
     }
 
-    public static Specification<ProductEntity> categoryIdEqual(UUID categoryId) {
+    public static Specification<ProductEntity> companyIdEqual(UUID companyId) {
         return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.equal(root.get("categoryId"), categoryId);
+            return criteriaBuilder.equal(root.get("companyId"), companyId);
         };
     }
 }

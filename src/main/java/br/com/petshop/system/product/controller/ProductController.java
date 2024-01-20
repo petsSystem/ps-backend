@@ -14,6 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +31,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -169,10 +171,13 @@ public class ProductController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductTableResponse> get (
+    public Page<ProductTableResponse> get (
             Principal authentication,
-            @RequestParam("categoryId") UUID categoryId) {
-        return validateService.getByCategoryId(authentication, categoryId);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam("companyId") UUID companyId) {
+        Pageable paging = PageRequest.of(page, size);
+        return validateService.getByCompanyId(authentication, paging, companyId);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do(s) produto(s)/serviço(s) pelo id.",

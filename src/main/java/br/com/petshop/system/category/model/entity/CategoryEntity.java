@@ -26,6 +26,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "sys_category")
 public class CategoryEntity extends AuditorBaseEntity implements Serializable {
+    @Column(name = "company_id")
     private UUID companyId;
     private Category type;
     private String description;

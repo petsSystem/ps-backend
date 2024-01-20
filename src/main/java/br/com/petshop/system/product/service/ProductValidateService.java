@@ -3,7 +3,9 @@ package br.com.petshop.system.product.service;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.system.category.model.dto.response.CategoryResponse;
+import br.com.petshop.system.category.model.entity.CategoryEntity;
+import br.com.petshop.system.category.model.enums.Category;
+import br.com.petshop.system.category.service.CategoryService;
 import br.com.petshop.system.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.system.product.model.dto.request.ProductUpdateRequest;
 import br.com.petshop.system.product.model.dto.response.ProductResponse;
@@ -16,6 +18,9 @@ import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -25,14 +30,16 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductValidateService {
     Logger log = LoggerFactory.getLogger(ProductService.class);
-    @Autowired
-    ProductService service;
+    @Autowired ProductService service;
+    @Autowired CategoryService categoryService;
     @Autowired private ProductConverterService convert;
     @Autowired private ScheduleService scheduleService;
 
@@ -96,18 +103,26 @@ public class ProductValidateService {
         }
     }
 
-    public List<ProductTableResponse> getByCategoryId(Principal authentication, UUID categoryId) {
+    public Page<ProductTableResponse> getByCompanyId(Principal authentication, Pageable paging, UUID companyId) {
         try {
-            List<ProductEntity> entities = service.findAllByCategoryId(categoryId);
+            Page<ProductEntity> entities = service.findAllByCompanyId(companyId, paging);
+
+            List<CategoryEntity> categories = categoryService.findAllByCompanyId(companyId);
+            Map<UUID, CategoryEntity> mapCategories = categories.stream()
+                    .collect(Collectors.toMap(CategoryEntity::getId, Function.identity()));
 
             List<ProductTableResponse> response = entities.stream()
-                    .map(c -> convert.entityIntoTableResponse(c))
+                    .map(c -> {
+                        ProductTableResponse resp = convert.entityIntoTableResponse(c);
+                        resp.setCategory(mapCategories.get(c.getCategoryId()).getType());
+                        return resp;
+                    })
                     .collect(Collectors.toList());
 
             Collections.sort(response, Comparator.comparing(ProductTableResponse::getActive).reversed()
                     .thenComparing(ProductTableResponse::getName));
 
-            return response;
+            return new PageImpl<>(response);
 
         } catch (Exception ex) {
             log.error(Message.PRODUCT_GET_ERROR.get() + " Error: " + ex.getMessage());

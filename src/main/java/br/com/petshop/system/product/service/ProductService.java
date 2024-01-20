@@ -14,6 +14,8 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -76,8 +78,8 @@ public class ProductService {
         return objectMapper.treeToValue(patched, ProductEntity.class);
     }
 
-    public List<ProductEntity> findAllByCategoryId(UUID categoryId) {
-        Specification<ProductEntity> filters = specification.filter(categoryId);
-        return repository.findAll(filters);
+    public Page<ProductEntity> findAllByCompanyId(UUID companyId, Pageable paging) {
+        Specification<ProductEntity> filters = specification.filter(companyId);
+        return repository.findAll(filters, paging);
     }
 }

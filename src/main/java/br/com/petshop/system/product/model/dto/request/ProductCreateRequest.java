@@ -18,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCreateRequest implements Serializable {
+    private UUID companyId;
     private UUID categoryId;
     private String name;
     private BigDecimal amount;

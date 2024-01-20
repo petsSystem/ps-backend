@@ -26,6 +26,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "sys_product")
 public class ProductEntity extends AuditorBaseEntity implements Serializable {
+    @Column(name = "company_id")
+    private UUID companyId;
+    @Column(name = "category_id")
     private UUID categoryId;
     private String name;
     private BigDecimal amount;
