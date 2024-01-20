@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryUpdateRequest implements Serializable {
     private Category type;
-    private String label;
     private String description;
     private List<Day> days;
 }

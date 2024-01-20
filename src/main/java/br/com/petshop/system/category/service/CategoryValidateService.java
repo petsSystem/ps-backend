@@ -103,8 +103,7 @@ public class CategoryValidateService {
                     .map(c -> convert.entityIntoTableResponse(c))
                     .collect(Collectors.toList());
 
-            Collections.sort(response, Comparator.comparing(CategoryTableResponse::getActive).reversed()
-                    .thenComparing(CategoryTableResponse::getLabel));
+            Collections.sort(response, Comparator.comparing(CategoryTableResponse::getActive).reversed());
 
             return response;
 

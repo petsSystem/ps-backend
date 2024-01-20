@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CategoryCreateRequest implements Serializable {
     private Category type;
-    private String label;
     private String description;
     private List<Day> days;
     private UUID companyId;

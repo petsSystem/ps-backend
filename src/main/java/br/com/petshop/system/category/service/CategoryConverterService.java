@@ -21,12 +21,15 @@ public class CategoryConverterService {
     }
 
     public CategoryEntity updateRequestIntoEntity(CategoryUpdateRequest request) {
-        return mapper.map(request, CategoryEntity.class);
+        CategoryEntity entity = mapper.map(request, CategoryEntity.class);
+        entity.setDays(request.getDays());
+        return entity;
     }
 
     public CategoryEntity updateRequestIntoEntity(CategoryEntity request, CategoryEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
+        entity.setDays(request.getDays());
         return entity;
     }
 

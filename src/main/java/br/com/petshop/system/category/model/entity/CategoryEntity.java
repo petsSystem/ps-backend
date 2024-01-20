@@ -28,7 +28,6 @@ import java.util.UUID;
 public class CategoryEntity extends AuditorBaseEntity implements Serializable {
     private UUID companyId;
     private Category type;
-    private String label;
     private String description;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "days", columnDefinition = "jsonb")

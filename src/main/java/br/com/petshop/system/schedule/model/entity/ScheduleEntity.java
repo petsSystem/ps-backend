@@ -1,7 +1,7 @@
 package br.com.petshop.system.schedule.model.entity;
 
 import br.com.petshop.system.audit.AuditorBaseEntity;
-import br.com.petshop.system.company.model.enums.Category;
+import br.com.petshop.system.category.model.enums.Category;
 import br.com.petshop.system.schedule.model.dto.request.ScheduleDays;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

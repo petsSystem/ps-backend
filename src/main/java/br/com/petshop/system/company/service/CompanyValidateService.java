@@ -5,6 +5,7 @@ import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.system.category.service.CategoryService;
 import br.com.petshop.system.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.system.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.system.company.model.dto.response.CompanyResponse;
@@ -36,6 +37,8 @@ public class CompanyValidateService {
     Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired CompanyService service;
     @Autowired private CompanyConverterService convert;
+    @Autowired private CategoryService categoryService;
+
     @Autowired private ScheduleService scheduleService;
 
     public CompanyResponse create(Principal authentication, CompanyCreateRequest request) {
@@ -45,10 +48,12 @@ public class CompanyValidateService {
 
             CompanyEntity entity = service.create(entityRequest);
 
-            List<UUID> scheduleIds = scheduleService.create(entity);
-//            entity.setScheduleIds(scheduleIds);
+            entity = service.save(entity);
 
-            service.save(entity);
+            //create all categories
+            categoryService.createAutomatic(entity.getId());
+
+
 
             return convert.entityIntoResponse(entity);
 

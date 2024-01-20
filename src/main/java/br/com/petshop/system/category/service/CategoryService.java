@@ -4,6 +4,7 @@ import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.system.category.model.entity.CategoryEntity;
+import br.com.petshop.system.category.model.enums.Category;
 import br.com.petshop.system.category.repository.CategoryRepository;
 import br.com.petshop.system.category.repository.CategorySpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +37,19 @@ public class CategoryService {
             throw new GenericAlreadyRegisteredException();
 
         return save(entity);
+    }
+
+    public void createAutomatic(UUID companyId) {
+        Category.stream()
+                .forEach(c -> {
+                    save(CategoryEntity.builder()
+                            .companyId(companyId)
+                            .type(c)
+                            .description(c.getDescription())
+                            .days(new ArrayList<>())
+                            .active(false)
+                            .build());
+                });
     }
 
     public CategoryEntity save(CategoryEntity entity) {
@@ -65,7 +80,7 @@ public class CategoryService {
     }
 
     public CategoryEntity updateById(UUID categoryId, CategoryEntity request) {
-        CategoryEntity entity = findByIdAndActiveIsTrue(categoryId);
+        CategoryEntity entity = findById(categoryId);
 
         entity = convert.updateRequestIntoEntity(request, entity);
         return repository.save(entity);

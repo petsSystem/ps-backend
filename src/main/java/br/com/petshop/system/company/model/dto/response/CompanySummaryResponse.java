@@ -1,6 +1,6 @@
 package br.com.petshop.system.company.model.dto.response;
 
-import br.com.petshop.system.company.model.enums.Category;
+import br.com.petshop.system.category.model.enums.Category;
 import br.com.petshop.system.model.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
