@@ -30,7 +30,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_user")
+@Table(name = "user")
 public class UserEntity extends AuditorBaseEntity implements UserDetails {
     private String name;
     @Column(unique = true)

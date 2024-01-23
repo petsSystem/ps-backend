@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_profile")
+@Table(name = "profile")
 public class ProfileEntity extends AuditorBaseEntity implements Serializable {
     @Column(unique = true)
     private String name;

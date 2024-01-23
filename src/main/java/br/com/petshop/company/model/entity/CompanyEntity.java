@@ -22,7 +22,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_company")
+@Table(name = "company")
 public class CompanyEntity extends AuditorBaseEntity implements Serializable {
     private String name;
     @Column(unique = true)
