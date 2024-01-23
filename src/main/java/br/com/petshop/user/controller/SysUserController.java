@@ -37,7 +37,7 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sys/users")
+@RequestMapping("/api/v1/pet/users")
 @Tag(name = "SYS - Users Services")
 public class SysUserController {
 

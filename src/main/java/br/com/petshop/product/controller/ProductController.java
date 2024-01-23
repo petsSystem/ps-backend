@@ -34,7 +34,7 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sys/products")
+@RequestMapping("/api/v1/pet/products")
 @Tag(name = "SYS - Product Services")
 public class ProductController {
 

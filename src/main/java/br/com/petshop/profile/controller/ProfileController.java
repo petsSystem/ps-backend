@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sys/profiles")
+@RequestMapping("/api/v1/pet/profiles")
 @Tag(name = "SYS - Profile Services")
 public class ProfileController {
 

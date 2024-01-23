@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/sys/categories")
+@RequestMapping("/api/v1/pet/categories")
 @Tag(name = "SYS - Category Services")
 public class CategoryController {
 
