@@ -1,6 +1,6 @@
 package br.com.petshop.app.address.model.entity;
 
-import br.com.petshop.app.user.model.entity.AppUserEntity;
+import br.com.petshop.customer.model.entity.CustomerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -59,7 +58,7 @@ public class AppAddressEntity implements Serializable {
     @JoinColumn(name = "app_user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private AppUserEntity appUser;
+    private CustomerEntity appUser;
 
 //    @JsonIgnore
 //    @ManyToMany(mappedBy = "appUserAddresses")

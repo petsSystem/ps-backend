@@ -36,7 +36,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors().and()
-                .authorizeHttpRequests(request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/api/v1/test/**", "/api/v1/app/auth/**", "/api/v1/sys/auth/**", "/api/v1/app/noauth/users/**", "/api/v1/sys/noauth/users/**")
+                .authorizeHttpRequests(request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/v1/pet/app/auth/**", "/api/v1/pet/sys/auth/**")
                         .permitAll().anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(

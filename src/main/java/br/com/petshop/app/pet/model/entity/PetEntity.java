@@ -5,7 +5,7 @@ import br.com.petshop.app.pet.model.enums.PetGender;
 import br.com.petshop.app.pet.model.enums.PetSize;
 import br.com.petshop.app.pet.model.enums.PetSpecie;
 import br.com.petshop.app.pet.model.enums.PetTemper;
-import br.com.petshop.app.user.model.entity.AppUserEntity;
+import br.com.petshop.customer.model.entity.CustomerEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -70,7 +70,7 @@ public class PetEntity implements Serializable {
     @JoinColumn(name = "app_user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private AppUserEntity appUser;
+    private CustomerEntity appUser;
 
 //
 //    @JsonIgnore

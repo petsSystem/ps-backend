@@ -8,8 +8,8 @@ import br.com.petshop.app.pet.model.dto.request.PetUpdateRequest;
 import br.com.petshop.app.pet.model.dto.response.PetResponse;
 import br.com.petshop.app.pet.model.entity.PetEntity;
 import br.com.petshop.app.pet.repository.PetRepository;
-import br.com.petshop.app.user.model.entity.AppUserEntity;
-import br.com.petshop.app.user.service.AppUserService;
+import br.com.petshop.customer.model.entity.CustomerEntity;
+import br.com.petshop.customer.service.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class PetService {
 
     Logger log = LoggerFactory.getLogger(PetService.class);
-    @Autowired private AppUserService appUserService;
+    @Autowired private CustomerService appUserService;
     @Autowired private PetRepository petRepository;
     @Autowired private PetConverterService convert;
 
@@ -45,7 +45,7 @@ public class PetService {
                             },
                             () -> {
                                 PetEntity entity = convert.createRequestIntoEntity(request);
-                                AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
+                                CustomerEntity userEntity = appUserService.findByEmail(authentication.getName());
                                 entity.setAppUser(userEntity);
                                 petEntity[0] = petRepository.save(entity);
                             });

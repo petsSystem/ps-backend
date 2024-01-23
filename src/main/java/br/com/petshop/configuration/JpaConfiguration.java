@@ -1,7 +1,7 @@
 package br.com.petshop.configuration;
 
-import br.com.petshop.system.audit.AuditorAwareImpl;
-import br.com.petshop.system.user.model.entity.SysUserEntity;
+import br.com.petshop.audit.AuditorAwareImpl;
+import br.com.petshop.user.model.entity.UserEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class JpaConfiguration {
 
     @Bean
-    public AuditorAware<SysUserEntity> auditorAware() {
+    public AuditorAware<UserEntity> auditorAware() {
         return new AuditorAwareImpl();
     }
 }

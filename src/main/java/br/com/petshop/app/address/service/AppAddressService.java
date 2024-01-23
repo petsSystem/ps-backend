@@ -6,14 +6,10 @@ import br.com.petshop.app.address.model.dto.response.AppAddressResponse;
 import br.com.petshop.app.address.model.entity.AppAddressEntity;
 import br.com.petshop.app.address.model.enums.Message;
 import br.com.petshop.app.address.repository.AppAddressRepository;
-import br.com.petshop.app.user.model.entity.AppUserEntity;
-import br.com.petshop.app.user.service.AppUserService;
+import br.com.petshop.customer.model.entity.CustomerEntity;
+import br.com.petshop.customer.service.CustomerService;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.utils.PetGeometry;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
+import br.com.petshop.customer.service.GeometryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +27,11 @@ import java.util.stream.Collectors;
 public class AppAddressService {
 
     Logger log = LoggerFactory.getLogger(AppAddressService.class);
-    @Autowired private AppUserService appUserService;
+    @Autowired private CustomerService appUserService;
     @Autowired private AppAddressRepository addressRepository;
     @Autowired private AppAddressConverterService convert;
 
-    @Autowired private PetGeometry geometry;
+    @Autowired private GeometryService geometry;
 
     public AppAddressResponse create(Principal authentication, AppAddressCreateRequest request) {
         try {
@@ -43,7 +39,7 @@ public class AppAddressService {
 //            if (opEntity.isPresent())
 //                throw new GenericAlreadyRegisteredException(Message.ADDRESS_ALREADY_REGISTERED.get());
 
-            AppUserEntity userEntity = appUserService.findByEmail(authentication.getName());
+            CustomerEntity userEntity = appUserService.findByEmail(authentication.getName());
             AppAddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
             addressEntity.setAppUser(userEntity);
 //            addressEntity.setGeom(geometry.getPoint(addressEntity.getLat(), addressEntity.getLon()));

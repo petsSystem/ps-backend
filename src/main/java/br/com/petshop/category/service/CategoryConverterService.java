@@ -1,0 +1,43 @@
+package br.com.petshop.category.service;
+
+import br.com.petshop.category.model.dto.request.CategoryCreateRequest;
+import br.com.petshop.category.model.dto.request.CategoryUpdateRequest;
+import br.com.petshop.category.model.dto.response.CategoryResponse;
+import br.com.petshop.category.model.dto.response.CategoryTableResponse;
+import br.com.petshop.category.model.entity.CategoryEntity;
+import org.modelmapper.Conditions;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CategoryConverterService {
+
+    @Autowired
+    private ModelMapper mapper;
+
+    public CategoryEntity createRequestIntoEntity(CategoryCreateRequest request) {
+        return mapper.map(request, CategoryEntity.class);
+    }
+
+    public CategoryEntity updateRequestIntoEntity(CategoryUpdateRequest request) {
+        CategoryEntity entity = mapper.map(request, CategoryEntity.class);
+        entity.setDays(request.getDays());
+        return entity;
+    }
+
+    public CategoryEntity updateRequestIntoEntity(CategoryEntity request, CategoryEntity entity) {
+        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        mapper.map(request, entity);
+        entity.setDays(request.getDays());
+        return entity;
+    }
+
+    public CategoryResponse entityIntoResponse(CategoryEntity entity) {
+        return mapper.map(entity, CategoryResponse.class);
+    }
+
+    public CategoryTableResponse entityIntoTableResponse(CategoryEntity entity) {
+        return mapper.map(entity, CategoryTableResponse.class);
+    }
+}
