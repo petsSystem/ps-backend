@@ -18,6 +18,11 @@ import java.util.UUID;
 public class CategoryTableResponse implements Serializable {
     private UUID id;
     private Category type;
+    private String label;
     private String description;
     private Boolean active;
+
+    public String getLabel() {
+        return this.type.getLabel();
+    }
 }
