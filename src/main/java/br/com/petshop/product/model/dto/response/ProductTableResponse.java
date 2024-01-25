@@ -20,6 +20,11 @@ public class ProductTableResponse implements Serializable {
     private UUID id;
     private String name;
     private Category category;
+    private String categoryLabel;
     private BigDecimal amount;
     private Boolean active;
+
+    public String getCategoryLabel() {
+        return this.category.getLabel();
+    }
 }
