@@ -4,5 +4,6 @@ public enum Resource {
     COMPANY,
     USER,
     CATEGORY,
-    SERVICE;
+    SERVICE,
+    CUSTOMER;
 }
