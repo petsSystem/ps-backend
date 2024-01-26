@@ -103,7 +103,7 @@ public class ProfileValidateService {
 
             if (getRole(authentication) != Role.ADMIN) {
                 entities = entities.stream()
-                        .filter(l -> !l.getName().equalsIgnoreCase("Administrador") ||
+                        .filter(l -> !l.getName().equalsIgnoreCase("Administrador") &&
                                 !l.getName().equalsIgnoreCase("Proprietário"))
                         .collect(Collectors.toList());
             }
