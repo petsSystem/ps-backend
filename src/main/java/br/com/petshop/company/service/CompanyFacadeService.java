@@ -1,18 +1,18 @@
 package br.com.petshop.company.service;
 
 import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.category.service.CategoryService;
+import br.com.petshop.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
 import br.com.petshop.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.company.model.entity.CompanyEntity;
+import br.com.petshop.company.model.enums.Message;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.category.service.CategoryService;
-import br.com.petshop.company.model.dto.request.CompanyCreateRequest;
-import br.com.petshop.company.model.enums.Message;
-import br.com.petshop.user.model.entity.UserEntity;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,9 +32,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class CompanyValidateService {
-    Logger log = LoggerFactory.getLogger(CompanyService.class);
-    @Autowired CompanyService service;
+public class CompanyFacadeService extends AuthenticationCommonService {
+    private Logger log = LoggerFactory.getLogger(CompanyService.class);
+    @Autowired private CompanyService service;
     @Autowired private CompanyConverterService convert;
     @Autowired private CategoryService categoryService;
 
@@ -50,8 +49,6 @@ public class CompanyValidateService {
 
             //create all categories
             categoryService.createAutomatic(entity.getId());
-
-
 
             return convert.entityIntoResponse(entity);
 
@@ -112,10 +109,10 @@ public class CompanyValidateService {
         try {
             Page<CompanyEntity> entities;
 
-            if (getRole(authentication) == Role.ADMIN)
+            if (getSysRole(authentication) == Role.ADMIN)
                 entities = service.findAll(paging);
             else
-                entities = service.findByEmployeeId(getAuthUser(authentication).getId(), paging);
+                entities = service.findByEmployeeId(getSysAuthUser(authentication).getId(), paging);
 
             List<CompanyResponse> response = entities.stream()
                     .map(c -> convert.entityIntoResponse(c))
@@ -140,8 +137,8 @@ public class CompanyValidateService {
     public CompanyResponse getById(Principal authentication, UUID companyId) {
         try {
 
-            if (getRole(authentication) != Role.ADMIN) {
-                if (!getAuthUser(authentication).getCompanyIds().contains(companyId))
+            if (getSysRole(authentication) != Role.ADMIN) {
+                if (!getSysAuthUser(authentication).getCompanyIds().contains(companyId))
                     throw new GenericForbiddenException();
             }
 
@@ -161,18 +158,6 @@ public class CompanyValidateService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.COMPANY_GET_ERROR.get(), ex);
         }
-    }
-
-    private UserEntity getAuthUser(Principal authentication) {
-        return ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-    }
-
-    private Role getRole(Principal authentication) {
-        UserEntity systemUser = ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-
-        return systemUser.getRole();
     }
 
     public List<CompanySummaryResponse> nearby(Double lat, Double lon, Double radius) {

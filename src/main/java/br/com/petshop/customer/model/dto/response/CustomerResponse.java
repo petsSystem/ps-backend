@@ -20,7 +20,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CustomerResponse implements Serializable {
     private UUID id;
-    private UUID companyId;
     private String name;
     private String cpf;
     private String email;

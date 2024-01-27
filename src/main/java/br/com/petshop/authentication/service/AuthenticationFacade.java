@@ -2,13 +2,13 @@ package br.com.petshop.authentication.service;
 
 import br.com.petshop.customer.model.dto.request.CustomerAppCreateRequest;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
-import br.com.petshop.customer.service.CustomerFacade;
+import br.com.petshop.customer.service.CustomerAppFacade;
 import br.com.petshop.authentication.model.dto.request.AuthenticationForget;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import br.com.petshop.authentication.model.enums.AuthType;
 import br.com.petshop.authentication.model.enums.Message;
-import br.com.petshop.user.service.SysUserValidateService;
+import br.com.petshop.user.service.SysUserFacadeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +22,8 @@ public class AuthenticationFacade {
 
     private Logger log = LoggerFactory.getLogger(AuthenticationFacade.class);
     @Autowired private AuthenticationService service;
-    @Autowired private SysUserValidateService userFacade;
-    @Autowired private CustomerFacade customerFacade;
+    @Autowired private SysUserFacadeService userFacade;
+    @Autowired private CustomerAppFacade customerFacade;
 
     public AuthenticationResponse login(AuthenticationRequest request) {
         try {
@@ -48,6 +48,6 @@ public class AuthenticationFacade {
     }
 
     public CustomerResponse create(CustomerAppCreateRequest request) {
-        return customerFacade.createApp(request);
+        return customerFacade.create(request);
     }
 }

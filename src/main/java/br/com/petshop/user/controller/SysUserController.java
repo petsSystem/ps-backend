@@ -6,7 +6,7 @@ import br.com.petshop.user.model.dto.response.SysUserMeResponse;
 import br.com.petshop.user.model.dto.response.SysUserProfileResponse;
 import br.com.petshop.user.model.dto.response.SysUserResponse;
 import br.com.petshop.user.model.dto.response.SysUserTableResponse;
-import br.com.petshop.user.service.SysUserValidateService;
+import br.com.petshop.user.service.SysUserFacadeService;
 import br.com.petshop.user.model.dto.request.SysUserPasswordRequest;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +41,7 @@ import java.util.UUID;
 @Tag(name = "SYS - Users Services")
 public class SysUserController {
 
-    @Autowired private SysUserValidateService validateService;
+    @Autowired private SysUserFacadeService facade;
 
     @Operation(summary = "Serviço de inclusão de usuário no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -95,7 +95,7 @@ public class SysUserController {
     public SysUserResponse create(
             Principal authentication,
             @RequestBody SysUserCreateRequest request) {
-        return validateService.create(authentication, request);
+        return facade.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de alteração de senha no sistema.",
@@ -129,7 +129,7 @@ public class SysUserController {
     public SysUserResponse changePassword (
             Principal authentication,
             @RequestBody SysUserPasswordRequest request) {
-        return validateService.changePassword(authentication, request);
+        return facade.changePassword(authentication, request);
     }
 
     @Operation(summary = "Serviço de recuperação dos dados do usuário logado no sistema.",
@@ -151,7 +151,7 @@ public class SysUserController {
     @ResponseStatus(HttpStatus.OK)
     public SysUserProfileResponse getProfile(
             Principal authentication) {
-        return validateService.getProfile(authentication);
+        return facade.getProfile(authentication);
     }
 
     @Operation(summary = "Serviço de recuperação dos dados do usuário logado no sistema.",
@@ -173,7 +173,7 @@ public class SysUserController {
     @ResponseStatus(HttpStatus.OK)
     public SysUserMeResponse me(
             Principal authentication) {
-        return validateService.getMeInfo(authentication);
+        return facade.getMeInfo(authentication);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de usuário no sistema.",
@@ -216,7 +216,7 @@ public class SysUserController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return validateService.activate(authentication, userId, patch);
+        return facade.activate(authentication, userId, patch);
     }
 
     @Operation(summary = "Serviço de marcação de último Petshop acessado.",
@@ -246,7 +246,7 @@ public class SysUserController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return validateService.updateCurrentCompany(authentication, patch);
+        return facade.updateCurrentCompany(authentication, patch);
     }
 
     @Operation(summary = "Serviço de atualização de usuário no sistema.",
@@ -292,7 +292,7 @@ public class SysUserController {
             Principal authentication,
             @PathVariable("userId") UUID userId,
             @RequestBody SysUserUpdateRequest request) {
-        return validateService.updateById(authentication, userId, request);
+        return facade.updateById(authentication, userId, request);
     }
 
     @Operation(summary = "Serviço de recuperação das informações de usuários do sistema, de acordo com o companyId informado.",
@@ -319,7 +319,7 @@ public class SysUserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return validateService.get(authentication, companyId, pageable);
+        return facade.get(authentication, companyId, pageable);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do usuário no sistema através do id.",
@@ -365,7 +365,6 @@ public class SysUserController {
     public SysUserResponse getById(
             Principal authentication,
             @PathVariable("userId") UUID userId) {
-        return validateService.getById(authentication, userId);
+        return facade.getById(authentication, userId);
     }
-
 }

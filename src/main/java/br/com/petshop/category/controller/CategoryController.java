@@ -1,7 +1,7 @@
 package br.com.petshop.category.controller;
 
 import br.com.petshop.category.model.dto.request.CategoryCreateRequest;
-import br.com.petshop.category.service.CategoryValidateService;
+import br.com.petshop.category.service.CategoryFacadeService;
 import br.com.petshop.category.model.dto.request.CategoryUpdateRequest;
 import br.com.petshop.category.model.dto.response.CategoryResponse;
 import br.com.petshop.category.model.dto.response.CategoryTableResponse;
@@ -36,7 +36,7 @@ import java.util.UUID;
 @Tag(name = "SYS - Category Services")
 public class CategoryController {
 
-    @Autowired private CategoryValidateService validateService;
+    @Autowired private CategoryFacadeService facade;
 
     @Operation(summary = "Serviço de inclusão de categoria no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -70,7 +70,7 @@ public class CategoryController {
     public CategoryResponse create(
             Principal authentication,
             @RequestBody CategoryCreateRequest request) {
-        return validateService.create(authentication, request);
+        return facade.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de categoria no sistema.",
@@ -113,7 +113,7 @@ public class CategoryController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return validateService.activate(authentication, categoryId, patch);
+        return facade.activate(authentication, categoryId, patch);
     }
 
     @Operation(summary = "Serviço de atualização de categoria pelo id.",
@@ -149,7 +149,7 @@ public class CategoryController {
             Principal authentication,
             @PathVariable("categoryId") UUID categoryId,
             @RequestBody CategoryUpdateRequest request) {
-        return validateService.updateById(authentication, categoryId, request);
+        return facade.updateById(authentication, categoryId, request);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da(s) categorias(s) de loja selecionada.",
@@ -172,7 +172,7 @@ public class CategoryController {
     public List<CategoryTableResponse> get (
             Principal authentication,
             @RequestParam("companyId") UUID companyId) {
-        return validateService.getByCompanyId(authentication, companyId);
+        return facade.getByCompanyId(authentication, companyId);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da(s) categoria(s) pelo id.",
@@ -206,6 +206,6 @@ public class CategoryController {
     public CategoryResponse getById (
             Principal authentication,
             @PathVariable("categoryId") UUID categoryId) {
-        return validateService.getById(authentication, categoryId);
+        return facade.getById(authentication, categoryId);
     }
 }

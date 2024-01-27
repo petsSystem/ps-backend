@@ -1,15 +1,17 @@
 package br.com.petshop.user.service;
 
 import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.profile.model.dto.Permission;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.user.model.dto.request.SysUserCreateRequest;
+import br.com.petshop.user.model.dto.request.SysUserPasswordRequest;
 import br.com.petshop.user.model.dto.request.SysUserUpdateRequest;
 import br.com.petshop.user.model.dto.response.SysUserMeResponse;
 import br.com.petshop.user.model.dto.response.SysUserProfileResponse;
@@ -17,7 +19,6 @@ import br.com.petshop.user.model.dto.response.SysUserResponse;
 import br.com.petshop.user.model.dto.response.SysUserTableResponse;
 import br.com.petshop.user.model.entity.UserEntity;
 import br.com.petshop.user.model.enums.Message;
-import br.com.petshop.user.model.dto.request.SysUserPasswordRequest;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,11 +38,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class SysUserValidateService {
-    Logger log = LoggerFactory.getLogger(SysUserValidateService.class);
+public class SysUserFacadeService extends AuthenticationCommonService {
+    private Logger log = LoggerFactory.getLogger(SysUserFacadeService.class);
     @Autowired private SysUserService service;
     @Autowired private SysUserConverterService convert;
-
 
     public SysUserResponse create(Principal authentication, SysUserCreateRequest request) {
         try {
@@ -92,7 +91,7 @@ public class SysUserValidateService {
 
     public SysUserResponse changePassword(Principal authentication, SysUserPasswordRequest request) {
         try {
-            UserEntity user = getAuthUser(authentication);
+            UserEntity user = getSysAuthUser(authentication);
             UserEntity entity = service.changePassword(user.getId(), request);
 
             return convert.entityIntoResponse(entity);
@@ -114,7 +113,7 @@ public class SysUserValidateService {
 
     public SysUserProfileResponse getProfile(Principal authentication) {
         try {
-            UserEntity entity = getAuthUser(authentication);
+            UserEntity entity = getSysAuthUser(authentication);
             entity = service.findById(entity.getId());
 
             return convert.entityIntoProfileResponse(entity);
@@ -128,7 +127,7 @@ public class SysUserValidateService {
 
     public SysUserMeResponse getMeInfo(Principal authentication) {
         try {
-            UserEntity entity = getAuthUser(authentication);
+            UserEntity entity = getSysAuthUser(authentication);
             entity = service.findById(entity.getId());
 
             CompanyEntity companyEntity = service.getCompanyInfo(entity);
@@ -177,7 +176,7 @@ public class SysUserValidateService {
 
     public SysUserMeResponse updateCurrentCompany(Principal authentication, JsonPatch patch) {
         try {
-            UserEntity user = getAuthUser(authentication);
+            UserEntity user = getSysAuthUser(authentication);
 
             UserEntity entity = service.updateCurrentCompany(user, patch);
 
@@ -210,7 +209,7 @@ public class SysUserValidateService {
         try {
             UserEntity entity = service.findByIdAndActiveIsTrue(userId);
 
-            validateUserAccess(getRole(authentication), getAuthUser(authentication), entity);
+            validateUserAccess(getSysRole(authentication), getSysAuthUser(authentication), entity);
 
             UserEntity entityRequest = convert.updateRequestIntoEntity(request);
 
@@ -240,9 +239,9 @@ public class SysUserValidateService {
 
     public  Page<SysUserTableResponse> get(Principal authentication, UUID companyId, Pageable pageable) {
         try {
-            UserEntity user = getAuthUser(authentication);
+            UserEntity user = getSysAuthUser(authentication);
 
-            if (getRole(authentication) != Role.ADMIN)
+            if (getSysRole(authentication) != Role.ADMIN)
                 validateCompanyIdsAccess(user.getCompanyIds(), companyId);
 
             Page<UserEntity> entities = service.findAllByCompanyId(companyId, pageable);
@@ -267,7 +266,7 @@ public class SysUserValidateService {
         try {
             UserEntity entity = service.findById(userId);
 
-            validateUserAccess(getRole(authentication), getAuthUser(authentication), entity);
+            validateUserAccess(getSysRole(authentication), getSysAuthUser(authentication), entity);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
 
@@ -303,17 +302,5 @@ public class SysUserValidateService {
     private void validateCompanyIdsAccess(List<UUID> companyIds, UUID companyId) {
         if (!companyIds.contains(companyId))
             throw new GenericForbiddenException();
-    }
-
-    private UserEntity getAuthUser(Principal authentication) {
-        return ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-    }
-
-    private Role getRole(Principal authentication) {
-        UserEntity systemUser = ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-
-        return systemUser.getRole();
     }
 }

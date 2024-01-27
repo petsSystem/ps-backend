@@ -30,14 +30,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class CompanyService {
-    Logger log = LoggerFactory.getLogger(CompanyService.class);
+    private Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired private CompanyRepository companyRepository;
     @Autowired private CompanyConverterService convert;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private GeometryService geometry;
     @Autowired private SysUserService employeeService;
-
-
 
     public CompanyEntity create(CompanyEntity entity) {
         Optional<CompanyEntity> company = companyRepository.findByCnpj(entity.getCnpj());

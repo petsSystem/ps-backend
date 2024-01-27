@@ -1,33 +1,33 @@
 package br.com.petshop.customer.service;
 
-import br.com.petshop.app.address.service.AppAddressService;
-import br.com.petshop.customer.model.dto.request.AppUserUpdateRequest;
 import br.com.petshop.customer.model.dto.request.CustomerChangePasswordRequest;
-import br.com.petshop.customer.model.dto.request.EmailValidateRequest;
-import br.com.petshop.customer.model.dto.response.CustomerResponse;
+import br.com.petshop.customer.model.dto.request.CustomerSysUpdateRequest;
 import br.com.petshop.customer.model.entity.CustomerEntity;
 import br.com.petshop.customer.model.enums.AppStatus;
-import br.com.petshop.customer.model.enums.Message;
 import br.com.petshop.customer.model.enums.Origin;
 import br.com.petshop.customer.repository.CustomerRepository;
-import br.com.petshop.app.pet.service.PetService;
-import br.com.petshop.authentication.service.JwtService;
+import br.com.petshop.customer.repository.CustomerSpecification;
 import br.com.petshop.exception.EmailTokenException;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.notification.MailNotificationService;
-import br.com.petshop.company.service.CompanyService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -36,16 +36,11 @@ public class
 CustomerService {
     private Logger log = LoggerFactory.getLogger(CustomerService.class);
     @Autowired private CustomerRepository repository;
+    @Autowired private ObjectMapper objectMapper;
     @Autowired private MailNotificationService mailNotificationService;
-    @Autowired private AppAddressService addressService;
-    @Autowired private PetService petService;
     @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private JwtService jwtService;
     @Autowired private CustomerConverterService convert;
-
-    @Autowired private CompanyService companyService;
-
-    @Autowired private GeometryService geometry;
+    @Autowired private CustomerSpecification specification;
 
     public void forget(String username) {
         CustomerEntity customerEntity = repository.findByUsernameAndActiveIsTrue(username)
@@ -55,7 +50,7 @@ CustomerService {
         customerEntity.setPassword(passwordEncoder.encode(newPassword));
         customerEntity.setChangePassword(true);
 
-        save(customerEntity);
+        repository.save(customerEntity);
 
         //DESENVOLVER HTML PARA ENVIO DE EMAIL
 
@@ -76,7 +71,7 @@ CustomerService {
                 customerEntity.setAppStatus(AppStatus.ACTIVE);
                 customerEntity.setPassword(passwordEncoder.encode(entity.getPassword()));
                 sendValidationEmailToken(customerEntity);
-                return save(customerEntity);
+                return repository.save(customerEntity);
             }
 
         if (entity.getOrigin() == Origin.APP) {
@@ -88,7 +83,32 @@ CustomerService {
 
         entity.setUsername(entity.getCpf());
 
-        return save(entity);
+        return repository.save(entity);
+    }
+
+    public CustomerEntity associateCompanyId (UUID customerId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        CustomerEntity entity = findById(customerId);
+
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        String companyIdString = ((ObjectNode) patched).get("companyIds").get(0).toString();
+        UUID companyId = UUID.fromString(companyIdString.replaceAll("\"", ""));
+
+        entity.getCompanyIds().add(companyId);
+
+        return repository.save(entity);
+    }
+
+    public CustomerEntity update(UUID customerId, CustomerSysUpdateRequest request) {
+        CustomerEntity entity = findById(customerId);
+
+        CustomerEntity newEntity = convert.updateRequestIntoEntity(request, entity);
+
+        return repository.save(newEntity);
+    }
+
+    public CustomerEntity findById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(GenericNotFoundException::new);
     }
 
     private void sendValidationEmailToken(CustomerEntity userEntity) {
@@ -121,9 +141,8 @@ CustomerService {
 
         entity.setPassword(passwordEncoder.encode(request.getNewPassword()));
         entity.setChangePassword(false);
-        entity = repository.save(entity);
 
-        return entity;
+        return repository.save(entity);
     }
 
     private String generateEmailTokenValidate() {
@@ -131,53 +150,31 @@ CustomerService {
         return String.valueOf(number);
     }
 
-    public CustomerResponse emailValidate(Principal authentication, EmailValidateRequest request) {
-        try {
-            CustomerEntity userEntity = findByEmail(authentication.getName());
-            if (request.emailToken().equalsIgnoreCase(userEntity.getEmailToken()) &&
-                    !emailTokenExpired(userEntity.getEmailTokenTime())) {
-                userEntity.setEmailValidated(true);
+    public CustomerEntity emailValidate(String cpf, String token) {
+        CustomerEntity entity = repository.findByCpf(cpf)
+                .orElseThrow(GenericNotFoundException::new);
 
-                save(userEntity);
+        if (token.equalsIgnoreCase(entity.getEmailToken()) &&
+                !emailTokenExpired(entity.getEmailTokenTime())) {
+            entity.setEmailValidated(true);
 
-                return convert.entityIntoResponse(userEntity);
-            } else
-                throw new EmailTokenException(Message.USER_ERROR_INVALID_TOKEN.get());
+            return repository.save(entity);
 
-        } catch (EmailTokenException ex) {
-            log.error("Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, ex.getMessage(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_VALIDATE_EMAIL.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_VALIDATE_EMAIL.get(), ex);
-        }
+        } else
+            throw new EmailTokenException();
     }
 
     private Boolean emailTokenExpired(LocalDateTime emailTokenTime) {
         if (LocalDateTime.now().isAfter(emailTokenTime.plusMinutes(1)))
-            throw new EmailTokenException(Message.USER_ERROR_EXPIRED_TOKEN.get());
+            throw new EmailTokenException();
         return false;
     }
 
-    public CustomerResponse emailValidateResend(Principal authentication) {
-        try {
-            CustomerEntity userEntity = findByEmail(authentication.getName());
+    public void resendEmailValidate(String cpf) {
+        CustomerEntity userEntity = repository.findByCpf(cpf)
+                .orElseThrow(GenericNotFoundException::new);
 
-            sendValidationEmailToken(userEntity);
-
-            return convert.entityIntoResponse(userEntity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_RESEND_TOKEN.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_RESEND_TOKEN.get(), ex);
-        }
+        sendValidationEmailToken(userEntity);
     }
 
     private String generatePassword() {
@@ -185,76 +182,14 @@ CustomerService {
         return newPassword.substring(0,6);
     }
 
-
-    public CustomerResponse update(Principal authentication, AppUserUpdateRequest request) {
-        try {
-            CustomerEntity userEntity = findByEmail(authentication.getName());
-            CustomerEntity newEntity = convert.updateRequestIntoEntity(request, userEntity);
-            if (request.getPassword() != null)
-                newEntity.setPassword(passwordEncoder.encode(request.getPassword()));
-            save(newEntity);
-            return convert.entityIntoResponse(newEntity);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_UPDATE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_UPDATE.get(), ex);
-        }
+    public void deactivate(UUID customerId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        CustomerEntity entity = findById(customerId);
+        entity.setActive(false);
+        repository.save(entity);
     }
 
-    public CustomerEntity findByEmail(String email) {
-        return repository.findByEmailAndActiveIsTrue(email)
-                .orElseThrow(GenericNotFoundException::new);
+    public Page<CustomerEntity> findAllByCompanyId(UUID companyId, Pageable pageable) {
+        Specification<CustomerEntity> filters = specification.filter(companyId);
+        return repository.findAll(filters, pageable);
     }
-
-    public CustomerResponse getByEmail(Principal authentication) {
-        try {
-            CustomerEntity userEntity = findByEmail(authentication.getName());
-            if (!userEntity.getEmailValidated())
-                sendValidationEmailToken(userEntity);
-
-            CustomerResponse response = convert.entityIntoResponse(userEntity);
-
-//            Set<AppAddressResponse> addressResponse = addressService.get(authentication);
-//            response.setAddresses(addressResponse);
-//
-//            Set<PetResponse> petResponse = petService.get(authentication);
-//            response.setPets(petResponse);
-
-            return response;
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_GET.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_GET.get(), ex);
-        }
-    }
-
-    public CustomerEntity save (CustomerEntity entity) {
-        return repository.save(entity);
-    }
-
-    public void deactivate(String email) {
-        try {
-            CustomerEntity userEntity = findByEmail(email);
-            userEntity.setActive(false);
-            save(userEntity);
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_ERROR_DELETE.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_ERROR_DELETE.get(), ex);
-        }
-    }
-
-
 }

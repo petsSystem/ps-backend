@@ -1,17 +1,16 @@
 package br.com.petshop.product.service;
 
-import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.authentication.service.AuthenticationCommonService;
 import br.com.petshop.category.model.entity.CategoryEntity;
 import br.com.petshop.category.service.CategoryService;
-import br.com.petshop.product.model.dto.response.ProductTableResponse;
-import br.com.petshop.product.model.entity.ProductEntity;
+import br.com.petshop.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.product.model.dto.request.ProductUpdateRequest;
 import br.com.petshop.product.model.dto.response.ProductResponse;
+import br.com.petshop.product.model.dto.response.ProductTableResponse;
+import br.com.petshop.product.model.entity.ProductEntity;
 import br.com.petshop.product.model.enums.Message;
-import br.com.petshop.user.model.entity.UserEntity;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,10 +32,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class ProductValidateService {
-    Logger log = LoggerFactory.getLogger(ProductService.class);
-    @Autowired ProductService service;
-    @Autowired CategoryService categoryService;
+public class ProductFacadeService extends AuthenticationCommonService {
+    private Logger log = LoggerFactory.getLogger(ProductService.class);
+    @Autowired private ProductService service;
+    @Autowired private CategoryService categoryService;
     @Autowired private ProductConverterService convert;
 
     public ProductResponse create(Principal authentication, ProductCreateRequest request) {
@@ -142,17 +140,5 @@ public class ProductValidateService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.PRODUCT_GET_ERROR.get(), ex);
         }
-    }
-
-    private UserEntity getAuthUser(Principal authentication) {
-        return ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-    }
-
-    private Role getRole(Principal authentication) {
-        UserEntity systemUser = ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-
-        return systemUser.getRole();
     }
 }

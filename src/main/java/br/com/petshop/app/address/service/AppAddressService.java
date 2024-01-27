@@ -39,7 +39,7 @@ public class AppAddressService {
 //            if (opEntity.isPresent())
 //                throw new GenericAlreadyRegisteredException(Message.ADDRESS_ALREADY_REGISTERED.get());
 
-            CustomerEntity userEntity = appUserService.findByEmail(authentication.getName());
+            CustomerEntity userEntity = null;//appUserService.findByEmail(authentication.getName());
             AppAddressEntity addressEntity = convert.addressCreateRequestIntoEntity(request);
             addressEntity.setAppUser(userEntity);
 //            addressEntity.setGeom(geometry.getPoint(addressEntity.getLat(), addressEntity.getLon()));

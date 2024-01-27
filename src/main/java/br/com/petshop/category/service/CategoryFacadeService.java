@@ -1,21 +1,19 @@
 package br.com.petshop.category.service;
 
-import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.authentication.service.AuthenticationCommonService;
 import br.com.petshop.category.model.dto.request.CategoryCreateRequest;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.category.model.dto.request.CategoryUpdateRequest;
 import br.com.petshop.category.model.dto.response.CategoryResponse;
 import br.com.petshop.category.model.dto.response.CategoryTableResponse;
 import br.com.petshop.category.model.entity.CategoryEntity;
 import br.com.petshop.category.model.enums.Message;
-import br.com.petshop.user.model.entity.UserEntity;
+import br.com.petshop.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.exception.GenericNotFoundException;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,10 +25,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class CategoryValidateService {
-    Logger log = LoggerFactory.getLogger(CategoryService.class);
-    @Autowired
-    CategoryService service;
+public class CategoryFacadeService extends AuthenticationCommonService {
+    private Logger log = LoggerFactory.getLogger(CategoryService.class);
+    @Autowired private CategoryService service;
     @Autowired private CategoryConverterService convert;
 
     public CategoryResponse create(Principal authentication, CategoryCreateRequest request) {
@@ -126,17 +123,5 @@ public class CategoryValidateService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.CATEGORY_GET_ERROR.get(), ex);
         }
-    }
-
-    private UserEntity getAuthUser(Principal authentication) {
-        return ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-    }
-
-    private Role getRole(Principal authentication) {
-        UserEntity systemUser = ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-
-        return systemUser.getRole();
     }
 }

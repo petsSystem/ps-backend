@@ -46,7 +46,11 @@ public class CustomerEntity extends AuditorBaseEntity implements UserDetails {
     private AppStatus appStatus;
     private Boolean active;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "pet_ids", columnDefinition = "jsonb")
     private List<UUID> petIds;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "company_ids", columnDefinition = "jsonb")
     private List<UUID> companyIds;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
@@ -73,7 +77,6 @@ public class CustomerEntity extends AuditorBaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        // email in our case
         return username;
     }
 

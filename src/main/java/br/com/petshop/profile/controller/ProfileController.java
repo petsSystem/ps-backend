@@ -3,7 +3,7 @@ package br.com.petshop.profile.controller;
 import br.com.petshop.profile.model.dto.request.ProfileCreateRequest;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.profile.model.dto.response.LabelResponse;
-import br.com.petshop.profile.service.ProfileValidateService;
+import br.com.petshop.profile.service.ProfileFacadeService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,7 +37,7 @@ import java.util.UUID;
 @Tag(name = "SYS - Profile Services")
 public class ProfileController {
 
-    @Autowired private ProfileValidateService profileValidateService;
+    @Autowired private ProfileFacadeService facade;
 
     //ACESSO: 'ADMIN'
     @Operation(summary = "Serviço de criação de perfil no sistema.",
@@ -70,7 +70,7 @@ public class ProfileController {
     public ProfileResponse create(
             Principal authentication,
             @RequestBody ProfileCreateRequest request) {
-        return profileValidateService.create(authentication, request);
+        return facade.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização parcial de perfil no sistema.",
@@ -113,7 +113,7 @@ public class ProfileController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return profileValidateService.partialUpdate(authentication, profileId, patch);
+        return facade.partialUpdate(authentication, profileId, patch);
     }
 
     //ACESSO: ADMIN
@@ -141,7 +141,7 @@ public class ProfileController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return profileValidateService.get(authentication, pageable);
+        return facade.get(authentication, pageable);
     }
 
     @Operation(summary = "Serviço de recuperação dos labels dos perfis do sistema.",
@@ -164,6 +164,6 @@ public class ProfileController {
     public List<LabelResponse> getLabels(
             Principal authentication) {
 
-        return profileValidateService.getLabels(authentication);
+        return facade.getLabels(authentication);
     }
 }

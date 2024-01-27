@@ -4,7 +4,7 @@ import br.com.petshop.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.product.model.dto.request.ProductUpdateRequest;
 import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.product.model.dto.response.ProductTableResponse;
-import br.com.petshop.product.service.ProductValidateService;
+import br.com.petshop.product.service.ProductFacadeService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,7 +38,7 @@ import java.util.UUID;
 @Tag(name = "SYS - Product Services")
 public class ProductController {
 
-    @Autowired private ProductValidateService validateService;
+    @Autowired private ProductFacadeService facade;
 
     @Operation(summary = "Serviço de inclusão de produto/serviço no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -72,7 +72,7 @@ public class ProductController {
     public ProductResponse create(
             Principal authentication,
             @RequestBody ProductCreateRequest request) {
-        return validateService.create(authentication, request);
+        return facade.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de produto/serviço no sistema.",
@@ -115,7 +115,7 @@ public class ProductController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return validateService.activate(authentication, productId, patch);
+        return facade.activate(authentication, productId, patch);
     }
 
     @Operation(summary = "Serviço de atualização de produto/serviço pelo id.",
@@ -151,7 +151,7 @@ public class ProductController {
             Principal authentication,
             @PathVariable("productId") UUID productId,
             @RequestBody ProductUpdateRequest request) {
-        return validateService.updateById(authentication, productId, request);
+        return facade.updateById(authentication, productId, request);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da(s) categorias(s) de loja selecionada.",
@@ -177,7 +177,7 @@ public class ProductController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam("companyId") UUID companyId) {
         Pageable paging = PageRequest.of(page, size);
-        return validateService.getByCompanyId(authentication, paging, companyId);
+        return facade.getByCompanyId(authentication, paging, companyId);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do(s) produto(s)/serviço(s) pelo id.",
@@ -211,6 +211,6 @@ public class ProductController {
     public ProductResponse getById (
             Principal authentication,
             @PathVariable("productId") UUID productId) {
-        return validateService.getById(authentication, productId);
+        return facade.getById(authentication, productId);
     }
 }

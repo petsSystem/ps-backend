@@ -7,7 +7,7 @@ import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.service.CompanyService;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
-import br.com.petshop.profile.service.ProfileValidateService;
+import br.com.petshop.profile.service.ProfileFacadeService;
 import br.com.petshop.user.model.entity.UserEntity;
 import br.com.petshop.user.model.enums.Message;
 import br.com.petshop.user.repository.UserRepository;
@@ -44,7 +44,7 @@ public class SysUserService {
     @Autowired private SysUserConverterService convert;
     @Autowired private CompanyService companyService;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private ProfileValidateService profileService;
+    @Autowired private ProfileFacadeService profileService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private SysUserAsyncService asyncService;
 

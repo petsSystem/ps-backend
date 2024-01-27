@@ -12,12 +12,10 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppUserUpdateRequest implements Serializable {
-    private String name;
-    private String cpf;
-    private String password;
-    private String phone;
-    private String birthDate;
+public class ForgetRequest implements Serializable {
+    private String email;
+    @Builder.Default
+    private Boolean changePassword = true;
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

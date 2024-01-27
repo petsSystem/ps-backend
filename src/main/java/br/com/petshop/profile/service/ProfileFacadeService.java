@@ -1,6 +1,7 @@
 package br.com.petshop.profile.service;
 
 import br.com.petshop.authentication.model.enums.Role;
+import br.com.petshop.authentication.service.AuthenticationCommonService;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.profile.model.dto.request.ProfileCreateRequest;
@@ -8,7 +9,6 @@ import br.com.petshop.profile.model.dto.response.LabelResponse;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.profile.model.entity.ProfileEntity;
 import br.com.petshop.profile.model.enums.Message;
-import br.com.petshop.user.model.entity.UserEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,12 +29,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class ProfileValidateService {
-
-    Logger log = LoggerFactory.getLogger(ProfileValidateService.class);
+public class ProfileFacadeService extends AuthenticationCommonService {
+    private Logger log = LoggerFactory.getLogger(ProfileFacadeService.class);
     @Autowired private ProfileService service;
     @Autowired private ProfileConverterService convert;
-
     @Autowired private ObjectMapper objectMapper;
 
     public ProfileResponse create (Principal authentication, ProfileCreateRequest request) {
@@ -101,7 +98,7 @@ public class ProfileValidateService {
 
             List<ProfileEntity> entities = service.findAllLabels();
 
-            if (getRole(authentication) != Role.ADMIN) {
+            if (getSysRole(authentication) != Role.ADMIN) {
                 entities = entities.stream()
                         .filter(l -> !l.getName().equalsIgnoreCase("Administrador") &&
                                 !l.getName().equalsIgnoreCase("Proprietário"))
@@ -130,17 +127,5 @@ public class ProfileValidateService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.PROFILE_GET_ERROR.get(), ex);
         }
-    }
-
-    private UserEntity getAuthUser(Principal authentication) {
-        return ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-    }
-
-    private Role getRole(Principal authentication) {
-        UserEntity systemUser = ((UserEntity) ((UsernamePasswordAuthenticationToken)
-                authentication).getPrincipal());
-
-        return systemUser.getRole();
     }
 }

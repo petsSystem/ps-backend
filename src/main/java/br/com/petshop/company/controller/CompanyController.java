@@ -4,7 +4,7 @@ import br.com.petshop.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
 import br.com.petshop.company.model.dto.response.CompanySummaryResponse;
-import br.com.petshop.company.service.CompanyValidateService;
+import br.com.petshop.company.service.CompanyFacadeService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,7 +39,7 @@ import java.util.UUID;
 @Tag(name = "Companies Services")
 public class CompanyController {
 
-    @Autowired private CompanyValidateService validateService;
+    @Autowired private CompanyFacadeService facade;
 
     //ACESSO: ADMIN e OWNER
     @Operation(summary = "Serviço de inclusão de loja no sistema.",
@@ -74,7 +74,7 @@ public class CompanyController {
     public CompanyResponse create(
             Principal authentication,
             @RequestBody CompanyCreateRequest request) {
-        return validateService.create(authentication, request);
+        return facade.create(authentication, request);
     }
     //ACESSO ADMIN
     @Operation(summary = "Serviço de ativação/desativação de loja no sistema.",
@@ -117,7 +117,7 @@ public class CompanyController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return validateService.activate(authentication, companyId, patch);
+        return facade.activate(authentication, companyId, patch);
     }
 
     //ACESSO: ADMIN, OWNER, MANAGER
@@ -164,7 +164,7 @@ public class CompanyController {
             Principal authentication,
             @PathVariable("companyId") UUID companyId,
             @RequestBody CompanyUpdateRequest request) {
-        return validateService.updateById(authentication, companyId, request);
+        return facade.updateById(authentication, companyId, request);
     }
 
     //ACESSO: ALL
@@ -190,7 +190,7 @@ public class CompanyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable paging = PageRequest.of(page, size);
-        return validateService.get(authentication, paging);
+        return facade.get(authentication, paging);
     }
 
     //ACESSO: ALL
@@ -236,7 +236,7 @@ public class CompanyController {
     public CompanyResponse getById (
             Principal authentication,
             @PathVariable("companyId") UUID companyId) {
-        return validateService.getById(authentication, companyId);
+        return facade.getById(authentication, companyId);
     }
 
     @Operation(summary = "Serviço que retorna as lojas próximos de uma localidade (latitude/longitude) informada.")
@@ -270,6 +270,6 @@ public class CompanyController {
             @RequestParam("lat") Double lat,
             @RequestParam("lon") Double lon,
             @RequestParam("radius") Double radius) {
-        return validateService.nearby(lat, lon, radius);
+        return facade.nearby(lat, lon, radius);
     }
 }

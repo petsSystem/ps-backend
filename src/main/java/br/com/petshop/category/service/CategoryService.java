@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Service
 public class CategoryService {
-    Logger log = LoggerFactory.getLogger(CategoryService.class);
+    private Logger log = LoggerFactory.getLogger(CategoryService.class);
     @Autowired private CategoryRepository repository;
     @Autowired private CategoryConverterService convert;
     @Autowired private ObjectMapper objectMapper;

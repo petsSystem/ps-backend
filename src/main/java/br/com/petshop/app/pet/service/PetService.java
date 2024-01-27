@@ -45,7 +45,7 @@ public class PetService {
                             },
                             () -> {
                                 PetEntity entity = convert.createRequestIntoEntity(request);
-                                CustomerEntity userEntity = appUserService.findByEmail(authentication.getName());
+                                CustomerEntity userEntity = null;//appUserService.findByEmail(authentication.getName());
                                 entity.setAppUser(userEntity);
                                 petEntity[0] = petRepository.save(entity);
                             });
