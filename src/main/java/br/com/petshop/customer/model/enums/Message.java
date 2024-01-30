@@ -14,7 +14,8 @@ public enum Message {
     CUSTOMER_SEND_EMAIL_ERROR("Erro ao enviar email. Tente novamente mais tarde."),
     CUSTOMER_GET_ERROR("Erro ao retornar dados do usuário. Tente novamente mais tarde."),
     CUSTOMER_ASSOCIATE_ERROR("Erro ao associar cliente a loja. Tente novamente mais tarde"),
-    CUSTOMER_FAVORITE_ERROR("Erro ao favoritar loja. Tente novamente mais tarde.");
+    CUSTOMER_FAVORITE_ERROR("Erro ao favoritar loja. Tente novamente mais tarde."),
+    CUSTOMER_UNFAVORITE_ERROR("Erro ao desfavoritar loja. Tente novamente mais tarde.");
 
     private String message;
 

@@ -34,7 +34,7 @@ import java.util.UUID;
 public class CustomerAPPController {
     @Autowired private CustomerAppFacade facade;
 
-    @Operation(summary = "Serviço de associação de petshop com cliente.",
+    @Operation(summary = "Serviço para favoritar petshop para cliente.",
             description = "Acesso: 'ALL'")
     @ApiResponses(value = {
             @ApiResponse(
@@ -56,12 +56,42 @@ public class CustomerAPPController {
             @Schema(example = "[\n" +
                     "    {\n" +
                     "        \"op\": \"add\",\n" +
-                    "        \"path\": \"/favorites/0\",\n" +
+                    "        \"path\": \"/companyIds/0\",\n" +
                     "        \"value\": \"${companyId}\"\n" +
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
         return facade.favorite(authentication, patch);
+    }
+
+    @Operation(summary = "Serviço para desfavoritar petshop para cliente.",
+            description = "Acesso: 'ALL'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao desassociar petshop do cliente. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/sys/customers/{customerId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping(path = "/unfavorite", consumes = "application/json-patch+json")
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerResponse unfavorite (
+            Principal authentication,
+            @Schema(example = "[\n" +
+                    "    {\n" +
+                    "        \"op\": \"remove\",\n" +
+                    "        \"path\": \"/companyIds/0\",\n" +
+                    "        \"value\": \"${companyId}\"\n" +
+                    "    }\n" +
+                    "]")
+            @RequestBody JsonPatch patch) {
+        return facade.unfavorite(authentication, patch);
     }
 
     @Operation(summary = "Serviço de alteração dos dados do usuário autenticado na aplicação.")

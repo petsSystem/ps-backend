@@ -32,11 +32,12 @@ public class CustomerResponse implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<UUID> companyIds;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<UUID> favorites;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Address address;
     private String username;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean changePassword;
-    private Role role;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean emailValidated;
 }

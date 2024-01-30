@@ -9,6 +9,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +36,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "customer")
-public class CustomerEntity extends AuditorBaseEntity implements UserDetails {
+public class CustomerEntity implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    protected UUID id;
     private String name;
     @Column(unique = true)
     private String cpf;

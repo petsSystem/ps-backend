@@ -84,6 +84,25 @@ public class CustomerAppFacade extends AuthenticationCommonService {
         }
     }
 
+    public CustomerResponse unfavorite(Principal authentication, JsonPatch patch) {
+        try {
+            UUID customerId = getAppAuthUser(authentication).getId();
+
+            CustomerEntity entity = service.desassociateCompanyId(customerId, patch, true);
+
+            return  converter.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.CUSTOMER_UNFAVORITE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_UNFAVORITE_ERROR.get(), ex);
+        }
+    }
+
     public CustomerResponse update(Principal authentication, CustomerSysUpdateRequest request) {
         try {
             CustomerEntity authUser = getAppAuthUser(authentication);

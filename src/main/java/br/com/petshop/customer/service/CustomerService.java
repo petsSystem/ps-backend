@@ -85,16 +85,27 @@ CustomerService {
     public CustomerEntity associateCompanyId (UUID customerId, JsonPatch patch, Boolean favorite) throws JsonPatchException, JsonProcessingException {
         CustomerEntity entity = findById(customerId);
 
-        String attribute = favorite ? "favorites" : " companyIds";
-
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        String companyIdString = ((ObjectNode) patched).get(attribute).get(0).toString();
+        String companyIdString = ((ObjectNode) patched).get("companyIds").get(0).toString();
         UUID companyId = UUID.fromString(companyIdString.replaceAll("\"", ""));
 
-        if (favorite)
+        if (!entity.getFavorites().contains(companyId))
             entity.getFavorites().add(companyId);
-        else
+
+        if (!entity.getCompanyIds().contains(companyId))
             entity.getCompanyIds().add(companyId);
+
+        return repository.save(entity);
+    }
+
+    public CustomerEntity desassociateCompanyId (UUID customerId, JsonPatch patch, Boolean favorite) throws JsonPatchException, JsonProcessingException {
+        CustomerEntity entity = findById(customerId);
+
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        String companyIdString = ((ObjectNode) patched).get("companyIds").get(0).toString();
+        UUID companyId = UUID.fromString(companyIdString.replaceAll("\"", ""));
+
+        entity.getFavorites().remove(companyId);
 
         return repository.save(entity);
     }
