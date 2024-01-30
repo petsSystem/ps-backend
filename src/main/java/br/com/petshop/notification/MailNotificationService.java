@@ -17,18 +17,31 @@ public class MailNotificationService {
     @Autowired private JavaMailSender emailSender;
     @Autowired private TemplateEngine templateEngine;
 
-    @Async
-    public void send(String mail, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply@petsystem.com");
-        message.setTo(mail);
-        message.setSubject(subject);
-        message.setText(body);
-        emailSender.send(message);
-    }
+    private final String TEMPLATE_NAME = "email-template";
 
     @Async
-    public void sendTemplate(String to, String subject, String templateName, Context context) {
+    public void sendEmail(String name, String mail, String token, MailType type) {
+
+        String firstName = name.split(" ")[0];
+        String message = type.get();
+        String subject = "PetHound - "+ message + token;
+
+        Context context = setContext(firstName, message, token);
+
+        sendTemplate(mail, subject, TEMPLATE_NAME, context);
+    }
+
+    private Context setContext(String name, String message, String token) {
+        Context context = new Context();
+
+        context.setVariable("name", name);
+        context.setVariable("message", message);
+        context.setVariable("token", token);
+
+        return context;
+    }
+
+    private void sendTemplate(String to, String subject, String templateName, Context context) {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
@@ -40,11 +53,16 @@ public class MailNotificationService {
             helper.setText(htmlContent, true);
             emailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            // Handle exception
-            System.out.println("Erro ao enviar email");
-            e.printStackTrace();
-        } finally {
-            System.out.println("Enviado email");
+            throw new RuntimeException();
         }
+    }
+
+    private void send(String mail, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("noreply@petsystem.com");
+        message.setTo(mail);
+        message.setSubject(subject);
+        message.setText(body);
+        emailSender.send(message);
     }
 }

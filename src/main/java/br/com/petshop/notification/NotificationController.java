@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.context.Context;
@@ -15,16 +16,20 @@ public class NotificationController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public void get () {
+    public void get (@RequestParam("tipo") String tipo) {
+        MailType type = MailType.NEW_PASSWORD;
 
-        Context context = new Context();
-        context.setVariable("title", "Vanessa");
+        if (tipo.equals("email"))
+            type = MailType.VALIDATE_EMAIL;
+        else if (tipo.equals("app"))
+            type = MailType.APP_INVITATION;
 
-        context.setVariable("message", "Sua nova senha de acesso é:");
+        service.sendEmail("Vanessa Paula Arronche",
+                "varronche1@gmail.com" , generateToken(), type);
+    }
 
-        context.setVariable("token", "27a1be77");
-
-
-        service.sendTemplate("varronche1@gmail.com", "PetHound - System", "email-template", context);
+    private String generateToken() {
+        int number = (int) (100000 + Math.random() * (999999 - 100000 + 1));
+        return String.valueOf(number);
     }
 }

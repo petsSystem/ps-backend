@@ -44,6 +44,7 @@ public class CustomerSysFacade extends AuthenticationCommonService {
             List<UUID> companyIds = new ArrayList<>();
             companyIds.add(request.getCompanyId());
             entity.setCompanyIds(companyIds);
+            entity.setFavorites(companyIds);
 
             entity = service.create(entity);
 
@@ -62,18 +63,18 @@ public class CustomerSysFacade extends AuthenticationCommonService {
 
     public CustomerResponse associateCompanyId(Principal authentication, UUID customerId, JsonPatch patch) {
         try {
-            CustomerEntity entity = service.associateCompanyId(customerId, patch);
+            CustomerEntity entity = service.associateCompanyId(customerId, patch, false);
 
             return  converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
-            log.error(br.com.petshop.company.model.enums.Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, br.com.petshop.company.model.enums.Message.COMPANY_NOT_FOUND_ERROR.get(), ex);
+                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(br.com.petshop.company.model.enums.Message.COMPANY_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.CUSTOMER_ASSOCIATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, br.com.petshop.company.model.enums.Message.COMPANY_ACTIVATE_ERROR.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_ASSOCIATE_ERROR.get(), ex);
         }
     }
 
@@ -99,7 +100,12 @@ public class CustomerSysFacade extends AuthenticationCommonService {
             Page<CustomerEntity> entities = service.findAllByCompanyId(companyId, pageable);
 
             List<CustomerTableResponse> response = entities.stream()
-                    .map(c -> converter.entityIntoTableResponse(c))
+                    .map(c -> {
+                        CustomerTableResponse resp = converter.entityIntoTableResponse(c);
+                        resp.setFavorite(c.getFavorites().contains(companyId));
+
+                        return resp;
+                    })
                     .collect(Collectors.toList());
 
             Collections.sort(response, Comparator.comparing(CustomerTableResponse::getActive).reversed()
@@ -108,9 +114,9 @@ public class CustomerSysFacade extends AuthenticationCommonService {
             return new PageImpl<>(response);
 
         } catch (Exception ex) {
-            log.error(br.com.petshop.user.model.enums.Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.CUSTOMER_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, br.com.petshop.user.model.enums.Message.USER_GET_ERROR.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_GET_ERROR.get(), ex);
         }
     }
 
@@ -125,9 +131,9 @@ public class CustomerSysFacade extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(br.com.petshop.user.model.enums.Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.CUSTOMER_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, br.com.petshop.user.model.enums.Message.USER_GET_ERROR.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_GET_ERROR.get(), ex);
         }
     }
 }

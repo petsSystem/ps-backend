@@ -251,25 +251,15 @@ public class CompanyController {
                             "\"detail\": \"Erro ao buscar petshop próximo ao endereço informado.\",\n" +
                             "\"instance\": \"/api/v1/system/companies/nearby\"\n" +
                             "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Cadastro de empresas não encontrado para o endereço informado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Não há petshop(s) próximo(s) ao endereço informado.\",\n" +
-                            "    \"instance\": \"/api/v1/system/companies/nearby\"\n" +
-                            "}\n" +
                             "\n")})})
     })
     @GetMapping("/nearby")
     @ResponseStatus(HttpStatus.OK)
     public List<CompanySummaryResponse> nearby(
+            Principal authentication,
             @RequestParam("lat") Double lat,
             @RequestParam("lon") Double lon,
             @RequestParam("radius") Double radius) {
-        return facade.nearby(lat, lon, radius);
+        return facade.nearby(authentication, lat, lon, radius);
     }
 }

@@ -19,4 +19,5 @@ public class CustomerTableResponse implements Serializable {
     private String email;
     private String phone;
     private Boolean active;
+    private Boolean favorite;
 }

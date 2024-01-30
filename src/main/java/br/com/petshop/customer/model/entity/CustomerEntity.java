@@ -47,11 +47,11 @@ public class CustomerEntity extends AuditorBaseEntity implements UserDetails {
     private Boolean active;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "pet_ids", columnDefinition = "jsonb")
-    private List<UUID> petIds;
-    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "company_ids", columnDefinition = "jsonb")
     private List<UUID> companyIds;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<UUID> favorites;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Address address;

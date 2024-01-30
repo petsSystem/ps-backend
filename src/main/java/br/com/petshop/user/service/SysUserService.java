@@ -6,6 +6,8 @@ import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.service.CompanyService;
+import br.com.petshop.notification.MailNotificationService;
+import br.com.petshop.notification.MailType;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.profile.service.ProfileFacadeService;
 import br.com.petshop.user.model.entity.UserEntity;
@@ -46,7 +48,7 @@ public class SysUserService {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private ProfileFacadeService profileService;
     @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private SysUserAsyncService asyncService;
+    @Autowired private MailNotificationService mailService;
 
     public UserEntity create(UserEntity request) {
         Optional<UserEntity> entity = repository.findByCpf(request.getCpf());
@@ -58,7 +60,7 @@ public class SysUserService {
         checkCompanyIds(request);
 
         List<ProfileResponse> profiles = getProfiles(request);
-        String password = generatePassword();
+        String password = generateToken();
 
         request.setUsername(request.getEmail());
         request.setPassword(passwordEncoder.encode(password));
@@ -69,7 +71,7 @@ public class SysUserService {
 
         UserEntity user = repository.save(request);
 
-        asyncService.sendNewPassword(user, password);
+        mailService.sendEmail(user.getName(), user.getEmail(), password, MailType.NEW_PASSWORD);
 
         return user;
     }
@@ -85,9 +87,9 @@ public class SysUserService {
                 .collect(Collectors.toList());
     }
 
-    private String generatePassword() {
-        String newPassword = UUID.randomUUID().toString();
-        return newPassword.substring(0,8);
+    private String generateToken() {
+        int number = (int) (100000 + Math.random() * (999999 - 100000 + 1));
+        return String.valueOf(number);
     }
 
     private Role getRole(List<ProfileResponse> profiles) {
@@ -127,13 +129,13 @@ public class SysUserService {
             UserEntity entity = repository.findByUsernameAndActiveIsTrue(username)
                     .orElseThrow(GenericNotFoundException::new);
 
-            String newPassword = generatePassword();
+            String newPassword = generateToken();
             entity.setPassword(passwordEncoder.encode(newPassword));
             entity.setChangePassword(true);
 
             entity = repository.save(entity);
 
-            asyncService.sendNewPassword(entity, newPassword);
+            mailService.sendEmail(entity.getName(), entity.getEmail(), newPassword, MailType.NEW_PASSWORD);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

@@ -4,27 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PetHound</title>
-    <link rel="stylesheet" type="text/css" media="all" href="./css/style.css" th:href="@{./css/style.css}" />
 </head>
 <body>
-<main class="principal">
-    <section>
-        <img class="principal__image" src="https://pet-system-backend-42e2abda25d2.herokuapp.com/img/logo-lapis-sbg-ph.png" alt="Logo Message PetHound">
-    </section>
-    <section class="principal__body">
-        <h1 class="principal__body__titulo" th:text="${title}">
-            Olá !
-        </h1>
-        <h2 class="principal__body__message" th:text="${message}">
-            Mensagem ao cliente.
-        </h2>
-        <div class="principal__body__token__box">
-            <p class="principal__body__token__text" th:text="${token}">token</p>
-        </div>
-    </section>
-</main>
-<footer>
-    <p class="rodape">Pet Hound! Sua ajuda diária para encontrar o melhor serviço para seu pet!</p>
-</footer>
+<div>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color: #F67426;max-width:600px;font-family: Arial, Helvetica, sans-serif;">
+        <tbody>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            <img align="center" width="200px" src="https://pet-system-backend-42e2abda25d2.herokuapp.com/img/logo-lapis-sbg-ph.png" alt="Logo PetHound">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table style="width: 100%;font-family: Arial, Helvetica, sans-serif;color: #FFFFFF">
+                    <tr>
+                        <td>
+                            <h2 style="font-family: Arial, Helvetica, sans-serif;">
+                                Olá <span th:text="${name}"/>!
+                            </h2>
+                            <h1 style="font-family: Arial, Helvetica, sans-serif;">
+                                <span th:text="${message}"/>
+                            </h1>
+                            <div  style="background-color: #ededed; height: 60px; border-radius: 15%; color: #F67426; font-family: Arial, Helvetica, sans-serif; font-size:38px; font-weight: 700;text-align:center">
+                                <p><span th:text="${token}"/></p>
+                            </div>
+                            <br/>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color: #F67426;max-width:600px;">
+        <tr>
+            <td>
+                <div  style="background-color: #FFFFFF; height: 10px;">
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" style="background-color: #F67426;max-width:600px;">
+        <tr>
+            <td>
+                <div  style="height: 30px; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size:14px;text-align:center">
+                    <p>PetHound! Sua ajuda diária para encontrar o melhor serviço para seu pet!</p>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
 </body>
+
+<!--<main class="principal">-->
+<!--    <section>-->
+<!--        <img class="principal__image" src="https://pet-system-backend-42e2abda25d2.herokuapp.com/img/logo-lapis-sbg-ph.png" alt="Logo Message PetHound">-->
+<!--    </section>-->
+<!--    <section class="principal__body">-->
+<!--        <h1 class="principal__body__titulo" th:text="${title}">-->
+<!--            Olá !-->
+<!--        </h1>-->
+<!--        <h2 class="principal__body__message" th:text="${message}">-->
+<!--            Mensagem ao cliente.-->
+<!--        </h2>-->
+<!--        <div class="principal__body__token__box">-->
+<!--            <p class="principal__body__token__text" th:text="${token}">token</p>-->
+<!--        </div>-->
+<!--    </section>-->
+<!--</main>-->
+
+<!--<footer>-->
+<!--    <p class="rodape">Pet Hound! Sua ajuda diária para encontrar o melhor serviço para seu pet!</p>-->
+<!--</footer>-->
+<!--</body>-->
 </html>

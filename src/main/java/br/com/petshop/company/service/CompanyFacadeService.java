@@ -9,11 +9,14 @@ import br.com.petshop.company.model.dto.response.CompanyResponse;
 import br.com.petshop.company.model.dto.response.CompanySummaryResponse;
 import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.model.enums.Message;
+import br.com.petshop.customer.model.entity.CustomerEntity;
+import br.com.petshop.customer.service.GeometryService;
 import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericForbiddenException;
 import br.com.petshop.exception.GenericNotActiveException;
 import br.com.petshop.exception.GenericNotFoundException;
 import com.github.fge.jsonpatch.JsonPatch;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,7 @@ public class CompanyFacadeService extends AuthenticationCommonService {
     @Autowired private CompanyService service;
     @Autowired private CompanyConverterService convert;
     @Autowired private CategoryService categoryService;
+    @Autowired private GeometryService geometry;
 
     public CompanyResponse create(Principal authentication, CompanyCreateRequest request) {
         try {
@@ -160,9 +164,29 @@ public class CompanyFacadeService extends AuthenticationCommonService {
         }
     }
 
-    public List<CompanySummaryResponse> nearby(Double lat, Double lon, Double radius) {
+    public List<CompanySummaryResponse> nearby(Principal authentication, Double lat, Double lon, Double radius) {
         try {
-            return service.nearby(lat, lon, radius);
+            Point point = geometry.getPoint(lat, lon);
+
+            List<CompanyEntity> companies = service.nearby(point, radius);
+
+            //adicionar as lojas favoritas no inicio da lista dos mais proximos
+            CustomerEntity customer = getAppAuthUser(authentication);
+            customer.getFavorites().stream()
+                    .forEach(c -> {
+                        CompanyEntity companyEntity = service.findById(c);
+                        companies.add(0, companyEntity);
+                    });
+
+            return companies.stream()
+                    .map(c -> {
+                        CompanySummaryResponse response = convert.entityIntoAppResponse(c);
+                        Double dist = service.getDistance(point, c.getId());
+                        response.setDistance(dist);
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+
         } catch (GenericNotFoundException ex) {
             log.error(Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(

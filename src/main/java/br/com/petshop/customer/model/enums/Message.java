@@ -12,7 +12,9 @@ public enum Message {
     CUSTOMER_RESEND_TOKEN_ERROR("Erro ao reenviar email de validação. Tente novamente mais tarde."),
     CUSTOMER_DELETE_ERROR("Erro ao excluir dados do usuário. Tente novamente mais tarde."),
     CUSTOMER_SEND_EMAIL_ERROR("Erro ao enviar email. Tente novamente mais tarde."),
-    CUSTOMER_GET_ERROR("Erro ao retornar dados do usuário. Tente novamente mais tarde.");
+    CUSTOMER_GET_ERROR("Erro ao retornar dados do usuário. Tente novamente mais tarde."),
+    CUSTOMER_ASSOCIATE_ERROR("Erro ao associar cliente a loja. Tente novamente mais tarde"),
+    CUSTOMER_FAVORITE_ERROR("Erro ao favoritar loja. Tente novamente mais tarde.");
 
     private String message;
 

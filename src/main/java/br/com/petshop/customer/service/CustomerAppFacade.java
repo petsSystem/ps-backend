@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @Service
 public class CustomerAppFacade extends AuthenticationCommonService {
@@ -61,6 +62,25 @@ public class CustomerAppFacade extends AuthenticationCommonService {
             log.error(Message.CUSTOMER_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.CUSTOMER_CREATE_ERROR.get(), ex);
+        }
+    }
+
+    public CustomerResponse favorite(Principal authentication, JsonPatch patch) {
+        try {
+            UUID customerId = getAppAuthUser(authentication).getId();
+
+            CustomerEntity entity = service.associateCompanyId(customerId, patch, true);
+
+            return  converter.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.CUSTOMER_FAVORITE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_FAVORITE_ERROR.get(), ex);
         }
     }
 

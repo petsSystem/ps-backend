@@ -100,19 +100,11 @@ public class CompanyService {
         return objectMapper.treeToValue(patched, CompanyEntity.class);
     }
 
-    public List<CompanySummaryResponse> nearby(Double lat, Double lon, Double radius) {
-        Point point = geometry.getPoint(lat, lon);
+    public List<CompanyEntity> nearby(Point point, Double radius) {
+        return companyRepository.findNearWithinDistance(point, radius);
+    }
 
-        List<CompanyEntity> companies = companyRepository.findNearWithinDistance(point, radius);
-        if (companies.isEmpty())
-            throw new GenericNotFoundException();
-        return companies.stream()
-                .map(c -> {
-                    CompanySummaryResponse response = convert.entityIntoAppResponse(c);
-                    Double dist = companyRepository.getDistance(point, c.getId());
-                    response.setDistance(dist);
-                    return response;
-                })
-                .collect(Collectors.toList());
+    public Double getDistance(Point point, UUID companyId) {
+        return companyRepository.getDistance(point, companyId);
     }
 }

@@ -30,8 +30,6 @@ public class CustomerResponse implements Serializable {
     private AppStatus appStatus;
     private Boolean active;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<UUID> petIds;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<UUID> companyIds;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Address address;

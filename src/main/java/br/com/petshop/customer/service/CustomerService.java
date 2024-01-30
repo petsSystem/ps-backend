@@ -12,6 +12,7 @@ import br.com.petshop.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.exception.GenericIncorrectPasswordException;
 import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.notification.MailNotificationService;
+import br.com.petshop.notification.MailType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +38,7 @@ CustomerService {
     private Logger log = LoggerFactory.getLogger(CustomerService.class);
     @Autowired private CustomerRepository repository;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private MailNotificationService mailNotificationService;
+    @Autowired private MailNotificationService mailService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private CustomerConverterService convert;
     @Autowired private CustomerSpecification specification;
@@ -46,18 +47,13 @@ CustomerService {
         CustomerEntity customerEntity = repository.findByUsernameAndActiveIsTrue(username)
                 .orElseThrow(GenericNotFoundException::new);
 
-        String newPassword = generatePassword();
+        String newPassword = generateToken();
         customerEntity.setPassword(passwordEncoder.encode(newPassword));
         customerEntity.setChangePassword(true);
 
         repository.save(customerEntity);
 
-        //DESENVOLVER HTML PARA ENVIO DE EMAIL
-
-        String subject = "Nova senha - APP Pet System";
-        String body = "Sua nova senha é: " + newPassword;
-
-        mailNotificationService.send(customerEntity.getEmail(), subject, body);
+        mailService.sendEmail(customerEntity.getName(), customerEntity.getEmail(), newPassword, MailType.NEW_PASSWORD);
     }
 
     public CustomerEntity create(CustomerEntity entity) {
@@ -78,7 +74,7 @@ CustomerService {
             entity.setPassword(passwordEncoder.encode(entity.getPassword()));
             sendValidationEmailToken(entity);
         } else {
-            sendEmailApp(entity);
+            mailService.sendEmail(entity.getName(), entity.getEmail(), "", MailType.APP_INVITATION);
         }
 
         entity.setUsername(entity.getCpf());
@@ -86,14 +82,19 @@ CustomerService {
         return repository.save(entity);
     }
 
-    public CustomerEntity associateCompanyId (UUID customerId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+    public CustomerEntity associateCompanyId (UUID customerId, JsonPatch patch, Boolean favorite) throws JsonPatchException, JsonProcessingException {
         CustomerEntity entity = findById(customerId);
 
+        String attribute = favorite ? "favorites" : " companyIds";
+
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        String companyIdString = ((ObjectNode) patched).get("companyIds").get(0).toString();
+        String companyIdString = ((ObjectNode) patched).get(attribute).get(0).toString();
         UUID companyId = UUID.fromString(companyIdString.replaceAll("\"", ""));
 
-        entity.getCompanyIds().add(companyId);
+        if (favorite)
+            entity.getFavorites().add(companyId);
+        else
+            entity.getCompanyIds().add(companyId);
 
         return repository.save(entity);
     }
@@ -112,24 +113,10 @@ CustomerService {
     }
 
     private void sendValidationEmailToken(CustomerEntity userEntity) {
-        userEntity.setEmailToken(generateEmailTokenValidate());
+        userEntity.setEmailToken(generateToken());
         userEntity.setEmailTokenTime(LocalDateTime.now());
 
-        //DESENVOLVER HTML PARA ENVIO DE EMAIL
-
-        String subject = "Validação de email - APP Pet System";
-        String body = "Seu token de validação é: " + userEntity.getEmailToken();
-
-        mailNotificationService.send(userEntity.getEmail(), subject, body);
-    }
-
-    private void sendEmailApp(CustomerEntity userEntity) {
-        //DESENVOLVER HTML PARA ENVIO DE EMAIL DE PROPAGANDA (PARA BAIXAR) O APP
-//
-//        String subject = "Validação de email - APP Pet System";
-//        String body = "Seu token de validação é: " + userEntity.getEmailToken();
-//
-//        mailNotificationService.send(userEntity.getEmail(), subject, body);
+        mailService.sendEmail(userEntity.getName(), userEntity.getEmail(), userEntity.getEmailToken(), MailType.VALIDATE_EMAIL);
     }
 
     public CustomerEntity changePassword(CustomerEntity authUser, CustomerChangePasswordRequest request) {
@@ -145,8 +132,8 @@ CustomerService {
         return repository.save(entity);
     }
 
-    private String generateEmailTokenValidate() {
-        int number = (int) (1000 + Math.random() * (9999 - 1000 + 1));
+    private String generateToken() {
+        int number = (int) (100000 + Math.random() * (999999 - 100000 + 1));
         return String.valueOf(number);
     }
 
@@ -175,11 +162,6 @@ CustomerService {
                 .orElseThrow(GenericNotFoundException::new);
 
         sendValidationEmailToken(userEntity);
-    }
-
-    private String generatePassword() {
-        String newPassword = UUID.randomUUID().toString();
-        return newPassword.substring(0,6);
     }
 
     public void deactivate(UUID customerId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
