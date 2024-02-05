@@ -136,7 +136,7 @@ public class CustomerSYSController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao retornar dados do usuário. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao retornar dados dos clientes. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/pet/sys/customers\"\n" +
                             "}\n" +
                             "\n")})}),
