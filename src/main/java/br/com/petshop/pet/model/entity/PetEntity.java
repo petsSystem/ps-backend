@@ -1,6 +1,6 @@
 package br.com.petshop.pet.model.entity;
 
-import br.com.petshop.audit.AuditorBaseEntity;
+import br.com.petshop.commons.audit.AuditorBaseEntity;
 import br.com.petshop.pet.model.enums.Coat;
 import br.com.petshop.pet.model.enums.Gender;
 import br.com.petshop.pet.model.enums.Temper;

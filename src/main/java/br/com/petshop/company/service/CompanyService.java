@@ -1,10 +1,9 @@
 package br.com.petshop.company.service;
 
 import br.com.petshop.company.model.entity.CompanyEntity;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotActiveException;
-import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.company.model.dto.response.CompanySummaryResponse;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericNotActiveException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.company.repository.CompanyRepository;
 import br.com.petshop.user.model.entity.UserEntity;
 import br.com.petshop.user.service.SysUserService;

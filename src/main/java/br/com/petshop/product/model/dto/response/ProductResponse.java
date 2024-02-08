@@ -1,6 +1,6 @@
 package br.com.petshop.product.model.dto.response;
 
-import br.com.petshop.model.Day;
+import br.com.petshop.commons.model.Day;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ProductResponse implements Serializable {
     private UUID id;
+    private UUID companyId;
     private UUID categoryId;
     private String name;
     private BigDecimal amount;

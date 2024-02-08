@@ -1,4 +1,4 @@
-package br.com.petshop.exception;
+package br.com.petshop.commons.exception;
 
 import lombok.NoArgsConstructor;
 

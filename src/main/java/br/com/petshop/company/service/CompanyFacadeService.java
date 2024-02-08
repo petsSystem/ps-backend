@@ -1,7 +1,7 @@
 package br.com.petshop.company.service;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.category.service.CategoryService;
 import br.com.petshop.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.company.model.dto.request.CompanyUpdateRequest;
@@ -11,10 +11,10 @@ import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.model.enums.Message;
 import br.com.petshop.customer.model.entity.CustomerEntity;
 import br.com.petshop.customer.service.GeometryService;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericForbiddenException;
-import br.com.petshop.exception.GenericNotActiveException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericForbiddenException;
+import br.com.petshop.commons.exception.GenericNotActiveException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package br.com.petshop.audit;
+package br.com.petshop.commons.audit;
 
 import br.com.petshop.user.model.entity.UserEntity;
 import org.springframework.data.domain.AuditorAware;

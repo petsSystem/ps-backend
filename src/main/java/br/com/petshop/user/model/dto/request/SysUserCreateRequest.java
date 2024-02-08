@@ -1,6 +1,6 @@
 package br.com.petshop.user.model.dto.request;
 
-import br.com.petshop.model.Address;
+import br.com.petshop.commons.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +23,7 @@ public class SysUserCreateRequest implements Serializable {
     private String phone;
     private List<UUID> profileIds;
     private List<UUID> companyIds;
+    private List<UUID> productIds;
     private Address address;
     @Builder.Default
     private Boolean active = true;

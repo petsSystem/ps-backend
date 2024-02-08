@@ -1,7 +1,7 @@
 package br.com.petshop.product.model.entity;
 
-import br.com.petshop.audit.AuditorBaseEntity;
-import br.com.petshop.model.Day;
+import br.com.petshop.commons.audit.AuditorBaseEntity;
+import br.com.petshop.commons.model.Day;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

@@ -35,7 +35,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/pet/products")
-@Tag(name = "SYS - Product Services")
+@Tag(name = "Product Services")
 public class ProductController {
 
     @Autowired private ProductFacadeService facade;

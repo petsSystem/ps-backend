@@ -2,9 +2,11 @@ package br.com.petshop.profile.model.entity;
 
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.profile.model.dto.Permission;
-import br.com.petshop.audit.AuditorBaseEntity;
+import br.com.petshop.commons.audit.AuditorBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +29,7 @@ import java.util.List;
 public class ProfileEntity extends AuditorBaseEntity implements Serializable {
     @Column(unique = true)
     private String name;
+    @Enumerated(EnumType.STRING)
     private Role role;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

@@ -1,7 +1,6 @@
 package br.com.petshop.pet.service;
 
-import br.com.petshop.exception.GenericNotFoundException;
-import br.com.petshop.pet.model.Breed;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.pet.model.dto.request.PetCreateRequest;
 import br.com.petshop.pet.model.dto.request.PetUpdateRequest;
 import br.com.petshop.pet.model.dto.response.PetResponse;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class PetFacadeService {
@@ -30,14 +28,15 @@ public class PetFacadeService {
     @Autowired private PetService service;
     @Autowired private PetConverterService converter;
 
-    public List<Breed> getDogsList(Principal authentication) {
+    public List<String> getDogsList(Principal authentication) {
         try {
-            return BreedType.dogs().stream()
-                    .map(b -> Breed.builder()
-                            .name(BreedType.getName(b))
-                            .size(BreedType.getSize(b))
-                            .build())
-                    .collect(Collectors.toList());
+            return BreedType.dogValues();
+//            return BreedType.dogs().stream()
+//                    .map(b -> Breed.builder()
+//                            .name(BreedType.getName(b))
+//                            .size(BreedType.getSize(b))
+//                            .build())
+//                    .collect(Collectors.toList());
 
         } catch (Exception ex) {
             log.error(Message.PET_LIST_ERROR.get() + " Bad Request: " + ex.getMessage());
@@ -46,14 +45,15 @@ public class PetFacadeService {
         }
     }
 
-    public List<Breed> getCatsList(Principal authentication) {
+    public List<String> getCatsList(Principal authentication) {
         try {
-            return BreedType.cats().stream()
-                    .map(b -> Breed.builder()
-                            .name(BreedType.getName(b))
-                            .size(BreedType.getSize(b))
-                            .build())
-                    .collect(Collectors.toList());
+            return BreedType.catValues();
+//            return BreedType.cats().stream()
+//                    .map(b -> Breed.builder()
+//                            .name(BreedType.getName(b))
+//                            .size(BreedType.getSize(b))
+//                            .build())
+//                    .collect(Collectors.toList());
 
         } catch (Exception ex) {
             log.error(Message.PET_LIST_ERROR.get() + " Bad Request: " + ex.getMessage());

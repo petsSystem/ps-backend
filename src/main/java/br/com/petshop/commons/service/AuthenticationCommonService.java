@@ -1,4 +1,4 @@
-package br.com.petshop.authentication.service;
+package br.com.petshop.commons.service;
 
 import br.com.petshop.customer.model.entity.CustomerEntity;
 import br.com.petshop.authentication.model.enums.Role;

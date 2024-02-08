@@ -1,4 +1,4 @@
-package br.com.petshop.model;
+package br.com.petshop.commons.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Day implements Serializable {
-
     private Weekday weekday;
     private String initialTime;
     private String endTime;

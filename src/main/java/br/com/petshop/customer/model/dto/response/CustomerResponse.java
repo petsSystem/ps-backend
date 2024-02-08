@@ -2,8 +2,7 @@ package br.com.petshop.customer.model.dto.response;
 
 import br.com.petshop.customer.model.enums.AppStatus;
 import br.com.petshop.customer.model.enums.Origin;
-import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.model.Address;
+import br.com.petshop.commons.model.Address;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

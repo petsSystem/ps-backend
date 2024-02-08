@@ -1,14 +1,14 @@
 package br.com.petshop.category.service;
 
-import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.category.model.dto.request.CategoryCreateRequest;
 import br.com.petshop.category.model.dto.request.CategoryUpdateRequest;
 import br.com.petshop.category.model.dto.response.CategoryResponse;
 import br.com.petshop.category.model.dto.response.CategoryTableResponse;
 import br.com.petshop.category.model.entity.CategoryEntity;
 import br.com.petshop.category.model.enums.Message;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

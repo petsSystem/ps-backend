@@ -38,7 +38,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/pet/users")
-@Tag(name = "SYS - Users Services")
+@Tag(name = "Users Services")
 public class SysUserController {
 
     @Autowired private SysUserFacadeService facade;
@@ -64,6 +64,17 @@ public class SysUserController {
                             "    \"title\": \"Bad Request\",\n" +
                             "    \"status\": 400,\n" +
                             "    \"detail\": \"Loja inativa.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso negado.\",\n" +
                             "    \"instance\": \"/api/v1/sys/users\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -191,6 +202,17 @@ public class SysUserController {
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso negado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
                     responseCode = "404",
                     description = "Usuário não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
@@ -296,7 +318,7 @@ public class SysUserController {
     }
 
     @Operation(summary = "Serviço de recuperação das informações de usuários do sistema, de acordo com o companyId informado.",
-            description = "Acesso: ADMIN, OWNER, MANAGER")
+            description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -308,18 +330,29 @@ public class SysUserController {
                             "\"detail\": \"Erro ao recuperar dados dos usuários. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/sys/users\"\n" +
                             "}\n" +
-                            "\n")})})
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Forbidden\",\n" +
+                            "    \"status\": 403,\n" +
+                            "    \"detail\": \"Acesso negado.\",\n" +
+                            "    \"instance\": \"/api/v1/sys/users\"\n" +
+                            "}\n" +
+                            "\n")})}),
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public Page<SysUserTableResponse> get(
             Principal authentication,
-            @RequestParam("companyId") UUID companyId,
+            @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "productId", required = false) UUID productId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return facade.get(authentication, companyId, pageable);
+        return facade.get(authentication, companyId, productId, pageable);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do usuário no sistema através do id.",

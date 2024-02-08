@@ -1,8 +1,8 @@
 package br.com.petshop.user.model.entity;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.audit.AuditorBaseEntity;
-import br.com.petshop.model.Address;
+import br.com.petshop.commons.audit.AuditorBaseEntity;
+import br.com.petshop.commons.model.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,6 +53,10 @@ public class UserEntity extends AuditorBaseEntity implements UserDetails {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "profile_ids", columnDefinition = "jsonb")
     private List<UUID> profileIds;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "product_ids", columnDefinition = "jsonb")
+    private List<UUID> productIds;
 
     @Enumerated(EnumType.STRING)
     private Role role;

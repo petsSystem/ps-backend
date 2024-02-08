@@ -55,7 +55,7 @@ public class PetController {
     })
     @GetMapping("/dogs")
     @ResponseStatus(HttpStatus.OK)
-    public List<Breed> getDogsList(
+    public List<String> getDogsList(
             Principal authentication) {
         return facade.getDogsList(authentication);
     }
@@ -76,7 +76,7 @@ public class PetController {
     })
     @GetMapping("/cats")
     @ResponseStatus(HttpStatus.OK)
-    public List<Breed> getCatsList(
+    public List<String> getCatsList(
             Principal authentication) {
         return facade.getCatsList(authentication);
     }

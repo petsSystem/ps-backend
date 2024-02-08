@@ -1,7 +1,7 @@
 package br.com.petshop.profile.repository;
 
 import br.com.petshop.profile.model.entity.ProfileEntity;
-import br.com.petshop.profile.model.dto.response.LabelResponse;
+import br.com.petshop.profile.model.dto.response.ProfileLabelResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,5 +18,5 @@ public interface ProfileRepository extends JpaRepository<ProfileEntity, Integer>
     Optional<ProfileEntity> findById(UUID profileId);
     Page<ProfileEntity> findAll(Pageable pageable);
     @Query(value = "SELECT id, name from sys_profile", nativeQuery = true)
-    List<LabelResponse> findAllNames();
+    List<ProfileLabelResponse> findAllNames();
 }

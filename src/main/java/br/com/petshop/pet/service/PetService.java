@@ -1,6 +1,6 @@
 package br.com.petshop.pet.service;
 
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.pet.model.entity.PetEntity;
 import br.com.petshop.pet.repository.PetRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,6 +1,6 @@
 package br.com.petshop.customer.service;
 
-import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.customer.model.dto.request.CustomerAppCreateRequest;
 import br.com.petshop.customer.model.dto.request.CustomerChangePasswordRequest;
 import br.com.petshop.customer.model.dto.request.CustomerSysUpdateRequest;
@@ -8,10 +8,10 @@ import br.com.petshop.customer.model.dto.request.EmailValidateRequest;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
 import br.com.petshop.customer.model.entity.CustomerEntity;
 import br.com.petshop.customer.model.enums.Message;
-import br.com.petshop.exception.EmailTokenException;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericIncorrectPasswordException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.EmailTokenException;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

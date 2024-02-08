@@ -1,6 +1,6 @@
 package br.com.petshop.configuration;
 
-import br.com.petshop.audit.AuditorAwareImpl;
+import br.com.petshop.commons.audit.AuditorAwareImpl;
 import br.com.petshop.user.model.entity.UserEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

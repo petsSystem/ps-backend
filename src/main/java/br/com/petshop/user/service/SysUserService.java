@@ -1,15 +1,15 @@
 package br.com.petshop.user.service;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericIncorrectPasswordException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.service.CompanyService;
 import br.com.petshop.notification.MailNotificationService;
 import br.com.petshop.notification.MailType;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
-import br.com.petshop.profile.service.ProfileFacadeService;
+import br.com.petshop.profile.service.ProfileBusinessService;
 import br.com.petshop.user.model.entity.UserEntity;
 import br.com.petshop.user.model.enums.Message;
 import br.com.petshop.user.repository.UserRepository;
@@ -46,7 +46,7 @@ public class SysUserService {
     @Autowired private SysUserConverterService convert;
     @Autowired private CompanyService companyService;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private ProfileFacadeService profileService;
+    @Autowired private ProfileBusinessService profileService;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private MailNotificationService mailService;
 
@@ -62,7 +62,7 @@ public class SysUserService {
         List<ProfileResponse> profiles = getProfiles(request);
         String password = generateToken();
 
-        request.setUsername(request.getEmail());
+        request.setUsername(request.getCpf());
         request.setPassword(passwordEncoder.encode(password));
         request.setChangePassword(true);
         request.setRole(getRole(profiles));
@@ -162,10 +162,7 @@ public class SysUserService {
         return entity;
     }
 
-    public UserEntity active(UUID userId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        UserEntity entity = repository.findById(userId)
-                .orElseThrow(GenericNotFoundException::new);
-
+    public UserEntity active(UserEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         Boolean activeValue = ((ObjectNode) patched).get("active").asBoolean();
 
@@ -206,8 +203,8 @@ public class SysUserService {
         return repository.save(entity);
     }
 
-    public Page<UserEntity> findAllByCompanyId(UUID companyId, Pageable pageable) {
-        Specification<UserEntity> filters = specification.filter(companyId);
+    public Page<UserEntity> findAllByFilter(UUID companyId, UUID productId, Pageable pageable) {
+        Specification<UserEntity> filters = specification.filter(companyId, productId);
         return repository.findAll(filters, pageable);
     }
 

@@ -1,4 +1,4 @@
-package br.com.petshop.model;
+package br.com.petshop.commons.model;
 
 public enum Weekday {
     SUNDAY ("Domingo"),

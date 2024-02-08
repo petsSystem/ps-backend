@@ -1,7 +1,7 @@
 package br.com.petshop.category.model.dto.request;
 
 import br.com.petshop.category.model.enums.Category;
-import br.com.petshop.model.Day;
+import br.com.petshop.commons.model.Day;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

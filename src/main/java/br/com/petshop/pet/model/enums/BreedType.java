@@ -118,19 +118,21 @@ public enum BreedType {
     WEST_HIGHLAND_TERRIER("107", "West Highland Terrier", "G", "DOG"),
     WHIPPET("108", "Whippet", "G", "DOG"),
     YORKSHIRE_TERRIER("109", "Yorkshire Terrier", "M", "DOG"),
+    OUTROS_DOG("110", "Outros...", "", "DOG"),
 
 
-    ABISSINIO("110", "Abissínio", "G", "CAT"),
-    ANGORA("111", "Angorá", "G", "CAT"),
-    BIRMANES("112", "Birmanês", "G", "CAT"),
-    BENGAL("113", "Gato de Bengala", "M", "CAT"),
-    MAINE_COON("114", "Maine Coon", "M", "CAT"),
-    PERSA("115", "Persa", "M", "CAT"),
-    RAGDOLL("116", "Ragdoll", "M", "CAT"),
-    SCOTTISH_FOLD("117", "Scottish Fold", "M", "CAT"),
-    SIAMES("118", "Siamês", "M", "CAT"),
-    SPYNX("119", "Spynx", "M", "CAT"),
-    VIRA_LATA_CAT("120", "Vira-Lata", "M", "CAT");
+    ABISSINIO("111", "Abissínio", "G", "CAT"),
+    ANGORA("112", "Angorá", "G", "CAT"),
+    BIRMANES("113", "Birmanês", "G", "CAT"),
+    BENGAL("114", "Gato de Bengala", "M", "CAT"),
+    MAINE_COON("115", "Maine Coon", "M", "CAT"),
+    PERSA("116", "Persa", "M", "CAT"),
+    RAGDOLL("117", "Ragdoll", "M", "CAT"),
+    SCOTTISH_FOLD("118", "Scottish Fold", "M", "CAT"),
+    SIAMES("119", "Siamês", "M", "CAT"),
+    SPYNX("120", "Spynx", "M", "CAT"),
+    VIRA_LATA_CAT("121", "Vira-Lata", "M", "CAT"),
+    OUTROS_CAT("122", "Outros...", "", "CAT");
 
     private String id;
     private String name;
@@ -157,9 +159,21 @@ public enum BreedType {
                 .collect(Collectors.toList());
     }
 
-    public static List<BreedType> dogs() {
+    public static List<String> catValues() {
+        return Stream.of(BreedType.values())
+                .filter(f -> f.type.equals("CAT"))
+                .map(m -> {
+                    return m.name;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> dogValues() {
         return Stream.of(BreedType.values())
                 .filter(f -> f.type.equals("DOG"))
+                .map(m -> {
+                    return m.name;
+                })
                 .collect(Collectors.toList());
     }
 

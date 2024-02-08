@@ -1,13 +1,12 @@
 package br.com.petshop.user.service;
 
-import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericForbiddenException;
+import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
+import br.com.petshop.commons.exception.GenericNotActiveException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
+import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.company.model.entity.CompanyEntity;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericForbiddenException;
-import br.com.petshop.exception.GenericIncorrectPasswordException;
-import br.com.petshop.exception.GenericNotActiveException;
-import br.com.petshop.exception.GenericNotFoundException;
 import br.com.petshop.profile.model.dto.Permission;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
 import br.com.petshop.user.model.dto.request.SysUserCreateRequest;
@@ -40,21 +39,28 @@ import java.util.stream.Collectors;
 @Service
 public class SysUserFacadeService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(SysUserFacadeService.class);
+    @Autowired private SysUserValidationService validate;
     @Autowired private SysUserService service;
-    @Autowired private SysUserConverterService convert;
+    @Autowired private SysUserConverterService converter;
 
     public SysUserResponse create(Principal authentication, SysUserCreateRequest request) {
         try {
-            UserEntity entity = convert.createRequestIntoEntity(request);
+            validate.accessByCompany(authentication, request.getCompanyIds());
+
+            UserEntity entity = converter.createRequestIntoEntity(request);
             entity = service.create(entity);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
 
-            SysUserResponse response = convert.entityIntoResponse(entity);
+            SysUserResponse response = converter.entityIntoResponse(entity);
             response.setProfiles(profiles);
 
             return response;
 
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.USER_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.USER_FORBIDDEN_ERROR.get(), ex);
         } catch (GenericAlreadyRegisteredException ex) {
             log.error(Message.USER_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -94,7 +100,7 @@ public class SysUserFacadeService extends AuthenticationCommonService {
             UserEntity user = getSysAuthUser(authentication);
             UserEntity entity = service.changePassword(user.getId(), request);
 
-            return convert.entityIntoResponse(entity);
+            return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -116,7 +122,7 @@ public class SysUserFacadeService extends AuthenticationCommonService {
             UserEntity entity = getSysAuthUser(authentication);
             entity = service.findById(entity.getId());
 
-            return convert.entityIntoProfileResponse(entity);
+            return converter.entityIntoProfileResponse(entity);
 
         } catch (Exception ex) {
             log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
@@ -137,7 +143,7 @@ public class SysUserFacadeService extends AuthenticationCommonService {
                     .flatMap(p -> p.getPermissions().stream())
                     .collect(Collectors.toList());
 
-            SysUserMeResponse response = convert.entityIntoMeResponse(entity);
+            SysUserMeResponse response = converter.entityIntoMeResponse(entity);
             response.setPermissions(permissions);
             response.setCompanyId(companyEntity.getId());
             response.setCompanyName(companyEntity.getName());
@@ -153,16 +159,24 @@ public class SysUserFacadeService extends AuthenticationCommonService {
 
     public SysUserResponse activate(Principal authentication, UUID userId, JsonPatch patch) {
         try {
+            UserEntity entity = service.findById(userId);
 
-            UserEntity entity = service.active(userId, patch);
+            validate.accessByCompany(authentication, entity.getCompanyIds());
+            validate.activate(authentication, entity);
+
+            entity = service.active(entity, patch);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
 
-            SysUserResponse response = convert.entityIntoResponse(entity);
+            SysUserResponse response = converter.entityIntoResponse(entity);
             response.setProfiles(profiles);
 
             return response;
 
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.USER_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.USER_FORBIDDEN_ERROR.get(), ex);
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -187,7 +201,7 @@ public class SysUserFacadeService extends AuthenticationCommonService {
                     .flatMap(p -> p.getPermissions().stream())
                     .collect(Collectors.toList());
 
-            SysUserMeResponse response = convert.entityIntoMeResponse(entity);
+            SysUserMeResponse response = converter.entityIntoMeResponse(entity);
             response.setPermissions(permissions);
             response.setCompanyId(companyEntity.getId());
             response.setCompanyName(companyEntity.getName());
@@ -209,15 +223,15 @@ public class SysUserFacadeService extends AuthenticationCommonService {
         try {
             UserEntity entity = service.findByIdAndActiveIsTrue(userId);
 
-            validateUserAccess(getSysRole(authentication), getSysAuthUser(authentication), entity);
+            validate.accessByUser(authentication, entity);
 
-            UserEntity entityRequest = convert.updateRequestIntoEntity(request);
+            UserEntity entityRequest = converter.updateRequestIntoEntity(request);
 
             entity = service.updateById(entityRequest, entity);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
 
-            SysUserResponse response = convert.entityIntoResponse(entity);
+            SysUserResponse response = converter.entityIntoResponse(entity);
             response.setProfiles(profiles);
 
             return response;
@@ -237,17 +251,14 @@ public class SysUserFacadeService extends AuthenticationCommonService {
         }
     }
 
-    public  Page<SysUserTableResponse> get(Principal authentication, UUID companyId, Pageable pageable) {
+    public  Page<SysUserTableResponse> get(Principal authentication, UUID companyId, UUID productId, Pageable pageable) {
         try {
-            UserEntity user = getSysAuthUser(authentication);
+            validate.accessByCompany(authentication, companyId);
 
-            if (getSysRole(authentication) != Role.ADMIN)
-                validateCompanyIdsAccess(user.getCompanyIds(), companyId);
-
-            Page<UserEntity> entities = service.findAllByCompanyId(companyId, pageable);
+            Page<UserEntity> entities = service.findAllByFilter(companyId, productId, pageable);
 
             List<SysUserTableResponse> response = entities.stream()
-                    .map(c -> convert.entityIntoTableResponse(c))
+                    .map(c -> converter.entityIntoTableResponse(c))
                     .collect(Collectors.toList());
 
             Collections.sort(response, Comparator.comparing(SysUserTableResponse::getActive).reversed()
@@ -255,6 +266,10 @@ public class SysUserFacadeService extends AuthenticationCommonService {
 
             return new PageImpl<>(response);
 
+        } catch (GenericForbiddenException ex) {
+            log.error(Message.USER_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.USER_FORBIDDEN_ERROR.get(), ex);
         } catch (Exception ex) {
             log.error(Message.USER_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -266,11 +281,11 @@ public class SysUserFacadeService extends AuthenticationCommonService {
         try {
             UserEntity entity = service.findById(userId);
 
-            validateUserAccess(getSysRole(authentication), getSysAuthUser(authentication), entity);
+            validate.accessByUser(authentication, entity);
 
             List<ProfileResponse> profiles = service.getProfiles(entity);
 
-            SysUserResponse response = convert.entityIntoResponse(entity);
+            SysUserResponse response = converter.entityIntoResponse(entity);
             response.setProfiles(profiles);
 
             return response;
@@ -288,19 +303,5 @@ public class SysUserFacadeService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.USER_GET_ERROR.get(), ex);
         }
-    }
-
-    private void validateUserAccess(Role role, UserEntity systemUser, UserEntity entity) {
-        if (role != Role.ADMIN) {
-            validateCompanyIdsAccess(systemUser.getCompanyIds(), entity.getCompanyIds().get(0));
-
-            if (role == Role.USER && (systemUser.getId() != entity.getId()))
-                throw new GenericForbiddenException();
-        }
-    }
-
-    private void validateCompanyIdsAccess(List<UUID> companyIds, UUID companyId) {
-        if (!companyIds.contains(companyId))
-            throw new GenericForbiddenException();
     }
 }

@@ -1,7 +1,7 @@
 package br.com.petshop.user.model.dto.response;
 
 import br.com.petshop.authentication.model.enums.Role;
-import br.com.petshop.model.Address;
+import br.com.petshop.commons.model.Address;
 import br.com.petshop.profile.model.dto.response.ProfileResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +28,7 @@ public class SysUserResponse implements Serializable {
     private Address address;
     private List<UUID> companyIds;
     private List<UUID> profileIds;
+    private List<UUID> productIds;
     private Role role;
     private String username;
     private Boolean changePassword;

@@ -1,8 +1,8 @@
 package br.com.petshop.category.service;
 
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotActiveException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericNotActiveException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.category.model.entity.CategoryEntity;
 import br.com.petshop.category.model.enums.Category;
 import br.com.petshop.category.repository.CategoryRepository;

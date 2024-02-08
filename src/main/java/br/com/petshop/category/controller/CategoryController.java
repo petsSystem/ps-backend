@@ -33,7 +33,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/pet/categories")
-@Tag(name = "SYS - Category Services")
+@Tag(name = "Category Services")
 public class CategoryController {
 
     @Autowired private CategoryFacadeService facade;

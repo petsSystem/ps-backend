@@ -1,10 +1,10 @@
 package br.com.petshop.product.service;
 
-import br.com.petshop.authentication.service.AuthenticationCommonService;
+import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.category.model.entity.CategoryEntity;
 import br.com.petshop.category.service.CategoryService;
-import br.com.petshop.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.product.model.dto.request.ProductUpdateRequest;
 import br.com.petshop.product.model.dto.response.ProductResponse;
@@ -36,18 +36,16 @@ public class ProductFacadeService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(ProductService.class);
     @Autowired private ProductService service;
     @Autowired private CategoryService categoryService;
-    @Autowired private ProductConverterService convert;
+    @Autowired private ProductConverterService converter;
 
     public ProductResponse create(Principal authentication, ProductCreateRequest request) {
         try {
 
-            ProductEntity entityRequest = convert.createRequestIntoEntity(request);
+            ProductEntity entityRequest = converter.createRequestIntoEntity(request);
 
             ProductEntity entity = service.create(entityRequest);
 
-            service.save(entity);
-
-            return convert.entityIntoResponse(entity);
+            return converter.entityIntoResponse(entity);
 
         } catch (GenericAlreadyRegisteredException ex) {
             log.error( Message.PRODUCT_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
@@ -65,7 +63,7 @@ public class ProductFacadeService extends AuthenticationCommonService {
 
             ProductEntity entity = service.activate(productId, patch);
 
-            return  convert.entityIntoResponse(entity);
+            return  converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.PRODUCT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -81,11 +79,11 @@ public class ProductFacadeService extends AuthenticationCommonService {
     public ProductResponse updateById(Principal authentication, UUID productId, ProductUpdateRequest request) {
         try {
 
-            ProductEntity entityRequest = convert.updateRequestIntoEntity(request);
+            ProductEntity entityRequest = converter.updateRequestIntoEntity(request);
 
             ProductEntity entity = service.updateById(productId, entityRequest);
 
-            return convert.entityIntoResponse(entity);
+            return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.PRODUCT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -108,7 +106,7 @@ public class ProductFacadeService extends AuthenticationCommonService {
 
             List<ProductTableResponse> response = entities.stream()
                     .map(c -> {
-                        ProductTableResponse resp = convert.entityIntoTableResponse(c);
+                        ProductTableResponse resp = converter.entityIntoTableResponse(c);
                         resp.setCategory(mapCategories.get(c.getCategoryId()).getType());
                         return resp;
                     })
@@ -129,7 +127,7 @@ public class ProductFacadeService extends AuthenticationCommonService {
     public ProductResponse getById(Principal authentication, UUID productId) {
         try {
             ProductEntity entity = service.findById(productId);
-            return convert.entityIntoResponse(entity);
+            return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.PRODUCT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

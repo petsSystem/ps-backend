@@ -10,23 +10,27 @@ import java.util.UUID;
 @Service
 public class UserSpecification {
 
-    public static Specification<UserEntity> filter (UUID companyId) {
+    public static Specification<UserEntity> filter (UUID companyId, UUID productId) {
         Specification<UserEntity> filters = Specification
                 .where(companyIdInList(companyId));
+
+        if (productId != null)
+            filters.and(productIdInList(productId));
 
         return filters;
     }
 
-//    public static Specification<EmployeeEntity> activeEqual(Boolean active) {
-//        return (root, query, criteriaBuilder) -> {
-//            return criteriaBuilder.equal(root.get("active"), active);
-//        };
-//    }
-
-    public static Specification<UserEntity> companyIdInList(UUID companyId) {
+    private static Specification<UserEntity> companyIdInList(UUID companyId) {
         return (root, query, criteriaBuilder) -> {
             Expression toJsonbArray = criteriaBuilder.function("jsonb_build_array", UUID.class, criteriaBuilder.literal(companyId));
             return criteriaBuilder.equal(criteriaBuilder.function("jsonb_contains", String.class, root.get("companyIds"), toJsonbArray), true);
+        };
+    }
+
+    private static Specification<UserEntity> productIdInList(UUID productId) {
+        return (root, query, criteriaBuilder) -> {
+            Expression toJsonbArray = criteriaBuilder.function("jsonb_build_array", UUID.class, criteriaBuilder.literal(productId));
+            return criteriaBuilder.equal(criteriaBuilder.function("jsonb_contains", String.class, root.get("productIds"), toJsonbArray), true);
         };
     }
 }

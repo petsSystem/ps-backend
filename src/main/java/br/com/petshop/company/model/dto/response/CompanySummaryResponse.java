@@ -1,7 +1,7 @@
 package br.com.petshop.company.model.dto.response;
 
 import br.com.petshop.category.model.enums.Category;
-import br.com.petshop.model.Address;
+import br.com.petshop.commons.model.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

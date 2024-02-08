@@ -1,6 +1,6 @@
 package br.com.petshop.company.model.dto.request;
 
-import br.com.petshop.model.Address;
+import br.com.petshop.commons.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
