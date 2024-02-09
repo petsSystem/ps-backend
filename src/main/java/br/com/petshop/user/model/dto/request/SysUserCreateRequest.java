@@ -27,4 +27,6 @@ public class SysUserCreateRequest implements Serializable {
     private Address address;
     @Builder.Default
     private Boolean active = true;
+    @Builder.Default
+    private Boolean changePassword = true;
 }

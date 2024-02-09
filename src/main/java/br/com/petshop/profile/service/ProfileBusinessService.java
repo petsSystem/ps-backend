@@ -1,5 +1,6 @@
 package br.com.petshop.profile.service;
 
+import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.profile.model.dto.request.ProfileCreateRequest;
@@ -118,6 +119,51 @@ public class ProfileBusinessService {
             return entities.stream().
                     map(e -> converter.entityIntoLabelResponse(e))
                     .collect(Collectors.toList());
+
+        } catch (Exception ex) {
+            log.error(Message.PROFILE_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_GET_ERROR.get(), ex);
+        }
+    }
+
+    public List<ProfileResponse> getByIds(List<UUID> profileIds) {
+        try {
+            return profileIds.stream()
+                    .map(p -> getById(p))
+                    .collect(Collectors.toList());
+
+        } catch (Exception ex) {
+            log.error(Message.PROFILE_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.PROFILE_GET_ERROR.get(), ex);
+        }
+    }
+
+    public Role getCommonRole(List<UUID> profileIds) {
+        try {
+            List<Role> roles = profileIds.stream()
+                    .map(p -> getById(p).getRole())
+                    .collect(Collectors.toList());
+
+            Role finalRole = roles.get(0);
+
+            if (roles.size() > 1 && finalRole != Role.ADMIN) {
+                for (int i = 1; i < roles.size(); i++) {
+                    Role role = roles.get(i);
+
+                    if (role == Role.ADMIN)
+                        return role;
+
+                    if (role == Role.OWNER && finalRole != Role.ADMIN)
+                        finalRole = role;
+
+                    if (role == Role.MANAGER && finalRole != Role.ADMIN && finalRole != Role.OWNER)
+                        finalRole = role;
+                }
+            }
+
+            return finalRole;
 
         } catch (Exception ex) {
             log.error(Message.PROFILE_GET_ERROR.get() + " Error: " + ex.getMessage());

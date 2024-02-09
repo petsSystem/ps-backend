@@ -1,6 +1,7 @@
 package br.com.petshop.user.service;
 
 import br.com.petshop.user.model.dto.request.SysUserCreateRequest;
+import br.com.petshop.user.model.dto.request.SysUserUpdateProfileRequest;
 import br.com.petshop.user.model.dto.request.SysUserUpdateRequest;
 import br.com.petshop.user.model.dto.response.SysUserMeResponse;
 import br.com.petshop.user.model.dto.response.SysUserProfileResponse;
@@ -25,6 +26,7 @@ public class SysUserConverterService {
         UserEntity entity = mapper.map(request, UserEntity.class);
         entity.setCompanyIds(request.getCompanyIds());
         entity.setProfileIds(request.getProfileIds());
+        entity.setProductIds(request.getProductIds());
 
         return entity;
     }
@@ -34,6 +36,19 @@ public class SysUserConverterService {
     }
 
     public UserEntity updateRequestIntoEntity(UserEntity request, UserEntity entity) {
+        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        mapper.map(request, entity);
+        entity.setCompanyIds(request.getCompanyIds());
+        entity.setProfileIds(request.getProfileIds());
+        entity.setProductIds(request.getProductIds());
+        return entity;
+    }
+
+    public UserEntity updateProfileRequestIntoEntity(SysUserUpdateProfileRequest request) {
+        return mapper.map(request, UserEntity.class);
+    }
+
+    public UserEntity updateProfileRequestIntoEntity(UserEntity request, UserEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
         return entity;

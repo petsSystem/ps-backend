@@ -8,7 +8,7 @@ import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import br.com.petshop.authentication.model.enums.AuthType;
 import br.com.petshop.authentication.model.enums.Message;
-import br.com.petshop.user.service.SysUserFacadeService;
+import br.com.petshop.user.service.SysUserBusinessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class AuthenticationFacade {
 
     private Logger log = LoggerFactory.getLogger(AuthenticationFacade.class);
     @Autowired private AuthenticationService service;
-    @Autowired private SysUserFacadeService userFacade;
+    @Autowired private SysUserBusinessService userFacade;
     @Autowired private CustomerAppFacade customerFacade;
 
     public AuthenticationResponse login(AuthenticationRequest request) {

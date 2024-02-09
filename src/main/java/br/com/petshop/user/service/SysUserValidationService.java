@@ -10,6 +10,11 @@ import java.security.Principal;
 @Service
 public class SysUserValidationService extends ValidationCommonService {
 
+    /**
+     * Users cannot activate or deactivate themselves.
+     * @param authentication
+     * @param entity
+     */
     public void activate(Principal authentication, UserEntity entity) {
         UserEntity user = getSysAuthUser(authentication);
 

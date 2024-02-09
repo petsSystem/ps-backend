@@ -1,4 +1,4 @@
-package br.com.petshop.user.model.dto.response;
+package br.com.petshop.user.model.dto.request;
 
 import br.com.petshop.commons.model.Address;
 import lombok.AllArgsConstructor;
@@ -8,23 +8,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SysUserResponse implements Serializable {
-    private UUID id;
+public class SysUserUpdateProfileRequest implements Serializable {
     private String name;
-    private String cpf;
     private String email;
     private String phone;
-    private Boolean active;
     private Address address;
-    private List<UUID> companyIds;
-    private List<UUID> profileIds;
-    private List<UUID> productIds;
 }

@@ -35,7 +35,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class CompanyFacadeService extends AuthenticationCommonService {
+public class CompanyBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired private CompanyService service;
     @Autowired private CompanyConverterService convert;
@@ -195,6 +195,32 @@ public class CompanyFacadeService extends AuthenticationCommonService {
             log.error(Message.COMPANY_GEO_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.COMPANY_GEO_ERROR.get(), ex);
+        }
+    }
+
+    public CompanyResponse findActiveCompany(UUID currentCompanyId, List<UUID> companyIds) {
+        try {
+            CompanyEntity entity = null;
+            if (currentCompanyId != null)
+                entity = service.findById(currentCompanyId);
+            else {
+                //retorna a primeira companyId ativa da lista
+                for(UUID companyId : companyIds) {
+                    entity = service.findById(companyId);
+                    if (entity.getActive())
+                        return convert.entityIntoResponse(entity);
+                }
+            }
+            return convert.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.COMPANY_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.COMPANY_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.COMPANY_GET_ERROR.get(), ex);
         }
     }
 }

@@ -4,7 +4,7 @@ import br.com.petshop.company.model.dto.request.CompanyCreateRequest;
 import br.com.petshop.company.model.dto.request.CompanyUpdateRequest;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
 import br.com.petshop.company.model.dto.response.CompanySummaryResponse;
-import br.com.petshop.company.service.CompanyFacadeService;
+import br.com.petshop.company.service.CompanyBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,7 +39,7 @@ import java.util.UUID;
 @Tag(name = "Companies Services")
 public class CompanyController {
 
-    @Autowired private CompanyFacadeService facade;
+    @Autowired private CompanyBusinessService facade;
 
     //ACESSO: ADMIN e OWNER
     @Operation(summary = "Serviço de inclusão de loja no sistema.",
