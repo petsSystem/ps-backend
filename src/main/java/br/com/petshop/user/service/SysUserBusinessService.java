@@ -358,6 +358,4 @@ public class SysUserBusinessService extends AuthenticationCommonService {
                     HttpStatus.BAD_REQUEST, Message.USER_SENDING_PASSWORD_ERROR.get(), ex);
         }
     }
-
-
 }

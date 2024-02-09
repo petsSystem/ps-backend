@@ -3,10 +3,6 @@ package br.com.petshop.user.service;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
-import br.com.petshop.company.model.entity.CompanyEntity;
-import br.com.petshop.company.service.CompanyService;
-import br.com.petshop.notification.MailType;
-import br.com.petshop.profile.service.ProfileBusinessService;
 import br.com.petshop.user.model.dto.request.SysUserPasswordRequest;
 import br.com.petshop.user.model.entity.UserEntity;
 import br.com.petshop.user.model.enums.Message;
@@ -104,7 +100,17 @@ public class SysUserService {
         return repository.save(entity);
     }
 
+    public UserEntity updateCurrentCompany(UserEntity user, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        UserEntity entity = repository.findById(user.getId())
+                .orElseThrow(GenericNotFoundException::new);
 
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        String currentCompanyValue = ((ObjectNode) patched).get("currentCompanyId").asText();
+
+        entity.setCurrentCompanyId(UUID.fromString(currentCompanyValue));
+
+        return repository.save(entity);
+    }
 
     public void forget (String username) {
         try {
@@ -128,39 +134,5 @@ public class SysUserService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.USER_SENDING_PASSWORD_ERROR.get(), ex);
         }
-    }
-
-
-
-
-
-    public UserEntity updateCurrentCompany(UserEntity user, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        UserEntity entity = repository.findById(user.getId())
-                .orElseThrow(GenericNotFoundException::new);
-
-        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        String currentCompanyValue = ((ObjectNode) patched).get("currentCompanyId").asText();
-
-        entity.setCurrentCompanyId(UUID.fromString(currentCompanyValue));
-
-        return repository.save(entity);
-    }
-
-
-
-
-
-
-
-
-    public UserEntity save(UserEntity entity) {
-        return repository.save(entity);
-    }
-
-    public UserEntity findByIdAndActive(UUID userId) {
-        Optional<UserEntity> entity = repository.findByIdAndActiveIsTrue(userId);
-        if (entity.isEmpty())
-            throw new GenericNotFoundException();
-        return entity.get();
     }
 }
