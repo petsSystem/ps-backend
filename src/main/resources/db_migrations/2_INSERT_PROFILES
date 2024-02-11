@@ -1,0 +1,91 @@
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('6ecb3690-ed18-450e-888d-3b07a8c605c0'::uuid, '2023-12-15 17:30:24.506',
+'2023-12-15 17:30:24.506', 'Administrador', '[{"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"],
+"resource": "COMPANY"}, {"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource": "USER"},
+{"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource": "CATEGORY"}, {"actions": ["SHOW",
+"CREATE", "EDIT", "ACTIVATE"], "resource": "SERVICE"}, {"actions": ["SHOW", "CREATE", "EDIT",
+"ACTIVATE"], "resource": "CUSTOMER"}]'::jsonb,  'ADMIN',
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid, '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('feaba313-27f6-46a7-8870-2967820da918'::uuid, '2023-12-15 17:30:19.154',
+'2023-12-15 17:30:19.154', 'Proprietário', '[{"actions": ["SHOW", "EDIT"], "resource": "COMPANY"},
+{"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource": "USER"}, {"actions": ["SHOW",
+"EDIT", "ACTIVATE"], "resource": "CATEGORY"}, {"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"],
+"resource": "SERVICE"}, {"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource": "CUSTOMER"}]'::jsonb,
+'OWNER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid, '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('86f507ec-869a-49ff-a210-c100ae894631'::uuid, '2023-12-15 17:30:12.917',
+'2023-12-15 17:30:12.917', 'Gerente', '[{"actions": ["SHOW", "EDIT"], "resource": "COMPANY"},
+{"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource": "USER"}, {"actions": ["SHOW",
+"EDIT"], "resource": "CATEGORY"}, {"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource":
+"SERVICE"}, {"actions": ["SHOW", "CREATE", "EDIT", "ACTIVATE"], "resource": "CUSTOMER"}]'::jsonb,
+'MANAGER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid, '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('8560e0b2-886f-4f85-892c-8cfbf6472c41'::uuid, '2023-12-15 17:30:06.897',
+'2023-12-15 17:30:06.897', 'Veterinário', '[{"actions": ["SHOW"], "resource": "COMPANY"},
+{"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"], "resource": "CATEGORY"},
+{"actions": ["SHOW"], "resource": "SERVICE"}, {"actions": ["SHOW", "EDIT"],
+"resource": "CUSTOMER"}]'::jsonb, 'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('9b09dd40-1e47-447a-a030-fb9fe5f870be'::uuid, '2023-12-15 17:30:01.681',
+'2023-12-15 17:30:01.681', 'Assistente de Veterinário', '[{"actions": ["SHOW"],
+"resource": "COMPANY"}, {"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"],
+"resource": "CATEGORY"}, {"actions": ["SHOW"], "resource": "SERVICE"}, {"actions":
+["SHOW", "EDIT"], "resource": "CUSTOMER"}]'::jsonb,
+'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('24a25bda-b262-46aa-8398-8a058ef7996c'::uuid, '2023-12-15 17:29:50.164',
+'2023-12-15 17:29:50.164', 'Banhista', '[{"actions": ["SHOW"], "resource": "COMPANY"},
+{"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"], "resource": "CATEGORY"},
+{"actions": ["SHOW"], "resource": "SERVICE"}, {"actions": ["SHOW", "EDIT"], "resource":
+"CUSTOMER"}]'::jsonb, 'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('89aade2f-e0c1-40ac-8db2-254c845af0e6'::uuid, '2023-12-15 17:29:44.130',
+'2023-12-15 17:29:44.130', 'Tosador', '[{"actions": ["SHOW"], "resource": "COMPANY"},
+{"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"], "resource": "CATEGORY"},
+{"actions": ["SHOW"], "resource": "SERVICE"}, {"actions": ["SHOW", "EDIT"], "resource":
+"CUSTOMER"}]'::jsonb, 'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('5be474f7-687c-4c93-8cca-7fb872d90e5a'::uuid, '2023-12-15 17:29:35.771',
+'2023-12-15 17:29:35.771', 'Esteticista', '[{"actions": ["SHOW"], "resource": "COMPANY"},
+{"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"], "resource": "CATEGORY"},
+{"actions": ["SHOW"], "resource": "SERVICE"}, {"actions": ["SHOW", "EDIT"], "resource":
+"CUSTOMER"}]'::jsonb, 'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('8bfb6658-26aa-4aee-ad79-8e23ab4cc536'::uuid, '2023-12-15 17:29:28.404',
+'2023-12-15 17:29:28.404', 'Vendedor', '[{"actions": ["SHOW"], "resource": "COMPANY"},
+{"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"], "resource": "CATEGORY"},
+{"actions": ["SHOW"], "resource": "SERVICE"}, {"actions": ["SHOW", "EDIT"], "resource":
+"CUSTOMER"}]'::jsonb, 'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);
+
+INSERT INTO public.profile
+(id, created_at, updated_at, "name", permissions, "role", created_by, updated_by)
+VALUES('f9295d64-9ad6-4f02-bac6-6dae80566a26'::uuid, '2023-12-15 17:29:56.003',
+'2023-12-15 17:29:56.003', 'Recepcionista', '[{"actions": ["SHOW"], "resource": "COMPANY"},
+{"actions": ["SHOW"], "resource": "USER"}, {"actions": ["SHOW"], "resource": "CATEGORY"},
+{"actions": ["SHOW"], "resource": "SERVICE"}, {"actions": ["SHOW", "EDIT"], "resource":
+"CUSTOMER"}]'::jsonb, 'USER', '457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid,
+'457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid);

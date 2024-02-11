@@ -1,7 +1,6 @@
 package br.com.petshop.category.service;
 
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.commons.exception.GenericNotActiveException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.category.model.entity.CategoryEntity;
 import br.com.petshop.category.model.enums.Category;
@@ -73,8 +72,8 @@ public class CategoryService {
         CategoryEntity category = repository.findById(categoryId)
                 .orElseThrow(GenericNotFoundException::new);
 
-        if (!category.getActive())
-            throw new GenericNotActiveException();
+//        if (!category.getActive())
+//            throw new GenericNotActiveException();
 
         return category;
     }

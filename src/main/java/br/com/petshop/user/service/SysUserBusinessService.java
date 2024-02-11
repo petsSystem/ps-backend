@@ -4,7 +4,6 @@ import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericForbiddenException;
 import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
-import br.com.petshop.commons.exception.GenericNotActiveException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
@@ -52,6 +51,23 @@ public class SysUserBusinessService extends AuthenticationCommonService {
     @Autowired private MailNotificationService mailService;
     @Autowired private CompanyBusinessService companyService;
 
+    public void forget (String username) {
+        try {
+            //chama serviço de esquecimento de senha
+            UserEntity entity = service.forget(username);
+
+            mailService.sendEmail(entity.getName(), entity.getEmail(), entity.getPassword(), MailType.NEW_PASSWORD);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.USER_SENDING_PASSWORD_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.USER_SENDING_PASSWORD_ERROR.get(), ex);
+        }
+    }
     public SysUserResponse create(Principal authentication, SysUserCreateRequest request) {
         try {
             //valida acesso da loja
@@ -85,10 +101,6 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             log.error(Message.USER_COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, Message.USER_COMPANY_NOT_FOUND_ERROR.get(), ex);
-        } catch (GenericNotActiveException ex) {
-            log.error(Message.USER_COMPANY_NOT_ACTIVE_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_COMPANY_NOT_ACTIVE_ERROR.get(), ex);
         } catch (Exception ex) {
             log.error(Message.USER_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -141,7 +153,7 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             validate.activate(authentication, entity);
 
             //ativa/desativa usuario
-            entity = service.active(entity, patch);
+            entity = service.activate(entity, patch);
 
             //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
@@ -343,19 +355,5 @@ public class SysUserBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public void forget (String username) {
-        try {
-            //chama serviço de esquecimento de senha
-            service.forget(username);
 
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_SENDING_PASSWORD_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_SENDING_PASSWORD_ERROR.get(), ex);
-        }
-    }
 }

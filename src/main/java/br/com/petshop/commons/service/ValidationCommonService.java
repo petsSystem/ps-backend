@@ -3,13 +3,11 @@ package br.com.petshop.commons.service;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.commons.exception.GenericForbiddenException;
 import br.com.petshop.user.model.entity.UserEntity;
-import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
-@Service
 public class ValidationCommonService extends AuthenticationCommonService {
 
     public void accessByCompany(Principal authentication, List<UUID> companyIds) {

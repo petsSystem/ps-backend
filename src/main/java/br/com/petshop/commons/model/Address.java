@@ -1,6 +1,5 @@
 package br.com.petshop.commons.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,10 +21,4 @@ public class Address implements Serializable {
     private String city;
     private String state;
     private String country;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Double lat;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Double lon;
-//    @Column(columnDefinition = "geometry(Point,4326)")
-//    private Point geom;
 }

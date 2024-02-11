@@ -5,7 +5,6 @@ import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.user.model.dto.request.SysUserPasswordRequest;
 import br.com.petshop.user.model.entity.UserEntity;
-import br.com.petshop.user.model.enums.Message;
 import br.com.petshop.user.repository.UserRepository;
 import br.com.petshop.user.repository.UserSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,11 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +33,20 @@ public class SysUserService {
     @Autowired private UserSpecification specification;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private PasswordEncoder passwordEncoder;
+
+    public UserEntity forget (String username) {
+        UserEntity entity = repository.findByUsernameAndActiveIsTrue(username)
+                .orElseThrow(GenericNotFoundException::new);
+
+        String newPassword = generateToken();
+        entity.setPassword(passwordEncoder.encode(newPassword));
+        entity.setChangePassword(true);
+
+        entity = repository.save(entity);
+        entity.setPassword(newPassword);
+
+        return entity;
+    }
 
     public UserEntity create(UserEntity request) {
         Optional<UserEntity> entity = repository.findByCpf(request.getCpf());
@@ -68,7 +79,7 @@ public class SysUserService {
         return repository.save(entity);
     }
 
-    public UserEntity active(UserEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+    public UserEntity activate(UserEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         Boolean activeValue = ((ObjectNode) patched).get("active").asBoolean();
 
@@ -110,29 +121,5 @@ public class SysUserService {
         entity.setCurrentCompanyId(UUID.fromString(currentCompanyValue));
 
         return repository.save(entity);
-    }
-
-    public void forget (String username) {
-        try {
-            UserEntity entity = repository.findByUsernameAndActiveIsTrue(username)
-                    .orElseThrow(GenericNotFoundException::new);
-
-            String newPassword = generateToken();
-            entity.setPassword(passwordEncoder.encode(newPassword));
-            entity.setChangePassword(true);
-
-            entity = repository.save(entity);
-
-            //mailService.sendEmail(entity.getName(), entity.getEmail(), newPassword, MailType.NEW_PASSWORD);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.USER_SENDING_PASSWORD_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.USER_SENDING_PASSWORD_ERROR.get(), ex);
-        }
     }
 }

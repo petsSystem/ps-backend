@@ -4,7 +4,7 @@ import br.com.petshop.customer.model.dto.request.CustomerChangePasswordRequest;
 import br.com.petshop.customer.model.dto.request.CustomerSysUpdateRequest;
 import br.com.petshop.customer.model.dto.request.EmailValidateRequest;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
-import br.com.petshop.customer.service.CustomerAppFacade;
+import br.com.petshop.customer.service.CustomerAppBusiness;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,7 +29,7 @@ import java.security.Principal;
 @RequestMapping("/api/v1/pet/app/customers")
 @Tag(name = "Serviços para Clientes")
 public class CustomerAPPController {
-    @Autowired private CustomerAppFacade facade;
+    @Autowired private CustomerAppBusiness facade;
 
     @Operation(summary = "Serviço para favoritar petshop para cliente.",
             description = "Acesso: 'ALL'")

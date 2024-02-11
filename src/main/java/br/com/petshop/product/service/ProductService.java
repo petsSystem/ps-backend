@@ -1,7 +1,6 @@
 package br.com.petshop.product.service;
 
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.commons.exception.GenericNotActiveException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.product.repository.ProductRepository;
 import br.com.petshop.product.model.entity.ProductEntity;
@@ -59,8 +58,8 @@ public class ProductService {
         ProductEntity category = repository.findById(categoryId)
                 .orElseThrow(GenericNotFoundException::new);
 
-        if (!category.getActive())
-            throw new GenericNotActiveException();
+//        if (!category.getActive())
+//            throw new GenericNotActiveException();
 
         return category;
     }

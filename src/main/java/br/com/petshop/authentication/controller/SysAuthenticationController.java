@@ -4,7 +4,7 @@ import br.com.petshop.authentication.model.dto.request.AuthenticationForget;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import br.com.petshop.authentication.model.enums.AuthType;
-import br.com.petshop.authentication.service.AuthenticationFacade;
+import br.com.petshop.authentication.service.AuthenticationBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/pet/sys/auth")
 @Tag(name = "Authentication Services for System")
 public class SysAuthenticationController {
-    @Autowired private AuthenticationFacade facade;
+    @Autowired private AuthenticationBusinessService businessService;
 
     @Operation(summary = "Serviço de autenticação no sistema PetHound.")
     @ApiResponses(value = {
@@ -55,7 +55,7 @@ public class SysAuthenticationController {
     public AuthenticationResponse login(
             @RequestBody AuthenticationRequest request) {
         request.setUsername("sys_".concat(request.getUsername()));
-        return facade.login(request);
+        return businessService.login(request);
     }
 
     @Operation(summary = "Serviço 'esqueci minha senha'. Envio de email com nova senha para o sistema PetHound.",
@@ -88,6 +88,6 @@ public class SysAuthenticationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void forget (
             @RequestBody AuthenticationForget request) {
-        facade.forget(request, AuthType.SYS);
+        businessService.forget(request, AuthType.SYS);
     }
 }

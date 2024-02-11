@@ -6,7 +6,7 @@ import br.com.petshop.authentication.model.dto.request.AuthenticationForget;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import br.com.petshop.authentication.model.enums.AuthType;
-import br.com.petshop.authentication.service.AuthenticationFacade;
+import br.com.petshop.authentication.service.AuthenticationBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -26,7 +26,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/pet/app/auth")
 @Tag(name = "Authentication Services for APP")
 public class AppAuthenticationController {
-    @Autowired private AuthenticationFacade facade;
+    @Autowired private AuthenticationBusinessService businessService;
+
+    @Operation(summary = "Serviço de cadastro de cliente no aplicativo.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao cadastrar cliente. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/app/auth\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Cliente já cadastrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Unprocessable Entity\",\n" +
+                            "    \"status\": 422,\n" +
+                            "    \"detail\": \"Cliente já cadastrado.\",\n" +
+                            "    \"instance\": \"/api/v1/pet/app/auth\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public CustomerResponse create (
+            @RequestBody CustomerAppCreateRequest request) {
+        return businessService.create(request);
+    }
 
     @Operation(summary = "Serviço que efetua login no APP.")
     @ApiResponses(value = {
@@ -38,7 +70,7 @@ public class AppAuthenticationController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao efetuar login. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/auth\"\n" +
+                            "\"instance\": \"/api/v1/pet/app/auth\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -49,7 +81,7 @@ public class AppAuthenticationController {
                             "\"title\": \"Unauthorized\",\n" +
                             "\"status\": 401,\n" +
                             "\"detail\": \"Usuário ou senha estão incorretos.\",\n" +
-                            "\"instance\": \"/api/v1/app/auth\"\n" +
+                            "\"instance\": \"/api/v1/pet/app/auth\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -58,10 +90,10 @@ public class AppAuthenticationController {
     public AuthenticationResponse login (
             @RequestBody AuthenticationRequest request) {
         request.setUsername("app_".concat(request.getUsername()));
-        return facade.login(request);
+        return businessService.login(request);
     }
 
-    @Operation(summary = "Serviço 'esqueci minha senha'. Envio de email com nova senha para o sistema APP.")
+    @Operation(summary = "Serviço para recuperação de senha, através do envio de email com nova senha.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "400",
@@ -71,7 +103,7 @@ public class AppAuthenticationController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao enviar email. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/auth/forget\"\n" +
+                            "\"instance\": \"/api/v1/pet/app/auth/forget\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -82,7 +114,7 @@ public class AppAuthenticationController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Usuário não cadastrado.\",\n" +
-                            "    \"instance\": \"/api/v1/app/auth/forget\"\n" +
+                            "    \"instance\": \"/api/v1/pet/app/auth/forget\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -90,38 +122,6 @@ public class AppAuthenticationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void forget (
             @RequestBody AuthenticationForget request) {
-        facade.forget(request, AuthType.APP);
-    }
-
-    @Operation(summary = "Serviço que cria usuário no APP.")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao cadastrar usuário. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/auth\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "422",
-                    description = "Cliente já cadastrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Unprocessable Entity\",\n" +
-                            "    \"status\": 422,\n" +
-                            "    \"detail\": \"Email já cadastrado.\",\n" +
-                            "    \"instance\": \"/api/v1/app/auth\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    public CustomerResponse create (
-            @RequestBody CustomerAppCreateRequest request) {
-        return facade.create(request);
+        businessService.forget(request, AuthType.APP);
     }
 }

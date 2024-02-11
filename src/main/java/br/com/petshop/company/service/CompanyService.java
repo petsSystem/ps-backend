@@ -1,19 +1,14 @@
 package br.com.petshop.company.service;
 
-import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.commons.exception.GenericNotActiveException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
+import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.repository.CompanyRepository;
-import br.com.petshop.user.model.entity.UserEntity;
-import br.com.petshop.user.service.SysUserService;
-import br.com.petshop.customer.service.GeometryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,80 +26,53 @@ import java.util.stream.Collectors;
 @Service
 public class CompanyService {
     private Logger log = LoggerFactory.getLogger(CompanyService.class);
-    @Autowired private CompanyRepository companyRepository;
-    @Autowired private CompanyConverterService convert;
+    @Autowired private CompanyRepository repository;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private GeometryService geometry;
-    @Autowired private SysUserService employeeService;
 
     public CompanyEntity create(CompanyEntity entity) {
-        Optional<CompanyEntity> company = companyRepository.findByCnpj(entity.getCnpj());
+        Optional<CompanyEntity> company = repository.findByCnpj(entity.getCnpj());
         if (company.isPresent())
             throw new GenericAlreadyRegisteredException();
 
-        entity.setGeom((Point)
-                geometry.getPoint(entity.getAddress().getLat(), entity.getAddress().getLon()));
-
-        return save(entity);
+        return repository.save(entity);
     }
 
-    public CompanyEntity save(CompanyEntity entity) {
-        return companyRepository.save(entity);
+    public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {
+        return repository.findById(companyId)
+                .orElseThrow(GenericNotFoundException::new);
     }
 
-    public CompanyEntity activate (UUID companyId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        CompanyEntity entity = findById(companyId);
+    public CompanyEntity updateById(CompanyEntity entity) {
+        return repository.save(entity);
+    }
 
-        entity = applyPatch(patch, entity);
+    public CompanyEntity activate (CompanyEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        entity = objectMapper.treeToValue(patched, CompanyEntity.class);
 
-        return companyRepository.save(entity);
+        return repository.save(entity);
     }
 
     public Page<CompanyEntity> findAll (Pageable paging) {
-            return companyRepository.findAll(paging);
+            return repository.findAll(paging);
     }
 
-    public Page<CompanyEntity> findByEmployeeId(UUID employeeId, Pageable paging) {
-        UserEntity employee = employeeService.findById(employeeId);
-        List<CompanyEntity> companies = employee.getCompanyIds().stream()
-                .map(c -> findById(c))
+    public Page<CompanyEntity> findByCompanyIds(List<UUID> companyIds) {
+        List<CompanyEntity> companies = companyIds.stream()
+                .map(c -> {
+                    Optional<CompanyEntity> entity = repository.findByIdAndActiveIsTrue(c);
+                    if (entity.isPresent())
+                        return entity.get();
+                    return null;
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(companies);
     }
 
     public CompanyEntity findById(UUID companyId) {
-        return companyRepository.findById(companyId)
+        return repository.findById(companyId)
                 .orElseThrow(GenericNotFoundException::new);
-    }
-
-    public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {
-        CompanyEntity company = companyRepository.findById(companyId)
-                .orElseThrow(GenericNotFoundException::new);
-
-        if (!company.getActive())
-            throw new GenericNotActiveException();
-
-        return company;
-    }
-
-    public CompanyEntity updateById(UUID companyId, CompanyEntity request) {
-        CompanyEntity entity = findByIdAndActiveIsTrue(companyId);
-
-        entity = convert.updateRequestIntoEntity(request, entity);
-        return companyRepository.save(entity);
-    }
-
-    private CompanyEntity applyPatch(JsonPatch patch, CompanyEntity entity) throws JsonPatchException, JsonProcessingException {
-        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        return objectMapper.treeToValue(patched, CompanyEntity.class);
-    }
-
-    public List<CompanyEntity> nearby(Point point, Double radius) {
-        return companyRepository.findNearWithinDistance(point, radius);
-    }
-
-    public Double getDistance(Point point, UUID companyId) {
-        return companyRepository.getDistance(point, companyId);
     }
 }

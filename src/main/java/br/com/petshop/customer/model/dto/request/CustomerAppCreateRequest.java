@@ -25,17 +25,13 @@ public class CustomerAppCreateRequest implements Serializable {
     private String cpf;
     private String email;
     private String birthDate;
+    private String password;
     @Builder.Default
     private Origin origin = Origin.APP;
     @Builder.Default
     private AppStatus appStatus = AppStatus.ACTIVE;
     @Builder.Default
     private Boolean active = true;
-
-    private List<UUID> companyIds = new ArrayList<>();
-    private List<UUID> favorites = new ArrayList<>();
-
-    private String password;
     @Builder.Default
     private Boolean changePassword = false;
     @Builder.Default

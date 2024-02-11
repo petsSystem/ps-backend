@@ -2,7 +2,7 @@ package br.com.petshop.authentication.service;
 
 import br.com.petshop.customer.model.dto.request.CustomerAppCreateRequest;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
-import br.com.petshop.customer.service.CustomerAppFacade;
+import br.com.petshop.customer.service.CustomerAppBusiness;
 import br.com.petshop.authentication.model.dto.request.AuthenticationForget;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
@@ -18,12 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class AuthenticationFacade {
+public class AuthenticationBusinessService {
 
-    private Logger log = LoggerFactory.getLogger(AuthenticationFacade.class);
+    private Logger log = LoggerFactory.getLogger(AuthenticationBusinessService.class);
     @Autowired private AuthenticationService service;
-    @Autowired private SysUserBusinessService userFacade;
-    @Autowired private CustomerAppFacade customerFacade;
+    @Autowired private SysUserBusinessService userBusiness;
+    @Autowired private CustomerAppBusiness customerBusiness;
 
     public AuthenticationResponse login(AuthenticationRequest request) {
         try {
@@ -42,12 +42,12 @@ public class AuthenticationFacade {
 
     public void forget (AuthenticationForget request, AuthType type) {
         if (type == AuthType.SYS)
-            userFacade.forget(request.username());
+            userBusiness.forget(request.username());
         else
-            customerFacade.forget(request.username());
+            customerBusiness.forget(request.username());
     }
 
     public CustomerResponse create(CustomerAppCreateRequest request) {
-        return customerFacade.create(request);
+        return customerBusiness.create(request);
     }
 }

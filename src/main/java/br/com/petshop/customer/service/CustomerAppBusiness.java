@@ -25,26 +25,11 @@ import java.security.Principal;
 import java.util.UUID;
 
 @Service
-public class CustomerAppFacade extends AuthenticationCommonService {
+public class CustomerAppBusiness extends AuthenticationCommonService {
 
-    private Logger log = LoggerFactory.getLogger(CustomerAppFacade.class);
+    private Logger log = LoggerFactory.getLogger(CustomerAppBusiness.class);
     @Autowired private CustomerService service;
     @Autowired private CustomerConverterService converter;
-
-    public void forget(String email) {
-        try {
-            service.forget(email);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.CUSTOMER_SEND_EMAIL_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_SEND_EMAIL_ERROR.get(), ex);
-        }
-    }
 
     public CustomerResponse create(CustomerAppCreateRequest request) {
         try {
@@ -62,6 +47,20 @@ public class CustomerAppFacade extends AuthenticationCommonService {
             log.error(Message.CUSTOMER_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.CUSTOMER_CREATE_ERROR.get(), ex);
+        }
+    }
+    public void forget(String email) {
+        try {
+            service.forget(email);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.CUSTOMER_SEND_EMAIL_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_SEND_EMAIL_ERROR.get(), ex);
         }
     }
 
