@@ -1,4 +1,4 @@
-INSERT INTO public.company
+INSERT INTO company
 (id, created_at, updated_at, active, address, cnpj, "name", phone, created_by, updated_by)
 VALUES('65569266-b178-487e-ba94-c72b774de6ee'::uuid, '2024-02-09 19:46:41.471', '2024-02-09 19:51:28.225',
 true, NULL, '39832661000190',

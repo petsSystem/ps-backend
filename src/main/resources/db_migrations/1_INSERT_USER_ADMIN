@@ -1,4 +1,4 @@
-INSERT INTO public.sys_user
+INSERT INTO sys_user
 (id, created_at, updated_at, active, address, change_password, company_ids, cpf, email,
 email_token, email_token_time, "name", "password", phone, profile_ids, "role", username,
 created_by, updated_by, current_company_id, product_ids)
