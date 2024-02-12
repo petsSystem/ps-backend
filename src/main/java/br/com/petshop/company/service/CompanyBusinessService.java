@@ -1,6 +1,6 @@
 package br.com.petshop.company.service;
 
-import br.com.petshop.category.service.CategoryService;
+import br.com.petshop.category.service.CategoryBusinessService;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericForbiddenException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
@@ -34,7 +34,7 @@ public class CompanyBusinessService extends AuthenticationCommonService {
     @Autowired private CompanyConverterService converter;
     @Autowired private CompanyService service;
     @Autowired private CompanyValidationService validate;
-    @Autowired private CategoryService categoryService;
+    @Autowired private CategoryBusinessService categoryBusinessService;
 
     public CompanyResponse create(Principal authentication, CompanyCreateRequest request) {
         try {
@@ -45,7 +45,7 @@ public class CompanyBusinessService extends AuthenticationCommonService {
             CompanyEntity entity = service.create(entityRequest);
 
             //criar todas as categorias inativas para a nova loja
-            categoryService.createAutomatic(entity.getId());
+            categoryBusinessService.createAutomatic(entity.getId());
 
             //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
@@ -63,7 +63,7 @@ public class CompanyBusinessService extends AuthenticationCommonService {
 
     public CompanyResponse updateById(Principal authentication, UUID companyId, CompanyUpdateRequest request) {
         try {
-            //recupera o usuario ativo pelo id
+            //recupera a loja ativa pelo id
             CompanyEntity entity = service.findByIdAndActiveIsTrue(companyId);
 
             //valida acesso a loja
@@ -95,7 +95,7 @@ public class CompanyBusinessService extends AuthenticationCommonService {
             //recupera o loja pelo id
             CompanyEntity entity = service.findById(companyId);
 
-            //ativa/desativa usuario
+            //ativa/desativa loja
             entity = service.activate(entity, patch);
 
             //converte a entidade na resposta final

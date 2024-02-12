@@ -2,7 +2,6 @@ package br.com.petshop.category.controller;
 
 import br.com.petshop.category.model.dto.request.CategoryUpdateRequest;
 import br.com.petshop.category.model.dto.response.CategoryResponse;
-import br.com.petshop.category.model.dto.response.CategoryTableResponse;
 import br.com.petshop.category.service.CategoryBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +33,7 @@ import java.util.UUID;
 @Tag(name = "Category Services")
 public class CategoryController {
 
-    @Autowired private CategoryBusinessService facade;
+    @Autowired private CategoryBusinessService businessService;
 
     @Operation(summary = "Serviço de atualização de categoria pelo id.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -47,7 +46,7 @@ public class CategoryController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao atualizar categoria. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/categories/{categoryId}\"\n" +
+                            "\"instance\": \"/api/v1/pet/categories/{categoryId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -58,7 +57,7 @@ public class CategoryController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Categoria não encontrada.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/categories/{categoryId}\"\n" +
+                            "    \"instance\": \"/api/v1/pet/categories/{categoryId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -69,7 +68,7 @@ public class CategoryController {
             Principal authentication,
             @PathVariable("categoryId") UUID categoryId,
             @RequestBody CategoryUpdateRequest request) {
-        return facade.updateById(authentication, categoryId, request);
+        return businessService.updateById(authentication, categoryId, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de categoria no sistema.",
@@ -112,7 +111,7 @@ public class CategoryController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return facade.activate(authentication, categoryId, patch);
+        return businessService.activate(authentication, categoryId, patch);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da(s) categorias(s) de loja selecionada.",
@@ -126,17 +125,17 @@ public class CategoryController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados da(s) categoria(s). Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/categories\"\n" +
+                            "\"instance\": \"/api/v1/pet/categories\"\n" +
                             "}\n" +
                             "\n")})})
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryTableResponse> get (
+    public List<CategoryResponse> get (
             Principal authentication,
             @RequestParam("companyId") UUID companyId,
             @RequestParam(value = "active", required = false, defaultValue = "false") Boolean active){
-        return facade.getByCompanyId(authentication, companyId, active);
+        return businessService.getAllByCompanyId(authentication, companyId, active);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da(s) categoria(s) pelo id.",
@@ -150,7 +149,18 @@ public class CategoryController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados da categoria. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/categories/{categoryId}\"\n" +
+                            "\"instance\": \"/api/v1/pet/categories/{categoryId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/pet/companies/{companiesId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -161,7 +171,7 @@ public class CategoryController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Categoria não encontrada.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/categories/{categoryId}\"\n" +
+                            "    \"instance\": \"/api/v1/pet/categories/{categoryId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -170,6 +180,6 @@ public class CategoryController {
     public CategoryResponse getById (
             Principal authentication,
             @PathVariable("categoryId") UUID categoryId) {
-        return facade.getById(authentication, categoryId);
+        return businessService.getById(authentication, categoryId);
     }
 }
