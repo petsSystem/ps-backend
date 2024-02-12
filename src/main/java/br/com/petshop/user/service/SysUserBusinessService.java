@@ -7,6 +7,7 @@ import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
+import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.service.CompanyBusinessService;
 import br.com.petshop.notification.MailNotificationService;
 import br.com.petshop.notification.MailType;
@@ -239,7 +240,8 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             //recupera a entidade do usuário logado
             entity = service.findById(entity.getId());
 
-            //recupera as informações da loja do usuário logado
+            //recupera as informações da ultima loja acessada do usuário logado
+            //(se nao tiver, carrega a primeira da lista do usuario logado)
             CompanyResponse companyEntity = companyService
                     .findActiveCompany(entity.getCurrentCompanyId(), entity.getCompanyIds());
 
@@ -333,7 +335,7 @@ public class SysUserBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public SysUserResponse updateCurrentCompany(Principal authentication, JsonPatch patch) {
+    public SysUserMeResponse updateCurrentCompany(Principal authentication, JsonPatch patch) {
         try {
             //recupera o usuario logado
             UserEntity user = getSysAuthUser(authentication);
@@ -341,8 +343,23 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             //atualiza a última loja acessada
             UserEntity entity = service.updateCurrentCompany(user, patch);
 
+            //recupera as informações da ultima loja acessada do usuário logado
+            CompanyResponse companyEntity = companyService
+                    .findActiveCompany(entity.getCurrentCompanyId(), entity.getCompanyIds());
+
+            //carrega as permissoes
+            List<ProfileResponse> profiles = profileService.getByIds(entity.getProfileIds());
+            List<Permission> permissions = profiles.stream()
+                    .flatMap(p -> p.getPermissions().stream())
+                    .collect(Collectors.toList());
+
             //converte a entidade na resposta final
-            return converter.entityIntoResponse(entity);
+            SysUserMeResponse response = converter.entityIntoMeResponse(entity);
+            response.setPermissions(permissions);
+            response.setCompanyId(companyEntity.getId());
+            response.setCompanyName(companyEntity.getName());
+
+            return response;
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -354,6 +371,4 @@ public class SysUserBusinessService extends AuthenticationCommonService {
                     HttpStatus.BAD_REQUEST, Message.USER_ACTIVATE_ERROR.get(), ex);
         }
     }
-
-
 }

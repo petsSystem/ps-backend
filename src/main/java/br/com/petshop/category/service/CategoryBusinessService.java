@@ -90,9 +90,9 @@ public class CategoryFacadeService extends AuthenticationCommonService {
         }
     }
 
-    public List<CategoryTableResponse> getByCompanyId(Principal authentication, UUID companyId) {
+    public List<CategoryTableResponse> getByCompanyId(Principal authentication, UUID companyId, Boolean active) {
         try {
-            List<CategoryEntity> entities = service.findAllByCompanyId(companyId);
+            List<CategoryEntity> entities = service.findAllByCompanyId(companyId, active);
 
             List<CategoryTableResponse> response = entities.stream()
                     .map(c -> convert.entityIntoTableResponse(c))
