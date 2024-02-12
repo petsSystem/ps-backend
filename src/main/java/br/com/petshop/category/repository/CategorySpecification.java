@@ -9,9 +9,12 @@ import java.util.UUID;
 @Service
 public class CategorySpecification {
 
-    public static Specification<CategoryEntity> filter (UUID companyId) {
+    public static Specification<CategoryEntity> filter (UUID companyId, Boolean active) {
         Specification<CategoryEntity> filters = Specification
                 .where(companyIdEqual(companyId));
+
+        if (active)
+            filters.and(activeIsTrue());
 
         return filters;
     }
@@ -19,6 +22,12 @@ public class CategorySpecification {
     public static Specification<CategoryEntity> companyIdEqual(UUID companyId) {
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.equal(root.get("companyId"), companyId);
+        };
+    }
+
+    public static Specification<CategoryEntity> activeIsTrue() {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get("active"), true);
         };
     }
 }

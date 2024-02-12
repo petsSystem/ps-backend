@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,7 +44,6 @@ public class CategoryService {
                             .companyId(companyId)
                             .type(c)
                             .description(c.getDescription())
-                            .days(new ArrayList<>())
                             .active(false)
                             .build());
                 });
@@ -90,8 +88,8 @@ public class CategoryService {
         return objectMapper.treeToValue(patched, CategoryEntity.class);
     }
 
-    public List<CategoryEntity> findAllByCompanyId(UUID companyId) {
-        Specification<CategoryEntity> filters = specification.filter(companyId);
+    public List<CategoryEntity> findAllByCompanyId(UUID companyId, Boolean active) {
+        Specification<CategoryEntity> filters = specification.filter(companyId, active);
         return repository.findAll(filters);
     }
 }

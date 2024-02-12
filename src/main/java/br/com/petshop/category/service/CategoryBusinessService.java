@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class CategoryFacadeService extends AuthenticationCommonService {
+public class CategoryBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(CategoryService.class);
     @Autowired private CategoryService service;
     @Autowired private CategoryConverterService convert;

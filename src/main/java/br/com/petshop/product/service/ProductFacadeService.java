@@ -100,7 +100,7 @@ public class ProductFacadeService extends AuthenticationCommonService {
         try {
             Page<ProductEntity> entities = service.findAllByCompanyId(companyId, paging);
 
-            List<CategoryEntity> categories = categoryService.findAllByCompanyId(companyId);
+            List<CategoryEntity> categories = categoryService.findAllByCompanyId(companyId, true);
             Map<UUID, CategoryEntity> mapCategories = categories.stream()
                     .collect(Collectors.toMap(CategoryEntity::getId, Function.identity()));
 
