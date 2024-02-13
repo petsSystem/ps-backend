@@ -1,6 +1,5 @@
 package br.com.petshop.product.model.dto.response;
 
-import br.com.petshop.commons.model.Day;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,8 +22,7 @@ public class ProductResponse implements Serializable {
     private UUID categoryId;
     private String name;
     private BigDecimal amount;
-    private List<Day> days;
     private Boolean additional;
-    private Integer appointmentConfig;
+    private List<UUID> additionalIds;
     private Boolean active;
 }

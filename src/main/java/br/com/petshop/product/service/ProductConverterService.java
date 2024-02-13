@@ -29,7 +29,6 @@ public class ProductConverterService {
     public ProductEntity updateRequestIntoEntity(ProductEntity request, ProductEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
-        entity.setDays(request.getDays());
         return entity;
     }
 

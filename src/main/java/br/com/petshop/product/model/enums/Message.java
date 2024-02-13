@@ -2,6 +2,7 @@ package br.com.petshop.product.model.enums;
 
 public enum Message {
     PRODUCT_CREATE_ERROR ("Erro ao cadastrar produto/serviço. Tente novamente mais tarde."),
+    PRODUCT_FORBIDDEN_ERROR ("Acesso negado."),
     PRODUCT_ALREADY_REGISTERED_ERROR ("Produto/serviço já cadastrado."),
     PRODUCT_ACTIVATE_ERROR ("Erro ao ativar/desativar produto/serviço. Tente novamente mais tarde."),
     PRODUCT_NOT_FOUND_ERROR ("Produto/serviço não encontrado."),

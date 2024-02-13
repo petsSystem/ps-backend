@@ -1,7 +1,6 @@
 package br.com.petshop.product.model.entity;
 
 import br.com.petshop.commons.audit.AuditorBaseEntity;
-import br.com.petshop.commons.model.Day;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -32,10 +31,9 @@ public class ProductEntity extends AuditorBaseEntity implements Serializable {
     private UUID categoryId;
     private String name;
     private BigDecimal amount;
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "days", columnDefinition = "jsonb")
-    private List<Day> days;
     private Boolean additional;
-    private Integer appointmentConfig;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "product_ids", columnDefinition = "jsonb")
+    private List<UUID> additionalIds;
     private Boolean active;
 }

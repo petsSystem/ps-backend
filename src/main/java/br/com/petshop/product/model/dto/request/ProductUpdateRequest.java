@@ -1,6 +1,5 @@
 package br.com.petshop.product.model.dto.request;
 
-import br.com.petshop.commons.model.Day;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductUpdateRequest implements Serializable {
-    private UUID categoryId;
     private String name;
     private BigDecimal amount;
-    private List<Day> days;
     private Boolean additional;
-    private Integer appointmentConfig;
+    private List<UUID> additionalIds;
 }

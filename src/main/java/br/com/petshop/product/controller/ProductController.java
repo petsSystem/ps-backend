@@ -4,7 +4,7 @@ import br.com.petshop.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.product.model.dto.request.ProductUpdateRequest;
 import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.product.model.dto.response.ProductTableResponse;
-import br.com.petshop.product.service.ProductFacadeService;
+import br.com.petshop.product.service.ProductBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,7 +38,7 @@ import java.util.UUID;
 @Tag(name = "Product Services")
 public class ProductController {
 
-    @Autowired private ProductFacadeService facade;
+    @Autowired private ProductBusinessService businessService;
 
     @Operation(summary = "Serviço de inclusão de produto/serviço no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -51,7 +51,18 @@ public class ProductController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao cadastrar produto/serviço. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/products\"\n" +
+                            "\"instance\": \"/api/v1/pet/products\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/pet/products\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -62,7 +73,7 @@ public class ProductController {
                             "\"title\": \"Unprocessable Entity\",\n" +
                             "\"status\": 422,\n" +
                             "\"detail\": \"Produto/serviço já cadastrado.\",\n" +
-                            "\"instance\": \"/api/v1/sys/products\"\n" +
+                            "\"instance\": \"/api/v1/pet/products\"\n" +
                             "}\n" +
                             "\n")})}),
     })
@@ -72,7 +83,54 @@ public class ProductController {
     public ProductResponse create(
             Principal authentication,
             @RequestBody ProductCreateRequest request) {
-        return facade.create(authentication, request);
+        return businessService.create(authentication, request);
+    }
+
+    @Operation(summary = "Serviço de atualização de produto/serviço pelo id.",
+            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao atualizar produto/serviço. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/products/{productId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/pet/products/{productId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Produto/serviço não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Produto/serviço não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/pet/products/{productId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PutMapping("/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public ProductResponse updateById(
+            Principal authentication,
+            @PathVariable("productId") UUID productId,
+            @RequestBody ProductUpdateRequest request) {
+        return businessService.updateById(authentication, productId, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de produto/serviço no sistema.",
@@ -86,7 +144,18 @@ public class ProductController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao ativar/desativar produto/serviço. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/products/{productId}\"\n" +
+                            "\"instance\": \"/api/v1/pet/products/{productId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/pet/products/{productId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -97,7 +166,7 @@ public class ProductController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Produto/serviço não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/products/{productId}\"\n" +
+                            "    \"instance\": \"/api/v1/pet/products/{productId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -115,46 +184,10 @@ public class ProductController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return facade.activate(authentication, productId, patch);
+        return businessService.activate(authentication, productId, patch);
     }
 
-    @Operation(summary = "Serviço de atualização de produto/serviço pelo id.",
-            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar produto/serviço. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/products/{productId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Produto/serviço não encontrado.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Produto/serviço não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/products/{productId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PutMapping("/{productId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public ProductResponse updateById(
-            Principal authentication,
-            @PathVariable("productId") UUID productId,
-            @RequestBody ProductUpdateRequest request) {
-        return facade.updateById(authentication, productId, request);
-    }
-
-    @Operation(summary = "Serviço de recuperação das informações da(s) categorias(s) de loja selecionada.",
+    @Operation(summary = "Serviço de recuperação das informações do(s) produto(s)/serviço(s) de categoria/loja selecionada.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
@@ -165,7 +198,18 @@ public class ProductController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados da(s) categoria(s). Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/products\"\n" +
+                            "\"instance\": \"/api/v1/pet/products\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/pet/products\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -175,9 +219,9 @@ public class ProductController {
             Principal authentication,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam("companyId") UUID companyId) {
+            @RequestParam(value = "companyId", required = true) UUID companyId) {
         Pageable paging = PageRequest.of(page, size);
-        return facade.getByCompanyId(authentication, paging, companyId);
+        return businessService.getAll(authentication, paging, companyId);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do(s) produto(s)/serviço(s) pelo id.",
@@ -191,7 +235,18 @@ public class ProductController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados do produto/serviço. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/sys/products/{productId}\"\n" +
+                            "\"instance\": \"/api/v1/pet/products/{productId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Forbidden\",\n" +
+                            "\"status\": 403,\n" +
+                            "\"detail\": \"Acesso negado.\",\n" +
+                            "\"instance\": \"/api/v1/pet/products/{productId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -202,7 +257,7 @@ public class ProductController {
                             "    \"title\": \"Not Found\",\n" +
                             "    \"status\": 404,\n" +
                             "    \"detail\": \"Produto/serviço não encontrado.\",\n" +
-                            "    \"instance\": \"/api/v1/sys/products/{productId}\"\n" +
+                            "    \"instance\": \"/api/v1/pet/products/{productId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -211,6 +266,6 @@ public class ProductController {
     public ProductResponse getById (
             Principal authentication,
             @PathVariable("productId") UUID productId) {
-        return facade.getById(authentication, productId);
+        return businessService.getById(authentication, productId);
     }
 }

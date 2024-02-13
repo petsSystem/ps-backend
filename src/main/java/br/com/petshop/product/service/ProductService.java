@@ -25,7 +25,6 @@ import java.util.UUID;
 public class ProductService {
     Logger log = LoggerFactory.getLogger(ProductService.class);
     @Autowired private ProductRepository repository;
-    @Autowired private ProductConverterService convert;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private ProductSpecification specification;
 
@@ -34,17 +33,16 @@ public class ProductService {
         if (company.isPresent())
             throw new GenericAlreadyRegisteredException();
 
-        return save(entity);
-    }
-
-    public ProductEntity save(ProductEntity entity) {
         return repository.save(entity);
     }
 
-    public ProductEntity activate (UUID categoryId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        ProductEntity entity = findById(categoryId);
+    public ProductEntity updateById(ProductEntity entity) {
+        return repository.save(entity);
+    }
 
-        entity = applyPatch(patch, entity);
+    public ProductEntity activate (ProductEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        entity = objectMapper.treeToValue(patched, ProductEntity.class);
 
         return repository.save(entity);
     }
@@ -55,25 +53,8 @@ public class ProductService {
     }
 
     public ProductEntity findByIdAndActiveIsTrue(UUID categoryId) {
-        ProductEntity category = repository.findById(categoryId)
+        return repository.findById(categoryId)
                 .orElseThrow(GenericNotFoundException::new);
-
-//        if (!category.getActive())
-//            throw new GenericNotActiveException();
-
-        return category;
-    }
-
-    public ProductEntity updateById(UUID categoryId, ProductEntity request) {
-        ProductEntity entity = findByIdAndActiveIsTrue(categoryId);
-
-        entity = convert.updateRequestIntoEntity(request, entity);
-        return repository.save(entity);
-    }
-
-    private ProductEntity applyPatch(JsonPatch patch, ProductEntity entity) throws JsonPatchException, JsonProcessingException {
-        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        return objectMapper.treeToValue(patched, ProductEntity.class);
     }
 
     public Page<ProductEntity> findAllByCompanyId(UUID companyId, Pageable paging) {
