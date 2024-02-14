@@ -134,7 +134,7 @@ public class CategoryController {
     public List<CategoryResponse> get (
             Principal authentication,
             @RequestParam(value = "companyId", required = true) UUID companyId,
-            @RequestParam(value = "active", required = false, defaultValue = "false") Boolean active){
+            @RequestParam(value = "active", required = false) Boolean active){
         return businessService.getAllByCompanyId(authentication, companyId, active);
     }
 

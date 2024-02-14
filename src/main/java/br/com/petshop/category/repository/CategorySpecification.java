@@ -11,10 +11,8 @@ public class CategorySpecification {
 
     public static Specification<CategoryEntity> filter (UUID companyId, Boolean active) {
         Specification<CategoryEntity> filters = Specification
-                .where(companyIdEqual(companyId));
-
-        if (active)
-            filters.and(activeIsTrue());
+                .where(companyIdEqual(companyId))
+                .and(activeEqual(active));
 
         return filters;
     }
@@ -25,9 +23,10 @@ public class CategorySpecification {
         };
     }
 
-    public static Specification<CategoryEntity> activeIsTrue() {
+    public static Specification<CategoryEntity> activeEqual(Boolean active) {
+        if (active == null) return null;
         return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.equal(root.get("active"), true);
+            return criteriaBuilder.equal(root.get("active"), active);
         };
     }
 }
