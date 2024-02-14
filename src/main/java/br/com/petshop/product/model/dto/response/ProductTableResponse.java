@@ -22,6 +22,7 @@ public class ProductTableResponse implements Serializable {
     private Category category;
     private String categoryLabel;
     private BigDecimal amount;
+    private Boolean additional;
     private Boolean active;
 
     public String getCategoryLabel() {
