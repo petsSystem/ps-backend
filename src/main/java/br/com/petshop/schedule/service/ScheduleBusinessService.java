@@ -25,7 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class ScheduleFacadeService extends AuthenticationCommonService {
+public class ScheduleBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(ScheduleService.class);
     @Autowired private ScheduleService service;
     @Autowired private ScheduleConverterService converter;

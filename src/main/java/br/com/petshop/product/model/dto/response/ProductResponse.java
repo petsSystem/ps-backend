@@ -21,6 +21,7 @@ public class ProductResponse implements Serializable {
     private UUID companyId;
     private UUID categoryId;
     private String name;
+    private Integer intervalMinutes;
     private BigDecimal amount;
     private Boolean additional;
     private List<UUID> additionalIds;

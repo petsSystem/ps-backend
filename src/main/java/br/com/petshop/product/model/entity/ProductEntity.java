@@ -30,6 +30,8 @@ public class ProductEntity extends AuditorBaseEntity implements Serializable {
     @Column(name = "category_id")
     private UUID categoryId;
     private String name;
+    @Column(name = "interval_minutes")
+    private Integer intervalMinutes;
     private BigDecimal amount;
     private Boolean additional;
     @JdbcTypeCode(SqlTypes.JSON)

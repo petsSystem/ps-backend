@@ -1,5 +1,6 @@
-package br.com.petshop.product.model.dto.request;
+package br.com.petshop.appointment.model.dto.response;
 
+import br.com.petshop.commons.model.Day;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,10 +16,11 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductUpdateRequest implements Serializable {
+public class AppointmentResponse implements Serializable {
+    private UUID id;
+    private UUID userId;
     private String name;
-    private BigDecimal amount;
-    private Integer intervalMinutes;
-    private Boolean additional;
-    private List<UUID> additionalIds;
+    private UUID productId;
+    private List<Day> days;
+    private Boolean active;
 }

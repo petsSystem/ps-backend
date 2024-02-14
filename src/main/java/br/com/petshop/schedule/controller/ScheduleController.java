@@ -4,7 +4,7 @@ import br.com.petshop.schedule.model.dto.request.ScheduleCreateRequest;
 import br.com.petshop.schedule.model.dto.request.ScheduleUpdateRequest;
 import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
 import br.com.petshop.schedule.model.dto.response.ScheduleTableResponse;
-import br.com.petshop.schedule.service.ScheduleFacadeService;
+import br.com.petshop.schedule.service.ScheduleBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,7 +36,7 @@ import java.util.UUID;
 @Tag(name = "Schedule Services")
 public class ScheduleController {
 
-    @Autowired private ScheduleFacadeService facade;
+    @Autowired private ScheduleBusinessService facade;
 
     @Operation(summary = "Serviço de inclusão de agenda para funcionário no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -71,6 +71,42 @@ public class ScheduleController {
             Principal authentication,
             @RequestBody ScheduleCreateRequest request) {
         return facade.create(authentication, request);
+    }
+
+    @Operation(summary = "Serviço de atualização de agenda pelo id.",
+            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao atualizar agenda. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Agenda não encontrada.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Agenda não encontrada.\",\n" +
+                            "    \"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PutMapping("/{scheduleId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
+    public ScheduleResponse updateById(
+            Principal authentication,
+            @PathVariable("scheduleId") UUID scheduleId,
+            @RequestBody ScheduleUpdateRequest request) {
+        return facade.updateById(authentication, scheduleId, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de agenda no sistema.",
@@ -116,41 +152,7 @@ public class ScheduleController {
         return facade.activate(authentication, scheduleId, patch);
     }
 
-    @Operation(summary = "Serviço de atualização de agenda pelo id.",
-            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao atualizar agenda. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-                            "}\n" +
-                            "\n")})}),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Agenda não encontrada.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "    \"type\": \"about:blank\",\n" +
-                            "    \"title\": \"Not Found\",\n" +
-                            "    \"status\": 404,\n" +
-                            "    \"detail\": \"Agenda não encontrada.\",\n" +
-                            "    \"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @PutMapping("/{scheduleId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-    public ScheduleResponse updateById(
-            Principal authentication,
-            @PathVariable("scheduleId") UUID scheduleId,
-            @RequestBody ScheduleUpdateRequest request) {
-        return facade.updateById(authentication, scheduleId, request);
-    }
+
 
     @Operation(summary = "Serviço de recuperação das agendas pelo id do produto.",
             description = "Acesso: ALL")
