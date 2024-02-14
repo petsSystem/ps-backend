@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ScheduleCreateRequest implements Serializable {
     private UUID userId;
-    private UUID productId;
+    private List<UUID> productIds;
     private List<Day> days;
     @Builder.Default
     private Boolean active = true;

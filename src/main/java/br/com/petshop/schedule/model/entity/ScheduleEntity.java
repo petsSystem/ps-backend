@@ -29,8 +29,8 @@ public class ScheduleEntity extends AuditorBaseEntity implements Serializable {
     private UUID userId;
     @Column(name = "user_name")
     private String name;
-    @Column(name = "product_id")
-    private UUID productId;
+    @Column(name = "product_ids")
+    private List<UUID> productIds;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "days", columnDefinition = "jsonb")
     private List<Day> days;

@@ -154,28 +154,28 @@ public class ScheduleController {
 
 
 
-    @Operation(summary = "Serviço de recuperação das agendas pelo id do produto.",
-            description = "Acesso: ALL")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Erro no sistema.",
-                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-                            "\"type\": \"about:blank\",\n" +
-                            "\"title\": \"Bad Request\",\n" +
-                            "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar agenda(s). Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/pet/schedules?productId=\"\n" +
-                            "}\n" +
-                            "\n")})})
-    })
-    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public List<ScheduleTableResponse> getByProductId (
-            Principal authentication,
-            @RequestParam("productId") UUID productId) {
-        return facade.getByProductId(authentication, productId);
-    }
+//    @Operation(summary = "Serviço de recuperação das agendas pelo id do produto.",
+//            description = "Acesso: ALL")
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Erro no sistema.",
+//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+//                            "\"type\": \"about:blank\",\n" +
+//                            "\"title\": \"Bad Request\",\n" +
+//                            "\"status\": 400,\n" +
+//                            "\"detail\": \"Erro ao recuperar agenda(s). Tente novamente mais tarde.\",\n" +
+//                            "\"instance\": \"/api/v1/pet/schedules?productId=\"\n" +
+//                            "}\n" +
+//                            "\n")})})
+//    })
+//    @GetMapping()
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<ScheduleTableResponse> getByProductId (
+//            Principal authentication,
+//            @RequestParam("productId") UUID productId) {
+//        return facade.getByProductId(authentication, productId);
+//    }
 
     @Operation(summary = "Serviço de recuperação das informações da agenda pelo id.",
             description = "Acesso: ALL")

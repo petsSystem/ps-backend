@@ -19,7 +19,9 @@ public class ScheduleConverterService {
 
     public ScheduleEntity createRequestIntoEntity(ScheduleCreateRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return mapper.map(request, ScheduleEntity.class);
+        ScheduleEntity entity = mapper.map(request, ScheduleEntity.class);
+        entity.setProductIds(request.getProductIds());
+        return entity;
     }
 
     public ScheduleEntity updateRequestIntoEntity(ScheduleUpdateRequest request) {
