@@ -131,16 +131,14 @@ public class ProductBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public Page<ProductTableResponse> getAll(Principal authentication, Pageable paging, UUID companyId) {
+    public Page<ProductTableResponse> getAll(Principal authentication, Pageable paging, UUID companyId, Boolean additional) {
         try {
             //recupera todos os produtos pelo companyId
-            Page<ProductEntity> entities = service.findAllByCompanyId(companyId, paging);
+            Page<ProductEntity> entities = service.findAllByCompanyId(companyId, additional, paging);
 
-            Boolean activeCategories = validate.getActiveCategories(authentication);
-
-            //recupera todas as categorias pelo companyId
+            //recupera todas as categorias ativas pelo companyId
             List<CategoryResponse> categories = categoryBusinessService
-                    .getAllByCompanyId(null, companyId, activeCategories);
+                    .getAllByCompanyId(null, companyId, true);
 
             //separo cada categoria em um map, sendo o id da categoria a chave
             Map<UUID, CategoryResponse> mapCategories = categories.stream()

@@ -57,8 +57,8 @@ public class ProductService {
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    public Page<ProductEntity> findAllByCompanyId(UUID companyId, Pageable paging) {
-        Specification<ProductEntity> filters = specification.filter(companyId);
+    public Page<ProductEntity> findAllByCompanyId(UUID companyId, Boolean additional, Pageable paging) {
+        Specification<ProductEntity> filters = specification.filter(companyId, additional);
         return repository.findAll(filters, paging);
     }
 }
