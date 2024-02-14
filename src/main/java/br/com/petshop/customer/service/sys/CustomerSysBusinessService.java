@@ -1,14 +1,16 @@
-package br.com.petshop.customer.service;
+package br.com.petshop.customer.service.sys;
 
+import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
+import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
-import br.com.petshop.customer.model.dto.request.CustomerSysCreateRequest;
-import br.com.petshop.customer.model.dto.request.CustomerSysUpdateRequest;
+import br.com.petshop.customer.model.dto.request.sys.CustomerSysCreateRequest;
+import br.com.petshop.customer.model.dto.request.sys.CustomerSysUpdateRequest;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
 import br.com.petshop.customer.model.dto.response.CustomerTableResponse;
 import br.com.petshop.customer.model.entity.CustomerEntity;
 import br.com.petshop.customer.model.enums.Message;
-import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
-import br.com.petshop.commons.exception.GenericNotFoundException;
+import br.com.petshop.notification.MailNotificationService;
+import br.com.petshop.notification.MailType;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -30,24 +31,26 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomerSysFacade extends AuthenticationCommonService {
+public class CustomerSysBusinessService extends AuthenticationCommonService {
 
-    private Logger log = LoggerFactory.getLogger(CustomerSysFacade.class);
-    @Autowired private CustomerService service;
-    @Autowired private CustomerConverterService converter;
+    private Logger log = LoggerFactory.getLogger(CustomerSysBusinessService.class);
+    @Autowired private CustomerSysService service;
+    @Autowired private MailNotificationService mailService;
+    @Autowired private CustomerSysConverterService converter;
 
     public CustomerResponse create(CustomerSysCreateRequest request) {
         try {
-            UserDetails user = converter.sysCreateRequestIntoEntity(request);
+            //converte request em entidade
+            UserDetails user = converter.createRequestIntoEntity(request);
             CustomerEntity entity = (CustomerEntity) user;
 
-            List<UUID> companyIds = new ArrayList<>();
-            companyIds.add(request.getCompanyId());
-            entity.setCompanyIds(companyIds);
-            entity.setFavorites(companyIds);
-
+            //cria a entidade customer
             entity = service.create(entity);
 
+            //envio email com link do APP
+            mailService.sendEmail(entity.getName(), entity.getEmail(), "", MailType.APP_INVITATION);
+
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (GenericAlreadyRegisteredException ex) {
@@ -61,27 +64,19 @@ public class CustomerSysFacade extends AuthenticationCommonService {
         }
     }
 
-    public CustomerResponse associateCompanyId(Principal authentication, UUID customerId, JsonPatch patch) {
-        try {
-            CustomerEntity entity = service.associateCompanyId(customerId, patch, false);
-
-            return  converter.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.CUSTOMER_ASSOCIATE_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_ASSOCIATE_ERROR.get(), ex);
-        }
-    }
-
     public CustomerResponse update(Principal authentication, UUID customerId, CustomerSysUpdateRequest request) {
         try {
-            CustomerEntity entity = service.update(customerId, request);
+            //recupera cliente pelo id
+            CustomerEntity entity = service.findById(customerId);
 
+            //converte request em entidade
+            CustomerEntity entityRequest = converter.updateRequestIntoEntity(request);
+            entity = converter.updateRequestIntoEntity(entityRequest, entity);
+
+            //faz atualizaçao da entidade
+            entity = service.updateById(entity);
+
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
@@ -95,10 +90,34 @@ public class CustomerSysFacade extends AuthenticationCommonService {
         }
     }
 
+    public CustomerResponse associateCompanyId(Principal authentication, UUID customerId, JsonPatch patch) {
+        try {
+            //recupera o cliente pelo id
+            CustomerEntity entity = service.findById(customerId);
+
+            //associo cliente
+            entity = service.associateCompanyId(entity, patch);
+
+            //converte a entidade na resposta final
+            return converter.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.CUSTOMER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.CUSTOMER_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.CUSTOMER_ASSOCIATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.CUSTOMER_ASSOCIATE_ERROR.get(), ex);
+        }
+    }
+
     public Page<CustomerTableResponse> get(Principal authentication, UUID companyId, Pageable pageable) {
         try {
+            //recupera todos os clientes por companyID
             Page<CustomerEntity> entities = service.findAllByCompanyId(companyId, pageable);
 
+            //converte entidade para a resposta
             List<CustomerTableResponse> response = entities.stream()
                     .map(c -> {
                         CustomerTableResponse resp = converter.entityIntoTableResponse(c);
@@ -108,9 +127,11 @@ public class CustomerSysFacade extends AuthenticationCommonService {
                     })
                     .collect(Collectors.toList());
 
+            //ordena por status + nome
             Collections.sort(response, Comparator.comparing(CustomerTableResponse::getActive).reversed()
                     .thenComparing(CustomerTableResponse::getName));
 
+            //pagina a lista
             return new PageImpl<>(response);
 
         } catch (Exception ex) {

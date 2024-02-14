@@ -49,10 +49,15 @@ public class SysUserService {
     }
 
     public UserEntity create(UserEntity request) {
-        Optional<UserEntity> entity = repository.findByCpf(request.getCpf());
+        Optional<UserEntity> entity = repository.findByCpfAndActiveIsTrue(request.getCpf());
 
-        if (entity.isPresent())
+        //caso já exista no sistema, substituir as lojas para o novo cadastro
+        if (entity.isPresent()) {
+            UserEntity user = entity.get();
+            user.setCompanyIds(request.getCompanyIds());
+            repository.save(request);
             throw new GenericAlreadyRegisteredException();
+        }
 
         String password = generateToken();
 

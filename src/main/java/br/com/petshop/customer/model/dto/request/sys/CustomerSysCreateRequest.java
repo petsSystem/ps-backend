@@ -1,4 +1,4 @@
-package br.com.petshop.customer.model.dto.request;
+package br.com.petshop.customer.model.dto.request.sys;
 
 import br.com.petshop.customer.model.enums.AppStatus;
 import br.com.petshop.customer.model.enums.Origin;

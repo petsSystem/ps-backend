@@ -14,10 +14,7 @@ import java.util.UUID;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Integer> {
 
     Optional<CustomerEntity> findById(UUID id);
-    Optional<CustomerEntity> findByCpf(String cpf);
+    Optional<CustomerEntity> findByCpfAndActiveIsTrue(String cpf);
     Optional<CustomerEntity> findByUsernameAndActiveIsTrue(String username);
-    Optional<CustomerEntity> findByEmail(String email);
-    Optional<CustomerEntity> findByEmailAndActiveIsTrue(String email);
-
     Page<CustomerEntity> findAll(Specification<CustomerEntity> filter, Pageable pageable);
 }

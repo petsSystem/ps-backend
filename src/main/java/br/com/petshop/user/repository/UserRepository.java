@@ -16,6 +16,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     Optional<UserEntity> findById(UUID employeeId);
     Optional<UserEntity> findByUsernameAndActiveIsTrue(String cpf);
     Optional<UserEntity> findByIdAndActiveIsTrue(UUID employeeId);
-    Optional<UserEntity> findByCpf(String cpf);
+    Optional<UserEntity> findByCpfAndActiveIsTrue(String cpf);
     Page<UserEntity> findAll(Specification<UserEntity> filter, Pageable pageable);
 }

@@ -1,4 +1,4 @@
-package br.com.petshop.customer.model.dto.request;
+package br.com.petshop.customer.model.dto.request.app;
 
 import lombok.Builder;
 

@@ -1,4 +1,4 @@
-package br.com.petshop.customer.model.dto.request;
+package br.com.petshop.customer.model.dto.request.sys;
 
 import br.com.petshop.commons.model.Address;
 import lombok.AllArgsConstructor;

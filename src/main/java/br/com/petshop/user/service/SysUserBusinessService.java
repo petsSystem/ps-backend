@@ -7,7 +7,6 @@ import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
-import br.com.petshop.company.model.entity.CompanyEntity;
 import br.com.petshop.company.service.CompanyBusinessService;
 import br.com.petshop.notification.MailNotificationService;
 import br.com.petshop.notification.MailType;

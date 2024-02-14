@@ -1,6 +1,6 @@
 package br.com.petshop.authentication.controller;
 
-import br.com.petshop.customer.model.dto.request.CustomerAppCreateRequest;
+import br.com.petshop.customer.model.dto.request.app.CustomerAppCreateRequest;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
 import br.com.petshop.authentication.model.dto.request.AuthenticationForget;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;

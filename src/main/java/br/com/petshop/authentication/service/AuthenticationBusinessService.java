@@ -1,13 +1,13 @@
 package br.com.petshop.authentication.service;
 
-import br.com.petshop.customer.model.dto.request.CustomerAppCreateRequest;
-import br.com.petshop.customer.model.dto.response.CustomerResponse;
-import br.com.petshop.customer.service.CustomerAppBusiness;
 import br.com.petshop.authentication.model.dto.request.AuthenticationForget;
 import br.com.petshop.authentication.model.dto.request.AuthenticationRequest;
 import br.com.petshop.authentication.model.dto.response.AuthenticationResponse;
 import br.com.petshop.authentication.model.enums.AuthType;
 import br.com.petshop.authentication.model.enums.Message;
+import br.com.petshop.customer.model.dto.request.app.CustomerAppCreateRequest;
+import br.com.petshop.customer.model.dto.response.CustomerResponse;
+import br.com.petshop.customer.service.app.CustomerAppBusinessService;
 import br.com.petshop.user.service.SysUserBusinessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class AuthenticationBusinessService {
     private Logger log = LoggerFactory.getLogger(AuthenticationBusinessService.class);
     @Autowired private AuthenticationService service;
     @Autowired private SysUserBusinessService userBusiness;
-    @Autowired private CustomerAppBusiness customerBusiness;
+    @Autowired private CustomerAppBusinessService customerBusiness;
 
     public AuthenticationResponse login(AuthenticationRequest request) {
         try {

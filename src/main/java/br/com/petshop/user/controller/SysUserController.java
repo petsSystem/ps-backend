@@ -42,7 +42,7 @@ import java.util.UUID;
 @Tag(name = "Users Services")
 public class SysUserController {
 
-    @Autowired private SysUserBusinessService facade;
+    @Autowired private SysUserBusinessService businessService;
 
     @Operation(summary = "Serviço de inclusão de usuário no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -107,7 +107,7 @@ public class SysUserController {
     public SysUserResponse create(
             Principal authentication,
             @RequestBody SysUserCreateRequest request) {
-        return facade.create(authentication, request);
+        return businessService.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização de usuário no sistema.",
@@ -154,7 +154,7 @@ public class SysUserController {
             Principal authentication,
             @PathVariable("userId") UUID userId,
             @RequestBody SysUserUpdateRequest request) {
-        return facade.updateById(authentication, userId, request);
+        return businessService.updateById(authentication, userId, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de usuário no sistema.",
@@ -208,7 +208,7 @@ public class SysUserController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return facade.activate(authentication, userId, patch);
+        return businessService.activate(authentication, userId, patch);
     }
 
     @Operation(summary = "Serviço de recuperação das informações de usuários do sistema, de acordo com o companyId informado.",
@@ -246,7 +246,7 @@ public class SysUserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return facade.get(authentication, companyId, productId, pageable);
+        return businessService.get(authentication, companyId, productId, pageable);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do usuário no sistema através do id.",
@@ -291,7 +291,7 @@ public class SysUserController {
     public SysUserResponse getById(
             Principal authentication,
             @PathVariable("userId") UUID userId) {
-        return facade.getById(authentication, userId);
+        return businessService.getById(authentication, userId);
     }
 
     @Operation(summary = "Serviço de recuperação dos dados do usuário logado no sistema.",
@@ -313,7 +313,7 @@ public class SysUserController {
     @ResponseStatus(HttpStatus.OK)
     public SysUserMeResponse me(
             Principal authentication) {
-        return facade.getMeInfo(authentication);
+        return businessService.getMeInfo(authentication);
     }
 
     @Operation(summary = "Serviço de recuperação dos dados do usuário logado no sistema.",
@@ -335,7 +335,7 @@ public class SysUserController {
     @ResponseStatus(HttpStatus.OK)
     public SysUserProfileResponse getProfile(
             Principal authentication) {
-        return facade.getProfile(authentication);
+        return businessService.getProfile(authentication);
     }
 
     @Operation(summary = "Serviço de atualização do perfil do usuário logado.",
@@ -358,7 +358,7 @@ public class SysUserController {
     public SysUserProfileResponse updateProfile(
             Principal authentication,
             @RequestBody SysUserUpdateProfileRequest request) {
-        return facade.updateProfile(authentication, request);
+        return businessService.updateProfile(authentication, request);
     }
 
     @Operation(summary = "Serviço de alteração de senha no sistema.",
@@ -392,7 +392,7 @@ public class SysUserController {
     public SysUserResponse changePassword (
             Principal authentication,
             @RequestBody SysUserPasswordRequest request) {
-        return facade.changePassword(authentication, request);
+        return businessService.changePassword(authentication, request);
     }
 
     @Operation(summary = "Serviço de marcação de último Petshop acessado.",
@@ -422,6 +422,6 @@ public class SysUserController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return facade.updateCurrentCompany(authentication, patch);
+        return businessService.updateCurrentCompany(authentication, patch);
     }
 }
