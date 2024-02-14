@@ -1,7 +1,5 @@
 package br.com.petshop.pet.model.enums;
 
-import br.com.petshop.pet.model.Breed;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

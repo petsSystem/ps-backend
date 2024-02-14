@@ -35,7 +35,7 @@ public class PetEntity extends AuditorBaseEntity implements Serializable {
     private String neutered;
     private Temper temper;
     private Coat coat;
-    private String weight;
+    private Double weight;
     private String breed;
     private Size size;
     private Boolean active;

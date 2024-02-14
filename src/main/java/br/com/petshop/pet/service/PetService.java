@@ -21,18 +21,18 @@ public class PetService {
 
     private Logger log = LoggerFactory.getLogger(PetService.class);
     @Autowired private PetRepository repository;
-    @Autowired private PetConverterService converter;
     @Autowired private ObjectMapper objectMapper;
 
     public PetEntity create(PetEntity request) {
         return repository.save(request);
     }
 
-    public PetEntity update(UUID petId, PetEntity request) {
-        PetEntity entity = repository.findByIdAndActiveIsTrue(petId)
+    public PetEntity findByIdAndActiveIsTrue(UUID petId) {
+        return repository.findByIdAndActiveIsTrue(petId)
                 .orElseThrow(GenericNotFoundException::new);
+    }
 
-        entity = converter.updateRequestIntoEntity(request, entity);
+    public PetEntity updateById(PetEntity entity) {
         return repository.save(entity);
     }
 
@@ -45,17 +45,10 @@ public class PetService {
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    public PetEntity deactivate (UUID petId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-        PetEntity entity = repository.findByIdAndActiveIsTrue(petId)
-                .orElseThrow(GenericNotFoundException::new);
-
-        entity = applyPatch(patch, entity);
+    public PetEntity deactivate (PetEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
+        entity = objectMapper.treeToValue(patched, PetEntity.class);
 
         return repository.save(entity);
-    }
-
-    private PetEntity applyPatch(JsonPatch patch, PetEntity entity) throws JsonPatchException, JsonProcessingException {
-        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-        return objectMapper.treeToValue(patched, PetEntity.class);
     }
 }

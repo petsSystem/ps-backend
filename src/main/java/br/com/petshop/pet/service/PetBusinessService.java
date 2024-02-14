@@ -22,21 +22,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class PetFacadeService {
+public class PetBusinessService {
 
-    private Logger log = LoggerFactory.getLogger(PetFacadeService.class);
+    private Logger log = LoggerFactory.getLogger(PetBusinessService.class);
     @Autowired private PetService service;
     @Autowired private PetConverterService converter;
 
     public List<String> getDogsList(Principal authentication) {
         try {
             return BreedType.dogValues();
-//            return BreedType.dogs().stream()
-//                    .map(b -> Breed.builder()
-//                            .name(BreedType.getName(b))
-//                            .size(BreedType.getSize(b))
-//                            .build())
-//                    .collect(Collectors.toList());
 
         } catch (Exception ex) {
             log.error(Message.PET_LIST_ERROR.get() + " Bad Request: " + ex.getMessage());
@@ -48,12 +42,6 @@ public class PetFacadeService {
     public List<String> getCatsList(Principal authentication) {
         try {
             return BreedType.catValues();
-//            return BreedType.cats().stream()
-//                    .map(b -> Breed.builder()
-//                            .name(BreedType.getName(b))
-//                            .size(BreedType.getSize(b))
-//                            .build())
-//                    .collect(Collectors.toList());
 
         } catch (Exception ex) {
             log.error(Message.PET_LIST_ERROR.get() + " Bad Request: " + ex.getMessage());
@@ -64,9 +52,13 @@ public class PetFacadeService {
 
     public PetResponse create(Principal authentication, PetCreateRequest request) {
         try {
+            //converte request em entidade
             PetEntity entity = converter.createRequestIntoEntity(request);
+
+            //cria a entidade pet
             entity = service.create(entity);
 
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (Exception ex) {
@@ -78,9 +70,17 @@ public class PetFacadeService {
 
     public PetResponse update(Principal authentication, UUID petId, PetUpdateRequest request) {
         try {
-            PetEntity entity = converter.updateRequestIntoEntity(request);
-            entity = service.update(petId, entity);
+            //recupera do pet ativo pelo id
+            PetEntity entity = service.findByIdAndActiveIsTrue(petId);
 
+            //converte request em entidade
+            PetEntity entityRequest = converter.updateRequestIntoEntity(request);
+            entity = converter.updateRequestIntoEntity(entityRequest, entity);
+
+            //faz atualizaçao da entidade
+            entity = service.updateById(entity);
+
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
@@ -96,7 +96,10 @@ public class PetFacadeService {
 
     public Set<PetResponse> getByCustomerId(Principal authentication, UUID customerId) {
         try {
+            //recupera todos os pets pelo customerId
             List<PetEntity> pets = service.getByCustomerId(customerId);
+
+            //converte a entidade na resposta final
             return pets.stream()
                     .map(p -> converter.entityIntoResponse(p))
                     .collect(Collectors.toSet());
@@ -110,8 +113,10 @@ public class PetFacadeService {
 
     public PetResponse getById(Principal authentication, UUID petId) {
         try {
+            //recupera o pet pelo id
             PetEntity entity = service.getById(petId);
 
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
@@ -127,9 +132,13 @@ public class PetFacadeService {
 
     public PetResponse deactivate (Principal authentication, UUID petId, JsonPatch patch) {
         try {
+            //recupera o pet pelo id
+            PetEntity entity = service.getById(petId);
 
-            PetEntity entity = service.deactivate(petId, patch);
+            //desativa o pet
+            entity = service.deactivate(entity, patch);
 
+            //converte a entidade na resposta final
             return  converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {

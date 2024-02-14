@@ -1,11 +1,9 @@
 package br.com.petshop.pet.controller;
 
-import br.com.petshop.pet.model.Breed;
 import br.com.petshop.pet.model.dto.request.PetCreateRequest;
 import br.com.petshop.pet.model.dto.request.PetUpdateRequest;
 import br.com.petshop.pet.model.dto.response.PetResponse;
-import br.com.petshop.pet.model.enums.BreedType;
-import br.com.petshop.pet.service.PetFacadeService;
+import br.com.petshop.pet.service.PetBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,7 +35,7 @@ import java.util.UUID;
 @Tag(name = "Pets Services")
 public class PetController {
 
-    @Autowired private PetFacadeService facade;
+    @Autowired private PetBusinessService businessService;
 
     @Operation(summary = "Serviço de recuperação de todas as racas de cães.")
     @ApiResponses(value = {
@@ -57,7 +55,7 @@ public class PetController {
     @ResponseStatus(HttpStatus.OK)
     public List<String> getDogsList(
             Principal authentication) {
-        return facade.getDogsList(authentication);
+        return businessService.getDogsList(authentication);
     }
 
     @Operation(summary = "Serviço de recuperação de todas as racas de gatos.")
@@ -78,7 +76,7 @@ public class PetController {
     @ResponseStatus(HttpStatus.OK)
     public List<String> getCatsList(
             Principal authentication) {
-        return facade.getCatsList(authentication);
+        return businessService.getCatsList(authentication);
     }
 
     @Operation(summary = "Serviço de cadastro de pet no sistema.")
@@ -99,7 +97,7 @@ public class PetController {
     @ResponseStatus(HttpStatus.OK)
     public PetResponse create(Principal authentication,
                               @RequestBody PetCreateRequest request) {
-        return facade.create(authentication, request);
+        return businessService.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização do cadastro do Pet do usuário no APP.")
@@ -117,7 +115,7 @@ public class PetController {
                             "\n")})}),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Cadastro do Pet não encontrado.",
+                    description = "Pet não encontrado.",
                     content = { @Content(examples = {@ExampleObject(value = "{\n" +
                             "    \"type\": \"about:blank\",\n" +
                             "    \"title\": \"Not Found\",\n" +
@@ -133,7 +131,7 @@ public class PetController {
             Principal authentication,
             @PathVariable("petId") UUID petId,
             @RequestBody PetUpdateRequest request) {
-        return facade.update(authentication, petId, request);
+        return businessService.update(authentication, petId, request);
     }
 
     @Operation(summary = "Serviço de recuperação das informações dos pets do cliente.")
@@ -146,7 +144,7 @@ public class PetController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar dados do(s) pet(s). Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/pets?customerId={customerId}\"\n" +
+                            "\"instance\": \"/api/v1/pet/pets?customerId={customerId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
@@ -155,7 +153,7 @@ public class PetController {
     public Set<PetResponse> getByCustomerId(
             Principal authentication,
             @RequestParam("customerId") UUID customerId) {
-        return facade.getByCustomerId(authentication, customerId);
+        return businessService.getByCustomerId(authentication, customerId);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do pet pelo id.")
@@ -188,7 +186,7 @@ public class PetController {
     public PetResponse getById(
             Principal authentication,
             @PathVariable("petId") UUID petId) {
-        return facade.getById(authentication, petId);
+        return businessService.getById(authentication, petId);
     }
 
     @Operation(summary = "Serviço de desativação de pet.")
@@ -201,7 +199,7 @@ public class PetController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao excluir pet. Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/app/pets/{petId}\"\n" +
+                            "\"instance\": \"/api/v1/pet/pets/{petId}\"\n" +
                             "}\n" +
                             "\n")})}),
             @ApiResponse(
@@ -229,6 +227,6 @@ public class PetController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return facade.deactivate(authentication, petId, patch);
+        return businessService.deactivate(authentication, petId, patch);
     }
 }
