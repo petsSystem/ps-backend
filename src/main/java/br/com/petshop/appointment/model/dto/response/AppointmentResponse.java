@@ -22,6 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppointmentResponse implements Serializable {
+    private UUID id;
     private UUID companyId;
     private UUID petId;
     private UUID customerId;

@@ -13,4 +13,5 @@ import java.util.UUID;
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Integer> {
     Optional<AppointmentEntity> findById(UUID appointmentId);
     List<AppointmentEntity> findAll(Specification<AppointmentEntity> filter);
+    List<AppointmentEntity> findByScheduleId(UUID scheduleId);
 }

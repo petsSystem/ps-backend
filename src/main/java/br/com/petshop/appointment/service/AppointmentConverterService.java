@@ -11,11 +11,16 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 @Service
 public class AppointmentConverterService {
 
-    @Autowired
-    private ModelMapper mapper;
+    @Autowired private ModelMapper mapper;
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public AppointmentEntity createRequestIntoEntity(AppointmentCreateRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -23,6 +28,7 @@ public class AppointmentConverterService {
     }
 
     public AppointmentEntity updateRequestIntoEntity(AppointmentUpdateRequest request) {
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
         entity.setAdditionalIds(request.getAdditionalIds());
         return entity;
@@ -36,7 +42,11 @@ public class AppointmentConverterService {
     }
 
     public AppointmentResponse entityIntoResponse(AppointmentEntity entity) {
-        return mapper.map(entity, AppointmentResponse.class);
+        AppointmentResponse appointment =  mapper.map(entity, AppointmentResponse.class);
+        appointment.setDate(LocalDate.parse(entity.getDate(), dateFormatter));
+        appointment.setTime(LocalTime.parse(entity.getTime(), timeFormatter));
+
+        return appointment;
     }
 
     public AppointmentTableResponse entityIntoTableResponse(AppointmentEntity entity) {

@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +19,9 @@ public class AppointmentUpdateRequest implements Serializable {
     private UUID petId;
     private UUID scheduleId;
     private UUID userId;
+    private String userName;
     private UUID productId;
     private List<UUID> additionalIds;
-    private LocalDate date;
-    private LocalTime time;
+    private String date;
+    private String time;
 }

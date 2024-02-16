@@ -43,6 +43,8 @@ public class CustomerSysBusinessService extends AuthenticationCommonService {
             //converte request em entidade
             UserDetails user = converter.createRequestIntoEntity(request);
             CustomerEntity entity = (CustomerEntity) user;
+            entity.setCompanyIds(List.of(request.getCompanyId()));
+            entity.setFavorites(List.of(request.getCompanyId()));
 
             //cria a entidade customer
             entity = service.create(entity);

@@ -1,5 +1,8 @@
 package br.com.petshop.schedule.service;
 
+import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
+import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
+import br.com.petshop.appointment.service.AppointmentBusinessService;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
@@ -19,9 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,7 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
     @Autowired private ScheduleService service;
     @Autowired private ScheduleConverterService converter;
     @Autowired private ScheduleValidateService validate;
+    @Autowired private AppointmentBusinessService appointmentService;
     public ScheduleResponse create(Principal authentication, ScheduleCreateRequest request) {
         try {
             //converte request em entidade
@@ -118,8 +124,10 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
                     .map(c -> converter.entityIntoTableResponse(c))
                     .collect(Collectors.toList());
 
-            //ordena por status
-            Collections.sort(response, Comparator.comparing(ScheduleTableResponse::getActive).reversed());
+            List<Map<LocalDate, AppointmentResponse>> apps = response.stream()
+                    .map(m -> appointmentService.getByScheduleId(m.getId()))
+                    .collect(Collectors.toList());
+
 
             return response;
 

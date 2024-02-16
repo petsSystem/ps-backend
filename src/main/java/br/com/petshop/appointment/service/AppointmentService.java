@@ -54,6 +54,10 @@ public class AppointmentService {
         return repository.findAll(filters);
     }
 
+    public List<AppointmentEntity> findByScheduleId(UUID scheduleId) {
+        return repository.findByScheduleId(scheduleId);
+    }
+
 
 //    public AppointmentEntity activate (UUID scheduleId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
 //        AppointmentEntity entity = findById(scheduleId);

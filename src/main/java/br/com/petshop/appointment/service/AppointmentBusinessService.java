@@ -17,8 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,6 +111,22 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.APPOINTMENT_GET_ERROR.get(), ex);
         }
+    }
+
+    public Map<LocalDate, AppointmentResponse> getByScheduleId(UUID scheduleId) {
+
+        List<AppointmentEntity> entities = service.findByScheduleId(scheduleId);
+        List<AppointmentResponse> appointments = entities.stream()
+                .map(c -> converter.entityIntoResponse(c))
+                .collect(Collectors.toList());
+
+        Collections.sort(appointments, Comparator.comparing(AppointmentResponse::getDate));
+
+        Map<LocalDate, AppointmentResponse> map = appointments.stream()
+                .collect(Collectors.toMap(AppointmentResponse::getDate, Function.identity()));
+
+        return map;
+
     }
 
 //
