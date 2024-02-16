@@ -43,7 +43,7 @@ public class CustomerSysService {
         }
 
         request.setAppStatus(AppStatus.PENDING);
-        request.setUsername(entity.getCpf());
+        request.setUsername(request.getCpf());
         return repository.save(request);
     }
 
