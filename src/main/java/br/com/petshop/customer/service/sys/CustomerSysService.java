@@ -44,7 +44,7 @@ public class CustomerSysService {
 
         request.setAppStatus(AppStatus.PENDING);
         request.setUsername(entity.getCpf());
-        return repository.save(entity);
+        return repository.save(request);
     }
 
     public CustomerEntity updateById(CustomerEntity entity) {
