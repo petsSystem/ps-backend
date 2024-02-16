@@ -93,8 +93,8 @@ public class SysUserService {
         return repository.save(entity);
     }
 
-    public Page<UserEntity> findAllByFilter(UUID companyId, UUID productId, Pageable pageable) {
-        Specification<UserEntity> filters = specification.filter(companyId, productId);
+    public Page<UserEntity> findAllByFilter(UUID companyId, Pageable pageable) {
+        Specification<UserEntity> filters = specification.filter(companyId);
         return repository.findAll(filters, pageable);
     }
 

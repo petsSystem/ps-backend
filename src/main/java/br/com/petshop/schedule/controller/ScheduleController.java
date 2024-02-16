@@ -1,6 +1,7 @@
 package br.com.petshop.schedule.controller;
 
 import br.com.petshop.schedule.model.dto.request.ScheduleCreateRequest;
+import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
 import br.com.petshop.schedule.model.dto.request.ScheduleUpdateRequest;
 import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
 import br.com.petshop.schedule.model.dto.response.ScheduleTableResponse;
@@ -36,7 +37,7 @@ import java.util.UUID;
 @Tag(name = "Schedule Services")
 public class ScheduleController {
 
-    @Autowired private ScheduleBusinessService facade;
+    @Autowired private ScheduleBusinessService businessService;
 
     @Operation(summary = "Serviço de inclusão de agenda para funcionário no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
@@ -70,7 +71,7 @@ public class ScheduleController {
     public ScheduleResponse create(
             Principal authentication,
             @RequestBody ScheduleCreateRequest request) {
-        return facade.create(authentication, request);
+        return businessService.create(authentication, request);
     }
 
     @Operation(summary = "Serviço de atualização de agenda pelo id.",
@@ -106,7 +107,7 @@ public class ScheduleController {
             Principal authentication,
             @PathVariable("scheduleId") UUID scheduleId,
             @RequestBody ScheduleUpdateRequest request) {
-        return facade.updateById(authentication, scheduleId, request);
+        return businessService.updateById(authentication, scheduleId, request);
     }
 
     @Operation(summary = "Serviço de ativação/desativação de agenda no sistema.",
@@ -149,33 +150,40 @@ public class ScheduleController {
                     "    }\n" +
                     "]")
             @RequestBody JsonPatch patch) {
-        return facade.activate(authentication, scheduleId, patch);
+        return businessService.activate(authentication, scheduleId, patch);
     }
 
 
 
-//    @Operation(summary = "Serviço de recuperação das agendas pelo id do produto.",
-//            description = "Acesso: ALL")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao recuperar agenda(s). Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules?productId=\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @GetMapping()
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<ScheduleTableResponse> getByProductId (
-//            Principal authentication,
-//            @RequestParam("productId") UUID productId) {
-//        return facade.getByProductId(authentication, productId);
-//    }
+    @Operation(summary = "Serviço de recuperação das agendas por filtro.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar agenda(s). Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/schedules?productId=\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public List<ScheduleTableResponse> getByFilter (
+            Principal authentication,
+            @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "userId", required = false) UUID userId,
+            @RequestParam(value = "productId", required = false) UUID productId) {
+        ScheduleFilterRequest filter = ScheduleFilterRequest.builder()
+                .companyId(companyId)
+                .productId(productId)
+                .userId(userId)
+                .build();
+        return businessService.getByFilter(authentication, filter);
+    }
 
     @Operation(summary = "Serviço de recuperação das informações da agenda pelo id.",
             description = "Acesso: ALL")
@@ -208,6 +216,6 @@ public class ScheduleController {
     public ScheduleResponse getById (
             Principal authentication,
             @PathVariable("scheduleId") UUID scheduleId) {
-        return facade.getById(authentication, scheduleId);
+        return businessService.getById(authentication, scheduleId);
     }
 }

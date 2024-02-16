@@ -11,8 +11,8 @@ import java.util.UUID;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Integer> {
-    Optional<ScheduleEntity> findById(UUID categoryId);
-    Optional<ScheduleEntity> findByUserIdAndProductId(UUID userId, UUID productId);
-    List<ScheduleEntity> findAllByProductId(UUID productId);
+    Optional<ScheduleEntity> findById(UUID scheduleId);
+
+    Optional<ScheduleEntity> findByIdAndCategoryId(UUID scheduleId, UUID categoryId);
     List<ScheduleEntity> findAll(Specification<ScheduleEntity> filter);
 }

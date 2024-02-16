@@ -8,6 +8,8 @@ import br.com.petshop.pet.model.enums.Size;
 import br.com.petshop.pet.model.enums.Specie;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,15 +30,20 @@ import java.util.UUID;
 public class PetEntity extends AuditorBaseEntity implements Serializable {
     private UUID customerId;
     private String name;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
+    @Enumerated(EnumType.STRING)
     private Specie specie;
     @Column(name = "birth_date")
     private String birthDate;
     private String neutered;
+    @Enumerated(EnumType.STRING)
     private Temper temper;
+    @Enumerated(EnumType.STRING)
     private Coat coat;
     private Double weight;
     private String breed;
+    @Enumerated(EnumType.STRING)
     private Size size;
     private Boolean active;
 }

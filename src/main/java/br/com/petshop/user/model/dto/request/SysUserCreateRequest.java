@@ -23,7 +23,6 @@ public class SysUserCreateRequest implements Serializable {
     private String phone;
     private List<UUID> profileIds;
     private List<UUID> companyIds;
-    private List<UUID> productIds;
     private Address address;
     @Builder.Default
     private Boolean active = true;

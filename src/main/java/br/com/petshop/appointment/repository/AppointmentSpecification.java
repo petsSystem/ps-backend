@@ -1,7 +1,7 @@
 package br.com.petshop.appointment.repository;
 
+import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
-import jakarta.persistence.criteria.Expression;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -10,17 +10,30 @@ import java.util.UUID;
 @Service
 public class AppointmentSpecification {
 
-    public static Specification<AppointmentEntity> filter (UUID productId) {
+    public static Specification<AppointmentEntity> filter (AppointmentFilterRequest filter) {
         Specification<AppointmentEntity> filters = Specification
-                .where(productIdInList(productId));
+                .where(companyIdEqual(filter.getCompanyId()))
+                .and(userIdEqual(filter.getUserId() == null ? null : filter.getUserId()))
+                .and(productIdEqual(filter.getProductId() == null ? null : filter.getProductId()));
 
         return filters;
     }
 
-    public static Specification<AppointmentEntity> productIdInList(UUID productId) {
+    public static Specification<AppointmentEntity> companyIdEqual(UUID companyId) {
         return (root, query, criteriaBuilder) -> {
-            Expression toJsonbArray = criteriaBuilder.function("jsonb_build_array", UUID.class, criteriaBuilder.literal(productId));
-            return criteriaBuilder.equal(criteriaBuilder.function("jsonb_contains", String.class, root.get("productIds"), toJsonbArray), true);
+            return criteriaBuilder.equal(root.get("companyId"), companyId);
+        };
+    }
+
+    public static Specification<AppointmentEntity> userIdEqual(UUID userId) {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get("userId"), userId);
+        };
+    }
+
+    public static Specification<AppointmentEntity> productIdEqual(UUID productId) {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get("productId"), productId);
         };
     }
 }

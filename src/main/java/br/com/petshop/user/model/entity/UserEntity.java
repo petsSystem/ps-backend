@@ -54,10 +54,6 @@ public class UserEntity extends AuditorBaseEntity implements UserDetails {
     @Column(name = "profile_ids", columnDefinition = "jsonb")
     private List<UUID> profileIds;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "product_ids", columnDefinition = "jsonb")
-    private List<UUID> productIds;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 

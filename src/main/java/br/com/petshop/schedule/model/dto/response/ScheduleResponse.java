@@ -18,9 +18,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ScheduleResponse implements Serializable {
     private UUID id;
+    private UUID companyId;
     private UUID userId;
     private String name;
-    private UUID productId;
+    private List<UUID> productIds;
     private List<Day> days;
     private Boolean active;
 }

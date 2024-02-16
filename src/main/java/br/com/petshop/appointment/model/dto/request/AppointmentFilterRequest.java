@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Builder
@@ -16,14 +16,14 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentFilter implements Serializable {
+public class AppointmentFilterRequest implements Serializable {
+    private UUID companyId;
     private UUID customerId;
     private UUID scheduleId;
     private UUID userId;
     private UUID productId;
-    private LocalDateTime datetime;
+    private LocalDate date;
+    private LocalTime time;
     private String paymentStatus;
     private String status;
-    private BigDecimal amount;
-    private Boolean active;
 }

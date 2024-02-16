@@ -1,9 +1,10 @@
 package br.com.petshop.schedule.service;
 
-import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
+import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.schedule.model.dto.request.ScheduleCreateRequest;
+import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
 import br.com.petshop.schedule.model.dto.request.ScheduleUpdateRequest;
 import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
 import br.com.petshop.schedule.model.dto.response.ScheduleTableResponse;
@@ -29,16 +30,16 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(ScheduleService.class);
     @Autowired private ScheduleService service;
     @Autowired private ScheduleConverterService converter;
-
+    @Autowired private ScheduleValidateService validate;
     public ScheduleResponse create(Principal authentication, ScheduleCreateRequest request) {
         try {
-
+            //converte request em entidade
             ScheduleEntity entityRequest = converter.createRequestIntoEntity(request);
 
+            //cria a entidade schedule
             ScheduleEntity entity = service.create(entityRequest);
 
-            service.save(entity);
-
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (GenericAlreadyRegisteredException ex) {
@@ -56,31 +57,22 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public ScheduleResponse activate (Principal authentication, UUID scheduleId, JsonPatch patch) {
-        try {
-
-            ScheduleEntity entity = service.activate(scheduleId, patch);
-
-            return  converter.entityIntoResponse(entity);
-
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.SCHEDULE_NOT_FOUND_ERROR.get(), ex);
-        } catch (Exception ex) {
-            log.error(Message.SCHEDULE_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_ACTIVATE_ERROR.get(), ex);
-        }
-    }
-
     public ScheduleResponse updateById(Principal authentication, UUID scheduleId, ScheduleUpdateRequest request) {
         try {
+            //recupera a agenda ativa pelo id
+            ScheduleEntity entity = service.findById(scheduleId);
 
+            //valida acesso a loja
+            validate.accessByCompany(authentication, request.getCompanyId());
+
+            //converte request em entidade
             ScheduleEntity entityRequest = converter.updateRequestIntoEntity(request);
+            entity = converter.updateRequestIntoEntity(entityRequest, entity);
 
-            ScheduleEntity entity = service.updateById(scheduleId, entityRequest);
+            //faz atualizaçao da entidade
+            entity = service.updateById(entity);
 
+            //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {
@@ -94,14 +86,39 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public List<ScheduleTableResponse> getByProductId(Principal authentication, UUID companyId) {
+    public ScheduleResponse activate (Principal authentication, UUID scheduleId, JsonPatch patch) {
         try {
-            List<ScheduleEntity> entities = service.findAllByProductId(companyId);
+            //recupera o loja pelo id
+            ScheduleEntity entity = service.findById(scheduleId);
 
+            //ativa/desativa loja
+            entity = service.activate(entity, patch);
+
+            //converte a entidade na resposta final
+            return converter.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.SCHEDULE_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.SCHEDULE_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_ACTIVATE_ERROR.get(), ex);
+        }
+    }
+
+    public List<ScheduleTableResponse> getByFilter(Principal authentication, ScheduleFilterRequest filter ) {
+        try {
+            //recupera todas as agendas pelo filtro
+            List<ScheduleEntity> entities = service.findAllByFilter(filter);
+
+            //converte a entidade na resposta final
             List<ScheduleTableResponse> response = entities.stream()
                     .map(c -> converter.entityIntoTableResponse(c))
                     .collect(Collectors.toList());
 
+            //ordena por status
             Collections.sort(response, Comparator.comparing(ScheduleTableResponse::getActive).reversed());
 
             return response;
@@ -115,7 +132,10 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
 
     public ScheduleResponse getById(Principal authentication, UUID scheduleId) {
         try {
+            //busca agenda pelo id
             ScheduleEntity entity = service.findById(scheduleId);
+
+            //converte entidade para a resposta
             return converter.entityIntoResponse(entity);
 
         } catch (GenericNotFoundException ex) {

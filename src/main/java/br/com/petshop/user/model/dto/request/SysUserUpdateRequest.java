@@ -22,6 +22,5 @@ public class SysUserUpdateRequest implements Serializable {
     private String phone;
     private List<UUID> profileIds;
     private List<UUID> companyIds;
-    private List<UUID> productIds;
     private Address address;
 }

@@ -242,11 +242,10 @@ public class SysUserController {
     public Page<SysUserTableResponse> get(
             Principal authentication,
             @RequestParam(value = "companyId", required = true) UUID companyId,
-            @RequestParam(value = "productId", required = false) UUID productId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return businessService.get(authentication, companyId, productId, pageable);
+        return businessService.get(authentication, companyId, pageable);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do usuário no sistema através do id.",

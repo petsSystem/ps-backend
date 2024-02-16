@@ -1,9 +1,9 @@
 INSERT INTO sys_user
 (id, created_at, updated_at, active, address, change_password, company_ids, cpf, email,
 email_token, email_token_time, "name", "password", phone, profile_ids, "role", username,
-created_by, updated_by, current_company_id, product_ids)
+created_by, updated_by, current_company_id)
 VALUES('457c89ce-1281-47f5-8a51-424bc3ea7908'::uuid, '2023-10-20 10:23:58.054',
 '2023-10-20 10:23:58.054', true, NULL, false, NULL, '12345678900', 'admin@admin.com', NULL, NULL,
 'Usuário Administrador', '$2a$10$icpZ6DZBpruvc2Hhbl4bKuEZKszqyG9PTG3aO94Tc5qQ7eW6zSv4.',
-NULL, NULL, 'ADMIN', '12345678900', NULL, NULL, NULL, NULL);
+NULL, NULL, 'ADMIN', '12345678900', NULL, NULL, NULL);
 

@@ -25,11 +25,16 @@ import java.util.UUID;
 @Entity
 @Table(name = "schedule")
 public class ScheduleEntity extends AuditorBaseEntity implements Serializable {
+    @Column(name = "company_id")
+    private UUID companyId;
+    @Column(name = "category_id")
+    private UUID categoryId;
     @Column(name = "user_id")
     private UUID userId;
     @Column(name = "user_name")
     private String name;
-    @Column(name = "product_ids")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "product_ids", columnDefinition = "jsonb")
     private List<UUID> productIds;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "days", columnDefinition = "jsonb")

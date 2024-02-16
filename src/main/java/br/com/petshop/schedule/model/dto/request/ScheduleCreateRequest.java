@@ -17,6 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleCreateRequest implements Serializable {
+    private UUID companyId;
+    private UUID categoryId;
     private UUID userId;
     private List<UUID> productIds;
     private List<Day> days;

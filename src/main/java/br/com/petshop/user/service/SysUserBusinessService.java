@@ -173,14 +173,14 @@ public class SysUserBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public  Page<SysUserTableResponse> get(Principal authentication, UUID companyId, UUID productId, Pageable pageable) {
+    public  Page<SysUserTableResponse> get(Principal authentication, UUID companyId, Pageable pageable) {
         try {
             //valida acesso a loja
             validate.accessByCompany(authentication, companyId);
 
             //find by filter (companyId + productId (sendo esse ultimo opcional))
             Page<UserEntity> entities = service
-                    .findAllByFilter(companyId, productId, pageable);
+                    .findAllByFilter(companyId, pageable);
 
             //converte entidade para a resposta
             List<SysUserTableResponse> response = entities.stream()

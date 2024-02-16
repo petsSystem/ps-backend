@@ -1,10 +1,13 @@
 package br.com.petshop.appointment.controller;
 
 import br.com.petshop.appointment.model.dto.request.AppointmentCreateRequest;
+import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
 import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.service.AppointmentBusinessService;
+import br.com.petshop.customer.model.dto.request.app.CustomerChangePasswordRequest;
+import br.com.petshop.customer.model.dto.response.CustomerResponse;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,119 +41,97 @@ public class AppointmentController {
 
     @Autowired private AppointmentBusinessService businessService;
 
-//    @Operation(summary = "Serviço de inclusão de agendamento para agenda informada.",
-//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao cadastrar agenda. Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "422",
-//                    description = "Agenda já cadastrada.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Unprocessable Entity\",\n" +
-//                            "\"status\": 422,\n" +
-//                            "\"detail\": \"Agenda já cadastrada.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//    })
-//    @PostMapping()
-//    @ResponseStatus(HttpStatus.CREATED)
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-//    public AppointmentResponse create(
-//            Principal authentication,
-//            @RequestBody AppointmentCreateRequest request) {
-//        return facade.create(authentication, request);
-//    }
-//
-//    @Operation(summary = "Serviço de atualização de agenda pelo id.",
-//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao atualizar agenda. Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "404",
-//                    description = "Agenda não encontrada.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "    \"type\": \"about:blank\",\n" +
-//                            "    \"title\": \"Not Found\",\n" +
-//                            "    \"status\": 404,\n" +
-//                            "    \"detail\": \"Agenda não encontrada.\",\n" +
-//                            "    \"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @PutMapping("/{scheduleId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-//    public AppointmentResponse updateById(
-//            Principal authentication,
-//            @PathVariable("scheduleId") UUID scheduleId,
-//            @RequestBody AppointmentUpdateRequest request) {
-//        return facade.updateById(authentication, scheduleId, request);
-//    }
-//
-//    @Operation(summary = "Serviço de ativação/desativação de agenda no sistema.",
-//            description = "Acesso: 'ADMIN', 'OWNER', 'MANAGER'")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao ativar/desativar agenda. Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "404",
-//                    description = "Agenda não encontrada.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "    \"type\": \"about:blank\",\n" +
-//                            "    \"title\": \"Not Found\",\n" +
-//                            "    \"status\": 404,\n" +
-//                            "    \"detail\": \"Agenda não encontrada.\",\n" +
-//                            "    \"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @PatchMapping(path = "/{scheduleId}", consumes = "application/json-patch+json")
-//    @ResponseStatus(HttpStatus.OK)
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
-//    public AppointmentResponse activate (
-//            Principal authentication,
-//            @PathVariable("scheduleId") UUID scheduleId,
-//            @Schema(example = "[\n" +
-//                    "    {\n" +
-//                    "        \"op\": \"replace\",\n" +
-//                    "        \"path\": \"/active\",\n" +
-//                    "        \"value\": \"true\"\n" +
-//                    "    }\n" +
-//                    "]")
-//            @RequestBody JsonPatch patch) {
-//        return facade.activate(authentication, scheduleId, patch);
-//    }
+    @Operation(summary = "Serviço de inclusão de agendamento para agenda informada.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao cadastrar agendamento. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public AppointmentResponse create(
+            Principal authentication,
+            @RequestBody AppointmentCreateRequest request) {
+        return businessService.create(authentication, request);
+    }
+
+    @Operation(summary = "Serviço de atualização de agendamento pelo id.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao atualizar agendamento. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Agendamento não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Agendamento não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PutMapping("/{scheduleId}")
+    @ResponseStatus(HttpStatus.OK)
+    public AppointmentResponse updateById(
+            Principal authentication,
+            @PathVariable("scheduleId") UUID scheduleId,
+            @RequestBody AppointmentUpdateRequest request) {
+        return businessService.updateById(authentication, scheduleId, request);
+    }
+
+    @Operation(summary = "Serviço de atualização de status do agendamento.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao alterar status do agendamento agenda. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Agendamento não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Agendamento não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @PatchMapping("/password")
+    @ResponseStatus(HttpStatus.OK)
+    public AppointmentResponse setStatus (
+            Principal authentication,
+            @RequestBody AppointmentStatusRequest request) {
+        return businessService.setStatus(authentication, request);
+    }
 //
 //
 //

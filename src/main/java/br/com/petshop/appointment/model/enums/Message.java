@@ -1,11 +1,11 @@
 package br.com.petshop.appointment.model.enums;
 
 public enum Message {
-    APPOINTMENT_CREATE_ERROR ("Erro ao cadastrar agenda. Tente novamente mais tarde."),
-    APPOINTMENT_UPDATE_ERROR ("Erro ao atualizar agenda. Tente novamente mais tarde."),
-    APPOINTMENT_CANCEL_ERROR ("Erro ao atualizar agenda. Tente novamente mais tarde."),
-    APPOINTMENT_CONFIRM_ERROR ("Erro ao atualizar agenda. Tente novamente mais tarde."),
-    APPOINTMENT_GET_ERROR ("Erro ao recuperar dados da(s) agenda(s). Tente novamente mais tarde.");
+    APPOINTMENT_CREATE_ERROR ("Erro ao cadastrar agendamento. Tente novamente mais tarde."),
+    APPOINTMENT_NOT_FOUND_ERROR ("Agendamento não encontrado"),
+    APPOINTMENT_UPDATE_ERROR ("Erro ao atualizar agendamento. Tente novamente mais tarde."),
+    APPOINTMENT_STATUS_ERROR ("Erro ao atualizar status do agendamento. Tente novamente mais tarde."),
+    APPOINTMENT_GET_ERROR ("Erro ao recuperar dados do(s) agendamento(s). Tente novamente mais tarde.");
 
     private String message;
 

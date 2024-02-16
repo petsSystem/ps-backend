@@ -11,8 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Integer> {
-//    Optional<AppointmentEntity> findById(UUID categoryId);
-//    Optional<AppointmentEntity> findByUserIdAndProductId(UUID userId, UUID productId);
-//    List<AppointmentEntity> findAllByProductId(UUID productId);
-//    List<AppointmentEntity> findAll(Specification<AppointmentEntity> filter);
+    Optional<AppointmentEntity> findById(UUID appointmentId);
+    List<AppointmentEntity> findAll(Specification<AppointmentEntity> filter);
 }

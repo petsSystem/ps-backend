@@ -46,7 +46,9 @@ public class CustomerEntity implements UserDetails {
     private String phone;
     @Column(name = "birth_date")
     private String birthDate;
+    @Enumerated(EnumType.STRING)
     private Origin origin;
+    @Enumerated(EnumType.STRING)
     @Column(name = "app_access_status")
     private AppStatus appStatus;
     private Boolean active;

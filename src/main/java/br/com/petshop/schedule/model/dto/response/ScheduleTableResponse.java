@@ -16,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ScheduleTableResponse implements Serializable {
     private UUID id;
+    private UUID companyId;
     private UUID userId;
     private String name;
     private Boolean active;

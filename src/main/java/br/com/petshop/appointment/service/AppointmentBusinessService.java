@@ -1,15 +1,14 @@
 package br.com.petshop.appointment.service;
 
 import br.com.petshop.appointment.model.dto.request.AppointmentCreateRequest;
+import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
+import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
-import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.enums.Message;
-import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
-import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,69 +27,87 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
     @Autowired private AppointmentService service;
     @Autowired private AppointmentConverterService converter;
 
-//    public AppointmentResponse create(Principal authentication, AppointmentCreateRequest request) {
-//        try {
-//
-//            AppointmentEntity entityRequest = converter.createRequestIntoEntity(request);
-//
-//            AppointmentEntity entity = service.create(entityRequest);
-//
-//            service.save(entity);
-//
-//            return converter.entityIntoResponse(entity);
-//
-//        } catch (GenericAlreadyRegisteredException ex) {
-//            log.error(Message.SCHEDULE_ALREADY_REGISTERED_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.UNPROCESSABLE_ENTITY, Message.SCHEDULE_ALREADY_REGISTERED_ERROR.get(), ex);
-//        } catch (GenericNotFoundException ex) {
-//            log.error(Message.SCHEDULE_USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.UNPROCESSABLE_ENTITY, Message.SCHEDULE_USER_NOT_FOUND_ERROR.get(), ex);
-//        } catch (Exception ex) {
-//            log.error(Message.SCHEDULE_CREATE_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_CREATE_ERROR.get(), ex);
-//        }
-//    }
-//
-//    public AppointmentResponse activate (Principal authentication, UUID scheduleId, JsonPatch patch) {
-//        try {
-//
-//            AppointmentEntity entity = service.activate(scheduleId, patch);
-//
-//            return  converter.entityIntoResponse(entity);
-//
-//        } catch (GenericNotFoundException ex) {
-//            log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.NOT_FOUND, Message.SCHEDULE_NOT_FOUND_ERROR.get(), ex);
-//        } catch (Exception ex) {
-//            log.error(Message.SCHEDULE_ACTIVATE_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_ACTIVATE_ERROR.get(), ex);
-//        }
-//    }
-//
-//    public AppointmentResponse updateById(Principal authentication, UUID scheduleId, AppointmentUpdateRequest request) {
-//        try {
-//
-//            AppointmentEntity entityRequest = converter.updateRequestIntoEntity(request);
-//
-//            AppointmentEntity entity = service.updateById(scheduleId, entityRequest);
-//
-//            return converter.entityIntoResponse(entity);
-//
-//        } catch (GenericNotFoundException ex) {
-//            log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.NOT_FOUND, Message.SCHEDULE_NOT_FOUND_ERROR.get(), ex);
-//        } catch (Exception ex) {
-//            log.error(Message.SCHEDULE_UPDATE_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_UPDATE_ERROR.get(), ex);
-//        }
-//    }
+    public AppointmentResponse create(Principal authentication, AppointmentCreateRequest request) {
+        try {
+            //converte request em entidade
+            AppointmentEntity entityRequest = converter.createRequestIntoEntity(request);
+
+            //cria a entidade
+            AppointmentEntity entity = service.create(entityRequest);
+
+            //converte a entidade na resposta final
+            return converter.entityIntoResponse(entity);
+
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_CREATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_CREATE_ERROR.get(), ex);
+        }
+    }
+
+    public AppointmentResponse updateById(Principal authentication, UUID appointmentId, AppointmentUpdateRequest request) {
+        try {
+            //recupera o agendamento pelo id
+            AppointmentEntity entity = service.findById(appointmentId);
+
+            //converte request em entidade
+            AppointmentEntity entityRequest = converter.updateRequestIntoEntity(request);
+            entity = converter.updateRequestIntoEntity(entityRequest, entity);
+
+            //faz atualizaçao da entidade
+            entity = service.updateById(entity);
+
+            //converte a entidade na resposta final
+            return converter.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_UPDATE_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_UPDATE_ERROR.get(), ex);
+        }
+    }
+
+    public AppointmentResponse setStatus(Principal authentication, AppointmentStatusRequest request) {
+        try {
+            //recupera appointment pelo id
+            AppointmentEntity entity = service.findById(request.getAppointmentId());
+
+            //faz a atualização do status
+            entity = service.setStatus(entity, request);
+
+            //converte a entidade na resposta final
+            return converter.entityIntoResponse(entity);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+        }
+    }
+
+    public List<AppointmentResponse> getByFilter(AppointmentFilterRequest filter ) {
+        try {
+            List<AppointmentEntity> entities = service.findAllByFilter(filter);
+
+            return entities.stream()
+                    .map(c -> converter.entityIntoResponse(c))
+                    .collect(Collectors.toList());
+
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_GET_ERROR.get(), ex);
+        }
+    }
+
 //
 //    public List<AppointmentTableResponse> getByProductId(Principal authentication, UUID companyId) {
 //        try {

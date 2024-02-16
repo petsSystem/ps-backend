@@ -26,5 +26,4 @@ public class SysUserResponse implements Serializable {
     private Address address;
     private List<UUID> companyIds;
     private List<UUID> profileIds;
-    private List<UUID> productIds;
 }

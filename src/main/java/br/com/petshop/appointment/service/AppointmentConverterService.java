@@ -17,29 +17,29 @@ public class AppointmentConverterService {
     @Autowired
     private ModelMapper mapper;
 
-//    public AppointmentEntity createRequestIntoEntity(AppointmentCreateRequest request) {
-//        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-//        return mapper.map(request, AppointmentEntity.class);
-//    }
-//
-//    public AppointmentEntity updateRequestIntoEntity(AppointmentUpdateRequest request) {
-//        AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
-//        entity.setDays(request.getDays());
-//        return entity;
-//    }
-//
-//    public AppointmentEntity updateRequestIntoEntity(AppointmentEntity request, AppointmentEntity entity) {
-//        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-//        mapper.map(request, entity);
-//        entity.setDays(request.getDays());
-//        return entity;
-//    }
-//
-//    public AppointmentResponse entityIntoResponse(AppointmentEntity entity) {
-//        return mapper.map(entity, AppointmentResponse.class);
-//    }
-//
-//    public AppointmentTableResponse entityIntoTableResponse(AppointmentEntity entity) {
-//        return mapper.map(entity, AppointmentTableResponse.class);
-//    }
+    public AppointmentEntity createRequestIntoEntity(AppointmentCreateRequest request) {
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return mapper.map(request, AppointmentEntity.class);
+    }
+
+    public AppointmentEntity updateRequestIntoEntity(AppointmentUpdateRequest request) {
+        AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
+        entity.setAdditionalIds(request.getAdditionalIds());
+        return entity;
+    }
+
+    public AppointmentEntity updateRequestIntoEntity(AppointmentEntity request, AppointmentEntity entity) {
+        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        mapper.map(request, entity);
+        entity.setAdditionalIds(request.getAdditionalIds());
+        return entity;
+    }
+
+    public AppointmentResponse entityIntoResponse(AppointmentEntity entity) {
+        return mapper.map(entity, AppointmentResponse.class);
+    }
+
+    public AppointmentTableResponse entityIntoTableResponse(AppointmentEntity entity) {
+        return mapper.map(entity, AppointmentTableResponse.class);
+    }
 }

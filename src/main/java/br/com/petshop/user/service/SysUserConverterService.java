@@ -26,7 +26,6 @@ public class SysUserConverterService {
         UserEntity entity = mapper.map(request, UserEntity.class);
         entity.setCompanyIds(request.getCompanyIds());
         entity.setProfileIds(request.getProfileIds());
-        entity.setProductIds(request.getProductIds());
 
         return entity;
     }
@@ -40,7 +39,6 @@ public class SysUserConverterService {
         mapper.map(request, entity);
         entity.setCompanyIds(request.getCompanyIds());
         entity.setProfileIds(request.getProfileIds());
-        entity.setProductIds(request.getProductIds());
         return entity;
     }
 
