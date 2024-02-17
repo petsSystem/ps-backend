@@ -172,7 +172,7 @@ public class ScheduleController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<ScheduleTableResponse> getByFilter (
+    public List<ScheduleResponse> getByFilter (
             Principal authentication,
             @RequestParam(value = "companyId", required = true) UUID companyId,
             @RequestParam(value = "userId", required = false) UUID userId,

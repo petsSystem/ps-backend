@@ -2,10 +2,13 @@ package br.com.petshop.appointment.service;
 
 import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
+import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
+import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +25,15 @@ public class AppointmentBusinessUtils {
                 .build();
     }
 
-    public Map<String, List<AppointmentResponse>> createMap() {
+    public Map<String, List<AppointmentResponse>> createMap(ProductResponse product, List<ScheduleResponse> schedules) {
+
+        Integer intervalMinutes = product.getIntervalMinutes();
+
+//        for(ScheduleResponse sch : schedules) {
+//
+//            LocalTime initialTime = LocalTime.parse(sch.getDays().ge)
+//
+//        }
         Map<String, List<AppointmentResponse>> scheduleMap = new HashMap<>();
 
         LocalDate today = LocalDate.now();

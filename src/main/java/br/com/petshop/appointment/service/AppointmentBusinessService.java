@@ -117,7 +117,7 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             List<ScheduleResponse> schedules = scheduleService.getByFilter(authentication, utils.getScheduleFilter(filter));
 
             //criar map com mes/ano
-            Map<String, List<AppointmentResponse>> scheduleMap = utils.createMap();
+            Map<String, List<AppointmentResponse>> scheduleMap = utils.createMap(product, schedules);
 
             //para cada scheduleId
             for (ScheduleResponse schedule : schedules) {

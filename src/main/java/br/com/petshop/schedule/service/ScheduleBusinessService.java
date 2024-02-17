@@ -1,8 +1,5 @@
 package br.com.petshop.schedule.service;
 
-import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
-import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
-import br.com.petshop.appointment.service.AppointmentBusinessService;
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
@@ -22,11 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,7 +29,6 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
     @Autowired private ScheduleService service;
     @Autowired private ScheduleConverterService converter;
     @Autowired private ScheduleValidateService validate;
-    @Autowired private AppointmentBusinessService appointmentService;
     public ScheduleResponse create(Principal authentication, ScheduleCreateRequest request) {
         try {
             //converte request em entidade
@@ -114,22 +106,15 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public List<ScheduleTableResponse> getByFilter(Principal authentication, ScheduleFilterRequest filter ) {
+    public List<ScheduleResponse> getByFilter(Principal authentication, ScheduleFilterRequest filter ) {
         try {
             //recupera todas as agendas pelo filtro
             List<ScheduleEntity> entities = service.findAllByFilter(filter);
 
             //converte a entidade na resposta final
-            List<ScheduleTableResponse> response = entities.stream()
-                    .map(c -> converter.entityIntoTableResponse(c))
+            return entities.stream()
+                    .map(c -> converter.entityIntoResponse(c))
                     .collect(Collectors.toList());
-
-            List<Map<LocalDate, AppointmentResponse>> apps = response.stream()
-                    .map(m -> appointmentService.getByScheduleId(m.getId()))
-                    .collect(Collectors.toList());
-
-
-            return response;
 
         } catch (Exception ex) {
             log.error(Message.SCHEDULE_GET_ERROR.get() + " Error: " + ex.getMessage());
