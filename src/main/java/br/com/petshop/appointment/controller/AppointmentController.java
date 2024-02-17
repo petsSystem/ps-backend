@@ -1,24 +1,21 @@
 package br.com.petshop.appointment.controller;
 
 import br.com.petshop.appointment.model.dto.request.AppointmentCreateRequest;
+import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
-import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.service.AppointmentBusinessService;
-import br.com.petshop.customer.model.dto.request.app.CustomerChangePasswordRequest;
-import br.com.petshop.customer.model.dto.response.CustomerResponse;
-import com.github.fge.jsonpatch.JsonPatch;
+import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
+import br.com.petshop.schedule.model.dto.response.ScheduleTableResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -132,9 +130,39 @@ public class AppointmentController {
             @RequestBody AppointmentStatusRequest request) {
         return businessService.setStatus(authentication, request);
     }
-//
-//
-//
+
+    @Operation(summary = "Serviço de recuperação dos agendamentos por filtro.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar agendamento(s). Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments?productId=\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, List<AppointmentResponse>> getByFilter (
+            Principal authentication,
+            @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "productId", required = true) UUID productId,
+            @RequestParam(value = "userId", required = false) UUID userId) {
+        AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
+                .companyId(companyId)
+                .productId(productId)
+                .userId(userId)
+                .build();
+        return businessService.getByFilter(authentication, filter);
+    }
+
+
+
 //    @Operation(summary = "Serviço de recuperação das agendas pelo id do produto.",
 //            description = "Acesso: ALL")
 //    @ApiResponses(value = {

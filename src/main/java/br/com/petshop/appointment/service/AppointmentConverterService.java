@@ -3,7 +3,6 @@ package br.com.petshop.appointment.service;
 import br.com.petshop.appointment.model.dto.request.AppointmentCreateRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
-import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -24,13 +23,24 @@ public class AppointmentConverterService {
 
     public AppointmentEntity createRequestIntoEntity(AppointmentCreateRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return mapper.map(request, AppointmentEntity.class);
+        AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
+
+        String date = request.getDate().replaceAll("/", "-");
+        entity.setDate(LocalDate.parse(date, dateFormatter));
+        entity.setTime(LocalTime.parse(request.getTime(), timeFormatter));
+
+        return entity;
     }
 
     public AppointmentEntity updateRequestIntoEntity(AppointmentUpdateRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
         entity.setAdditionalIds(request.getAdditionalIds());
+
+        String date = request.getDate().replaceAll("/", "-");
+        entity.setDate(LocalDate.parse(date, dateFormatter));
+        entity.setTime(LocalTime.parse(request.getTime(), timeFormatter));
+
         return entity;
     }
 
@@ -43,13 +53,13 @@ public class AppointmentConverterService {
 
     public AppointmentResponse entityIntoResponse(AppointmentEntity entity) {
         AppointmentResponse appointment =  mapper.map(entity, AppointmentResponse.class);
-        appointment.setDate(LocalDate.parse(entity.getDate(), dateFormatter));
-        appointment.setTime(LocalTime.parse(entity.getTime(), timeFormatter));
+
+        String date = entity.getDate().format(dateFormatter);
+        date = date.replaceAll("-", "/");
+        String time = entity.getTime().format(timeFormatter);
+        appointment.setDate(date);
+        appointment.setTime(time);
 
         return appointment;
-    }
-
-    public AppointmentTableResponse entityIntoTableResponse(AppointmentEntity entity) {
-        return mapper.map(entity, AppointmentTableResponse.class);
     }
 }

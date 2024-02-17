@@ -55,7 +55,7 @@ public class AppointmentService {
     }
 
     public List<AppointmentEntity> findByScheduleId(UUID scheduleId) {
-        return repository.findByScheduleId(scheduleId);
+        return repository.findBySchedule(scheduleId);
     }
 
 

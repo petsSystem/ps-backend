@@ -17,6 +17,4 @@ public class Day implements Serializable {
     private Weekday weekday;
     private String initialTime;
     private String endTime;
-    private Integer simultaneous;
-    private Integer intervalMinutes;
 }

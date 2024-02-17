@@ -11,8 +11,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,8 +29,8 @@ public class AppointmentResponse implements Serializable {
     private String userName;
     private UUID productId;
     private List<UUID> additionalIds;
-    private LocalDate date;
-    private LocalTime time;
+    private String date;
+    private String time;
     private PaymentStatus paymentStatus;
     private PaymentType paymentType;
     private Status status;

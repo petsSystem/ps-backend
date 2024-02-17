@@ -49,8 +49,8 @@ public class AppointmentEntity extends AuditorBaseEntity implements Serializable
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "product_ids", columnDefinition = "jsonb")
     private List<UUID> additionalIds;
-    private String date;
-    private String time;
+    private LocalDate date;
+    private LocalTime time;
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
     private PaymentStatus paymentStatus;

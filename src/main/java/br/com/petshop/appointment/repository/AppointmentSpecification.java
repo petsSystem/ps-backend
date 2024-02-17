@@ -12,9 +12,8 @@ public class AppointmentSpecification {
 
     public static Specification<AppointmentEntity> filter (AppointmentFilterRequest filter) {
         Specification<AppointmentEntity> filters = Specification
-                .where(companyIdEqual(filter.getCompanyId()))
-                .and(userIdEqual(filter.getUserId() == null ? null : filter.getUserId()))
-                .and(productIdEqual(filter.getProductId() == null ? null : filter.getProductId()));
+                .where(productIdEqual(filter.getProductId()))
+                .and(userIdEqual(filter.getUserId() == null ? null : filter.getUserId()));
 
         return filters;
     }
