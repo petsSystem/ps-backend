@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -23,6 +24,7 @@ public class ProductTableResponse implements Serializable {
     private String categoryLabel;
     private BigDecimal amount;
     private Boolean additional;
+    private List<UUID> additionalIds;
     private Boolean active;
 
     public String getCategoryLabel() {

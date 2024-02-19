@@ -37,6 +37,8 @@ public class ProductConverterService {
     }
 
     public ProductTableResponse entityIntoTableResponse(ProductEntity entity) {
-        return mapper.map(entity, ProductTableResponse.class);
+        ProductTableResponse response = mapper.map(entity, ProductTableResponse.class);
+        response.setAdditionalIds(entity.getAdditionalIds());
+        return response;
     }
 }
