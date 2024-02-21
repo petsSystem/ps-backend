@@ -1,4 +1,4 @@
-package br.com.petshop.commons.model;
+package br.com.petshop.schedule.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +8,14 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
+import java.util.List;
 
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Day implements Serializable {
+public class Structure implements Serializable {
     private DayOfWeek weekday;
-    private String initialTime;
-    private String endTime;
+    private List<String> times;
 }

@@ -9,10 +9,6 @@ import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.enums.Message;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
-import br.com.petshop.product.model.dto.response.ProductResponse;
-import br.com.petshop.product.service.ProductBusinessService;
-import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
-import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
 import br.com.petshop.schedule.service.ScheduleBusinessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,25 +18,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class AppointmentBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(AppointmentService.class);
     @Autowired private AppointmentService service;
     @Autowired private AppointmentConverterService converter;
-    @Autowired private ProductBusinessService productService;
-    @Autowired private AppointmentBusinessUtils utils;
     @Autowired private ScheduleBusinessService scheduleService;
+    @Autowired private AppointmentScheduleService appointmentScheduleService;
 
     public AppointmentResponse create(Principal authentication, AppointmentCreateRequest request) {
         try {
@@ -108,55 +100,44 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public Map<String, List<AppointmentResponse>> getByFilter(Principal authentication, AppointmentFilterRequest filter ) {
+    public TreeMap<LocalDate, Boolean> getMonthAvailability(Principal authentication, AppointmentFilterRequest filter) {
         try {
-            //recuperar o product
-            ProductResponse product = productService.getById(authentication, filter.getProductId());
+            //recupero a estrutura do agendamento
+            TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
+                    scheduleService.getStructure(filter.getUserId(), filter.getProductId());
 
-            //recuperar as agendas por productId e/ou userId
-            List<ScheduleResponse> schedules = scheduleService.getByFilter(authentication, utils.getScheduleFilter(filter));
+            //recupero a quantidade de agenda disponivel por horário
+            TreeMap<DayOfWeek, Integer> structureAvailability = scheduleService.getAvailability(structure);
 
-            //criar map com mes/ano
-            Map<String, List<AppointmentResponse>> scheduleMap = utils.createMap(product, schedules);
+            //recupera agendamentos pelo companyId e (userId ou productId)
+            List<AppointmentEntity> appointments = service.findAllByFilter(filter);
 
-            //para cada scheduleId
-            for (ScheduleResponse schedule : schedules) {
-                //recuperar os appointments
-                List<AppointmentEntity> appointments  = service.findByScheduleId(schedule.getId());
-                //para cada appointment
-                for (AppointmentEntity appointment : appointments) {
-                    //verificar mes/ano e incluir na lista do map
-                    String key = utils.getKey(appointment.getDate());
+            //transformar os agendamentos em Map<Data, Agendamento>
+            TreeMap<LocalDate, List<UUID>> appointmentsMap =
+                    appointmentScheduleService.mapAppointmentsDays(appointments);
 
-                    AppointmentResponse response = converter.entityIntoResponse(appointment);
-                    scheduleMap.get(key).add(response);
+            //MERGE DE DISPONIBILIDADE DE AGENDA (visualização mensal) - fixo 3 meses
+            return appointmentScheduleService.getMonthView(structureAvailability, appointments, appointmentsMap);
 
-//                    List<AppointmentResponse> apps = new ArrayList<>();
-//                    apps.addAll(map.get(app.getDate()));
-//                    apps.add(app);
-//                    map.put(app.getDate(), apps);
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+        }
+    }
+    public AppointmentResponse getById(Principal authentication, UUID appointmentId) {
+        try {
+            AppointmentEntity entity = service.findById(appointmentId);
+            return converter.entityIntoResponse(entity);
 
-                }
-            }
-
-
-            //arrumar o find do appointment... hoje ele pega todos do scheudle id.
-            //precisarei pegar por query... pegar todos os appointments do schedule id cujo date
-            //seja maior que a data atual
-
-            return scheduleMap;
-
-
-
-
-//
-//
-//            List<AppointmentEntity> entities = service.findAllByFilter(filter);
-//
-//            return entities.stream()
-//                    .map(c -> converter.entityIntoResponse(c))
-//                    .collect(Collectors.toList());
-
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
             log.error(Message.APPOINTMENT_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -164,65 +145,7 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
-//    public Map<LocalDate, List<AppointmentResponse>> getByScheduleId(UUID scheduleId) {
-//
-//        List<AppointmentEntity> entities = service.findByScheduleId(scheduleId);
-//        List<AppointmentResponse> appointments = entities.stream()
-//                .map(c -> converter.entityIntoResponse(c))
-//                .collect(Collectors.toList());
-//
-//        Collections.sort(appointments, Comparator.comparing(AppointmentResponse::getDate));
-//
-//        Map<LocalDate, List<AppointmentResponse>> map = new HashMap<>();
-//
-//        for (AppointmentResponse app : appointments) {
-//            if (map.isEmpty() || map.get(app.getDate()) == null) {
-//                map.put(app.getDate(), List.of(app));
-//            } else {
-//                List<AppointmentResponse> apps = new ArrayList<>();
-//                apps.addAll(map.get(app.getDate()));
-//                apps.add(app);
-//                map.put(app.getDate(), apps);
-//            }
-//        }
-//
-//        return map;
-//
-//    }
-
-//
-//    public List<AppointmentTableResponse> getByProductId(Principal authentication, UUID companyId) {
-//        try {
-//            List<AppointmentEntity> entities = service.findAllByProductId(companyId);
-//
-//            List<AppointmentTableResponse> response = entities.stream()
-//                    .map(c -> converter.entityIntoTableResponse(c))
-//                    .collect(Collectors.toList());
-//
-//            Collections.sort(response, Comparator.comparing(AppointmentTableResponse::getActive).reversed());
-//
-//            return response;
-//
-//        } catch (Exception ex) {
-//            log.error(Message.SCHEDULE_GET_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_GET_ERROR.get(), ex);
-//        }
-//    }
-//
-//    public AppointmentResponse getById(Principal authentication, UUID scheduleId) {
-//        try {
-//            AppointmentEntity entity = service.findById(scheduleId);
-//            return converter.entityIntoResponse(entity);
-//
-//        } catch (GenericNotFoundException ex) {
-//            log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.NOT_FOUND, Message.SCHEDULE_NOT_FOUND_ERROR.get(), ex);
-//        } catch (Exception ex) {
-//            log.error(Message.SCHEDULE_GET_ERROR.get() + " Error: " + ex.getMessage());
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_GET_ERROR.get(), ex);
-//        }
-//    }
+    public Map<String, List<AppointmentResponse>> getDayAvailability(Principal authentication, AppointmentFilterRequest filter) {
+        return null;
+    }
 }

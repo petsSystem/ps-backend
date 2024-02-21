@@ -14,8 +14,8 @@ public class ScheduleSpecification {
     public static Specification<ScheduleEntity> filter (ScheduleFilterRequest filter) {
         Specification<ScheduleEntity> filters = Specification
                 .where(companyIdEqual(filter.getCompanyId()))
-                .and(userIdEqual(filter.getUserId()))
-                .and(productIdInList(filter.getProductId()));
+                .and(productIdInList(filter.getProductId()))
+                .and(userIdEqual(filter.getUserId()));
 
         return filters;
     }

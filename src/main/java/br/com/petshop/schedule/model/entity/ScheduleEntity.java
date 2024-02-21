@@ -2,6 +2,7 @@ package br.com.petshop.schedule.model.entity;
 
 import br.com.petshop.commons.audit.AuditorBaseEntity;
 import br.com.petshop.commons.model.Day;
+import br.com.petshop.schedule.model.dto.Structure;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -16,7 +17,6 @@ import org.hibernate.type.SqlTypes;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
-
 
 @Builder
 @Getter
@@ -41,4 +41,7 @@ public class ScheduleEntity extends AuditorBaseEntity implements Serializable {
     @Column(name = "days", columnDefinition = "jsonb")
     private List<Day> days;
     private Boolean active;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "structure", columnDefinition = "jsonb")
+    private List<Structure> structure;
 }

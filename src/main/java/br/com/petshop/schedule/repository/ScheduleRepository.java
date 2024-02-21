@@ -1,8 +1,12 @@
 package br.com.petshop.schedule.repository;
 
+import br.com.petshop.product.model.entity.ProductEntity;
 import br.com.petshop.schedule.model.entity.ScheduleEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +16,10 @@ import java.util.UUID;
 @Repository
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Integer> {
     Optional<ScheduleEntity> findById(UUID scheduleId);
-
     Optional<ScheduleEntity> findByIdAndCategoryId(UUID scheduleId, UUID categoryId);
     List<ScheduleEntity> findAll(Specification<ScheduleEntity> filter);
+    Optional<ScheduleEntity> findByUserId(UUID userId);
+
+    @Query(value = "SELECT * FROM schedule WHERE product_ids in (:productId)", nativeQuery = true)
+    List<ScheduleEntity> findByProductId(UUID productId);
 }

@@ -7,7 +7,6 @@ import br.com.petshop.appointment.model.enums.Status;
 import br.com.petshop.appointment.repository.AppointmentRepository;
 import br.com.petshop.appointment.repository.AppointmentSpecification;
 import br.com.petshop.commons.exception.GenericNotFoundException;
-import br.com.petshop.schedule.model.entity.ScheduleEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,8 +6,6 @@ import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
 import br.com.petshop.appointment.service.AppointmentBusinessService;
-import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
-import br.com.petshop.schedule.model.dto.response.ScheduleTableResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -28,8 +26,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 @RestController
@@ -131,7 +131,67 @@ public class AppointmentController {
         return businessService.setStatus(authentication, request);
     }
 
-    @Operation(summary = "Serviço de recuperação dos agendamentos por filtro.",
+    @Operation(summary = "Serviço de recuperação da disponibilidade dos dias dos próximos 3 meses.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar disponibilidade de agenda. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments?companyId=&productId=&userId=\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/month")
+    @ResponseStatus(HttpStatus.OK)
+    public TreeMap<LocalDate, Boolean> getMonthAvailability (
+            Principal authentication,
+            @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "productId", required = true) UUID productId,
+            @RequestParam(value = "userId", required = false) UUID userId) {
+        AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
+                .companyId(companyId)
+                .productId(productId)
+                .userId(userId)
+                .build();
+        return businessService.getMonthAvailability(authentication, filter);
+    }
+
+    @Operation(summary = "Serviço de recuperação da disponibilidade do dia informado.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar disponibilidade de agenda. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments?companyId=&productId=&userId=\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/day")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, List<AppointmentResponse>> getDayAvailability (
+            Principal authentication,
+            @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "productId", required = true) UUID productId,
+            @RequestParam(value = "userId", required = false) UUID userId) {
+        AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
+                .companyId(companyId)
+                .productId(productId)
+                .userId(userId)
+                .build();
+        return businessService.getDayAvailability(authentication, filter);
+    }
+
+    @Operation(summary = "Serviço de recuperação das informações da agenda pelo id.",
             description = "Acesso: ALL")
     @ApiResponses(value = {
             @ApiResponse(
@@ -142,81 +202,26 @@ public class AppointmentController {
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
                             "\"detail\": \"Erro ao recuperar agendamento(s). Tente novamente mais tarde.\",\n" +
-                            "\"instance\": \"/api/v1/pet/appointments?productId=\"\n" +
+                            "\"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
+                            "}\n" +
+                            "\n")})}),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Agendamento não encontrado.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "    \"type\": \"about:blank\",\n" +
+                            "    \"title\": \"Not Found\",\n" +
+                            "    \"status\": 404,\n" +
+                            "    \"detail\": \"Agendamento não encontrado.\",\n" +
+                            "    \"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
                             "}\n" +
                             "\n")})})
     })
-    @GetMapping()
+    @GetMapping("/{appointmentId}")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, List<AppointmentResponse>> getByFilter (
+    public AppointmentResponse getById (
             Principal authentication,
-            @RequestParam(value = "companyId", required = true) UUID companyId,
-            @RequestParam(value = "productId", required = true) UUID productId,
-            @RequestParam(value = "userId", required = false) UUID userId) {
-        AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
-                .companyId(companyId)
-                .productId(productId)
-                .userId(userId)
-                .build();
-        return businessService.getByFilter(authentication, filter);
+            @PathVariable("scheduleId") UUID appointmentId) {
+        return businessService.getById(authentication, appointmentId);
     }
-
-
-
-//    @Operation(summary = "Serviço de recuperação das agendas pelo id do produto.",
-//            description = "Acesso: ALL")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao recuperar agenda(s). Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules?productId=\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @GetMapping()
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<AppointmentTableResponse> getByProductId (
-//            Principal authentication,
-//            @RequestParam("productId") UUID productId) {
-//        return facade.getByProductId(authentication, productId);
-//    }
-//
-//    @Operation(summary = "Serviço de recuperação das informações da agenda pelo id.",
-//            description = "Acesso: ALL")
-//    @ApiResponses(value = {
-//            @ApiResponse(
-//                    responseCode = "400",
-//                    description = "Erro no sistema.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "\"type\": \"about:blank\",\n" +
-//                            "\"title\": \"Bad Request\",\n" +
-//                            "\"status\": 400,\n" +
-//                            "\"detail\": \"Erro ao recuperar agenda(s). Tente novamente mais tarde.\",\n" +
-//                            "\"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-//                            "}\n" +
-//                            "\n")})}),
-//            @ApiResponse(
-//                    responseCode = "404",
-//                    description = "Agenda não encontrada.",
-//                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
-//                            "    \"type\": \"about:blank\",\n" +
-//                            "    \"title\": \"Not Found\",\n" +
-//                            "    \"status\": 404,\n" +
-//                            "    \"detail\": \"Agenda não encontrada.\",\n" +
-//                            "    \"instance\": \"/api/v1/pet/schedules/{scheduleId}\"\n" +
-//                            "}\n" +
-//                            "\n")})})
-//    })
-//    @GetMapping("/{scheduleId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public AppointmentResponse getById (
-//            Principal authentication,
-//            @PathVariable("scheduleId") UUID scheduleId) {
-//        return facade.getById(authentication, scheduleId);
-//    }
 }
