@@ -5,6 +5,7 @@ import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
+import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.service.AppointmentBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -178,8 +181,9 @@ public class AppointmentController {
     })
     @GetMapping("/day")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, List<AppointmentResponse>> getDayAvailability (
+    public TreeMap<LocalTime, List<AppointmentEntity>> getDayAvailability (
             Principal authentication,
+            @RequestParam(value = "date", required = true) String date,
             @RequestParam(value = "companyId", required = true) UUID companyId,
             @RequestParam(value = "productId", required = true) UUID productId,
             @RequestParam(value = "userId", required = false) UUID userId) {
@@ -188,7 +192,10 @@ public class AppointmentController {
                 .productId(productId)
                 .userId(userId)
                 .build();
-        return businessService.getDayAvailability(authentication, filter);
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate dateFormatted = LocalDate.parse(date, dateFormatter);
+        return businessService.getDayAvailability(authentication, dateFormatted, filter);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da agenda pelo id.",

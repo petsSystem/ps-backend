@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -65,5 +66,19 @@ public class AppointmentScheduleService {
         System.out.println(availableDays);
 
         return availableDays;
+    }
+
+    public static TreeMap<LocalTime, List<AppointmentEntity>> mapAppointments(LocalDate date, List<AppointmentEntity> appointments) {
+        TreeMap<LocalTime, List<AppointmentEntity>> mapAppointments = new TreeMap<>();
+        for(AppointmentEntity app: appointments) {
+            if (app.getDate().equals(date)) {
+                List<AppointmentEntity> appointmentsTime = mapAppointments.get(app.getTime());
+                if (appointmentsTime == null)
+                    appointmentsTime = new ArrayList<>();
+                appointmentsTime.add(app);
+                mapAppointments.put(app.getTime(), appointmentsTime);
+            }
+        }
+        return mapAppointments;
     }
 }

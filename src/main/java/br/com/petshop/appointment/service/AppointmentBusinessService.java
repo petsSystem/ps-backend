@@ -129,6 +129,30 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
                     HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
         }
     }
+
+    public TreeMap<LocalTime, List<AppointmentEntity>> getDayAvailability(Principal authentication, LocalDate date, AppointmentFilterRequest filter) {
+        try {
+            //recupero a estrutura do agendamento
+            TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
+                    scheduleService.getStructure(filter.getUserId(), filter.getProductId());
+
+            //recupera agendamentos pelo companyId e (userId ou productId)
+            List<AppointmentEntity> appointments = service.findAllByFilter(filter);
+
+            //transformar os agendamentos em Map<Time, List<Agendamento>>
+            return appointmentScheduleService.mapAppointments(date, appointments);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+        }
+    }
+
     public AppointmentResponse getById(Principal authentication, UUID appointmentId) {
         try {
             AppointmentEntity entity = service.findById(appointmentId);
@@ -143,9 +167,5 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.APPOINTMENT_GET_ERROR.get(), ex);
         }
-    }
-
-    public Map<String, List<AppointmentResponse>> getDayAvailability(Principal authentication, AppointmentFilterRequest filter) {
-        return null;
     }
 }

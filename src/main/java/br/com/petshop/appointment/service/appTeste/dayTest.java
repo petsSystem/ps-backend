@@ -21,39 +21,62 @@ public class dayTest {
 
     public static void main(String[] args) {
 
+//        //mock de agendas de usuarios
+//        List<Schedule> schedules = mockUserSchedules();
+//
+//        //CRIO A AGENDA MATRIZ DE DISPONIBILIDADE (AGENDA DE TODOS OS SCHEDULES MERGEADOS)
+//        TreeMap<DayOfWeek, TreeMap<LocalTime, List<Integer>>> mapSchedule = createScheduleStructure(schedules);
+//
+//        //VERIFICAR A QUANTIDADE DE AGENDAMENTOS POSSIVEIS POR DIA DA SEMANA
+//        mapSchedule.forEach((k, v) -> availability(k, v));
+//        System.out.println("AVAILABLE: " + available);
+//
+//        //CRIAR OS AGENDAMENTOS
+//        List<Appointment> appointments = mockAppointments();
+//
+//        //RECUPERAR TODOS OS APPOINTMENTS e separa-los por dia
+//        TreeMap<LocalDate, List<Integer>> mapAppointments = mapAppointmentsDays(appointments);
+//
+//        //MERGE DE DISPONIBILIDADE DE AGENDA (visualização mensal) - fixo 3 meses
+//        TreeMap<LocalDate, Boolean> availableMensalDays = getMensalView(appointments, mapAppointments);
+//
+//        LocalDate today = LocalDate.now();
+//        //MERGE DE DISPONIBILIDADE DE AGENDA NO DIA
+
+        TreeMap<LocalTime, List<Appointment>> availableDay = getDayView(LocalDate.now());
+        System.out.println(availableDay);
+
+    }
+
+    private static TreeMap<LocalTime, List<Appointment>> getDayView(LocalDate date) {
+
         //mock de agendas de usuarios
         List<Schedule> schedules = mockUserSchedules();
 
         //CRIO A AGENDA MATRIZ DE DISPONIBILIDADE (AGENDA DE TODOS OS SCHEDULES MERGEADOS)
         TreeMap<DayOfWeek, TreeMap<LocalTime, List<Integer>>> mapSchedule = createScheduleStructure(schedules);
-        
-        //VERIFICAR A QUANTIDADE DE AGENDAMENTOS POSSIVEIS POR DIA DA SEMANA
-        mapSchedule.forEach((k, v) -> availability(k, v));
-        System.out.println("AVAILABLE: " + available);
 
         //CRIAR OS AGENDAMENTOS
         List<Appointment> appointments = mockAppointments();
 
-        //RECUPERAR TODOS OS APPOINTMENTS e separa-los por dia
-        TreeMap<LocalDate, List<Integer>> mapAppointments = mapAppointmentsDays(appointments);
-
-        //MERGE DE DISPONIBILIDADE DE AGENDA (visualização mensal) - fixo 3 meses
-        TreeMap<LocalDate, Boolean> availableMensalDays = getMensalView(appointments, mapAppointments);
-
-        LocalDate today = LocalDate.now();
-        //MERGE DE DISPONIBILIDADE DE AGENDA NO DIA
-        TreeMap<DayOfWeek, TreeMap<LocalTime, List<Integer>>> availableWeekDay = getWeekView(today);
-
-        TreeMap<LocalTime, List<Integer>> availableDay = getDayView(today);
+        //RECUPERAR TODOS OS APPOINTMENTS do dia e separa-los por horario
+        return mapAppointments(date, appointments);
 
     }
 
-    private static TreeMap<LocalTime, List<Integer>> getDayView(LocalDate today) {
-        return null;
-    }
+    private static TreeMap<LocalTime, List<Appointment>> mapAppointments(LocalDate date, List<Appointment> appointments) {
+        TreeMap<LocalTime, List<Appointment>> mapAppointments = new TreeMap<>();
+        for(Appointment app: appointments) {
+            if (app.getDate().equals(date)) {
+                List<Appointment> appointmentsTime = mapAppointments.get(app.getTime());
+                if (appointmentsTime == null)
+                    appointmentsTime = new ArrayList<>();
+                appointmentsTime.add(app);
+                mapAppointments.put(app.getTime(), appointments);
+            }
+        }
 
-    private static TreeMap<DayOfWeek, TreeMap<LocalTime, List<Integer>>> getWeekView(LocalDate today) {
-        return null;
+        return mapAppointments;
     }
 
     private static TreeMap<LocalDate, Boolean> getMensalView(List<Appointment> appointments, TreeMap<LocalDate, List<Integer>> mapAppointments) {
@@ -213,7 +236,7 @@ public class dayTest {
         Appointment app = Appointment.builder()
                 .id(1)
                 .scheduleId(1)
-                .date(LocalDate.parse("19-02-2023", dateFormatter))
+                .date(LocalDate.parse("19-02-2024", dateFormatter))
                 .time(LocalTime.parse("09:00", timeFormatter))
                 .name("Sophie")
                 .build();
@@ -223,7 +246,7 @@ public class dayTest {
         app = Appointment.builder()
                 .id(2)
                 .scheduleId(1)
-                .date(LocalDate.parse("19-02-2023", dateFormatter))
+                .date(LocalDate.parse("19-02-2024", dateFormatter))
                 .time(LocalTime.parse("09:30", timeFormatter))
                 .name("Lady")
                 .build();
@@ -233,7 +256,7 @@ public class dayTest {
         app = Appointment.builder()
                 .id(3)
                 .scheduleId(1)
-                .date(LocalDate.parse("21-02-2023", dateFormatter))
+                .date(LocalDate.parse("21-02-2024", dateFormatter))
                 .time(LocalTime.parse("07:00", timeFormatter))
                 .name("Sara")
                 .build();
@@ -243,7 +266,7 @@ public class dayTest {
         app = Appointment.builder()
                 .id(4)
                 .scheduleId(2)
-                .date(LocalDate.parse("21-02-2023", dateFormatter))
+                .date(LocalDate.parse("21-02-2024", dateFormatter))
                 .time(LocalTime.parse("09:00", timeFormatter))
                 .name("Sophie")
                 .build();
