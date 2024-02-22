@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,9 +190,24 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public TreeMap<DayOfWeek, Integer> getAvailability(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
+    public TreeMap<DayOfWeek, Integer> getWeekDayAvailability(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
         try {
-            return structureService.getAvailability(structure);
+            return structureService.getWeekDayAvailability(structure);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.SCHEDULE_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.SCHEDULE_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.SCHEDULE_GET_ERROR.get(), ex);
+        }
+    }
+
+    public TreeMap<LocalTime, Integer> getTimeAvailability(LocalDate date, TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
+        try {
+            return structureService.getTimeAvailability(date, structure);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.SCHEDULE_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

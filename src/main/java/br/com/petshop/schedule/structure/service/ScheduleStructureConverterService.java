@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 public class ScheduleStructureConverterService {
 
-    public List<Structure> mapIntoList(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> mapSchedule) {
+    public List<Structure> mapToList(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> mapSchedule) {
         List<Structure> structures = new ArrayList<>();
         for (DayOfWeek dow : mapSchedule.keySet()) {
             TreeMap<LocalTime, List<UUID>> mapTimes = mapSchedule.get(dow);

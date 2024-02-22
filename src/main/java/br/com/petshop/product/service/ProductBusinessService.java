@@ -131,24 +131,20 @@ public class ProductBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public Page<ProductTableResponse> getAll(Principal authentication, Pageable paging, UUID companyId, Boolean additional) {
+    public Page<ProductTableResponse> getAll(Principal authentication, Pageable paging, UUID companyId, UUID categoryId, Boolean additional) {
         try {
             //recupera todos os produtos pelo companyId
-            Page<ProductEntity> entities = service.findAllByCompanyId(companyId, additional, paging);
+            Page<ProductEntity> entities = service.findAllByCompanyId(companyId, categoryId, additional, paging);
 
             //recupera todas as categorias ativas pelo companyId
-            List<CategoryResponse> categories = categoryBusinessService
-                    .getAllByCompanyId(null, companyId, true);
-
-            //separo cada categoria em um map, sendo o id da categoria a chave
-            Map<UUID, CategoryResponse> mapCategories = categories.stream()
-                    .collect(Collectors.toMap(CategoryResponse::getId, Function.identity()));
+            CategoryResponse category = categoryBusinessService
+                    .getById(authentication, categoryId);
 
             //converto a entidade em resposta e seto o tipo de categoria na resposta
             List<ProductTableResponse> response = entities.stream()
                     .map(c -> {
                         ProductTableResponse resp = converter.entityIntoTableResponse(c);
-                        resp.setCategory(mapCategories.get(c.getCategoryId()).getType());
+                        resp.setCategory(category.getType());
                         return resp;
                     })
                     .collect(Collectors.toList());

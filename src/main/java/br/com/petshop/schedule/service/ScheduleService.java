@@ -2,8 +2,6 @@ package br.com.petshop.schedule.service;
 
 import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
-import br.com.petshop.company.model.entity.CompanyEntity;
-import br.com.petshop.product.model.entity.ProductEntity;
 import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
 import br.com.petshop.schedule.model.entity.ScheduleEntity;
 import br.com.petshop.schedule.repository.ScheduleRepository;
@@ -18,8 +16,6 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 

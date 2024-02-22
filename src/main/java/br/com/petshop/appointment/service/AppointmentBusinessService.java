@@ -106,18 +106,18 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
                     scheduleService.getStructure(filter.getUserId(), filter.getProductId());
 
-            //recupero a quantidade de agenda disponivel por horário
-            TreeMap<DayOfWeek, Integer> structureAvailability = scheduleService.getAvailability(structure);
+            //recupero a quantidade de agenda disponivel por dia da semana
+            TreeMap<DayOfWeek, Integer> structureAvailability = scheduleService.getWeekDayAvailability(structure);
 
-            //recupera agendamentos pelo companyId e (userId ou productId)
+            //recupera agendamentos pelo companyId, productId, userId (opcional)
             List<AppointmentEntity> appointments = service.findAllByFilter(filter);
 
             //transformar os agendamentos em Map<Data, Agendamento>
-            TreeMap<LocalDate, List<UUID>> appointmentsMap =
-                    appointmentScheduleService.mapAppointmentsDays(appointments);
+            TreeMap<LocalDate, List<AppointmentEntity>> appointmentsMap =
+                    appointmentScheduleService.mapAppointments(appointments);
 
             //MERGE DE DISPONIBILIDADE DE AGENDA (visualização mensal) - fixo 3 meses
-            return appointmentScheduleService.getMonthView(structureAvailability, appointments, appointmentsMap);
+            return appointmentScheduleService.getMonthView(structureAvailability, appointmentsMap);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
@@ -130,7 +130,37 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
-    public TreeMap<LocalTime, List<AppointmentEntity>> getDayAvailability(Principal authentication, LocalDate date, AppointmentFilterRequest filter) {
+    public TreeMap<LocalTime, Boolean> getDayAvailability(Principal authentication, AppointmentFilterRequest filter) {
+        try {
+            //recupero a estrutura do agendamento completo
+            TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
+                    scheduleService.getStructure(filter.getUserId(), filter.getProductId());
+
+            //recupero a quantidade de agenda disponivel por horario do dia
+            TreeMap<LocalTime, Integer> structureTimeAvailability = scheduleService.getTimeAvailability(filter.getDate(), structure);
+
+            //recupera agendamentos pelo companyId, productId, userId (opcional) e date (opcional)
+            List<AppointmentEntity> appointments = service.findAllByFilter(filter);
+
+            //transformar os agendamentos em Map<Time, Agendamento>
+            TreeMap<LocalTime, List<AppointmentEntity>> appointmentsTimeMap =
+                    appointmentScheduleService.mapAppointmentsTime(appointments);
+
+            //MERGE DE DISPONIBILIDADE DE AGENDA (visualização dia)
+            return appointmentScheduleService.getDateTimeView(structureTimeAvailability, appointmentsTimeMap);
+
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+        }
+    }
+
+    public TreeMap<LocalTime, List<AppointmentEntity>> schedule(Principal authentication, AppointmentFilterRequest filter) {
         try {
             //recupero a estrutura do agendamento
             TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
@@ -140,7 +170,7 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             List<AppointmentEntity> appointments = service.findAllByFilter(filter);
 
             //transformar os agendamentos em Map<Time, List<Agendamento>>
-            return appointmentScheduleService.mapAppointments(date, appointments);
+            return null;//appointmentScheduleService.mapAppointments(appointments);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

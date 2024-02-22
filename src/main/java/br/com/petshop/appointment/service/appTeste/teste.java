@@ -1,4 +1,4 @@
-package br.com.petshop.appointment.service;
+package br.com.petshop.appointment.service.appTeste;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,6 +8,16 @@ import java.time.format.DateTimeFormatter;
 public class teste {
 
     public static void main(String[] args) {
+
+        String date = "2024-02-21";
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateFormatted = LocalDate.parse(date, dateFormatter);
+
+        System.out.println(dateFormatted);
+
+
+
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
         String data = "14-02-2024 17:56";

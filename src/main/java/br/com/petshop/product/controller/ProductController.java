@@ -220,9 +220,10 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "categoryId", required = true) UUID categoryId,
             @RequestParam(value = "additional", required = false) Boolean additional) {
         Pageable paging = PageRequest.of(page, size);
-        return businessService.getAll(authentication, paging, companyId, additional);
+        return businessService.getAll(authentication, paging, companyId, categoryId, additional);
     }
 
     @Operation(summary = "Serviço de recuperação das informações do(s) produto(s)/serviço(s) pelo id.",

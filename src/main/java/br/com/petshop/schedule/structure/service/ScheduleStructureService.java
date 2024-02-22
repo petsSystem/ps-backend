@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ScheduleStructureService {
         TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> mapSchedule =
                 createScheduleStructure(intervalMinutes, schedules);
 
-        List<Structure> structures = converter.mapIntoList(mapSchedule);
+        List<Structure> structures = converter.mapToList(mapSchedule);
         entity.setStructure(structures);
 
         scheduleService.update(entity);
@@ -191,7 +192,7 @@ public class ScheduleStructureService {
             structure.setProductId(productId);
         }
 
-        List<Structure> structureList = converter.mapIntoList(mapSchedule);
+        List<Structure> structureList = converter.mapToList(mapSchedule);
         structure.setStructure(structureList);
 
         return repository.save(structure);
@@ -211,11 +212,11 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Returns a number of available appointments for a specific time of a structure.
+     * Returns a number of available appointments for a specific day of week of a structure.
      * @param structure
      * @return
      */
-    public TreeMap<DayOfWeek, Integer> getAvailability(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
+    public TreeMap<DayOfWeek, Integer> getWeekDayAvailability(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
         TreeMap<DayOfWeek, Integer> available = new TreeMap<>();
 
         for (DayOfWeek dow : structure.keySet()) {
@@ -225,6 +226,27 @@ public class ScheduleStructureService {
                 count = 0;
             count = count + times.size();
             available.put(dow, count);
+        }
+        return available;
+    }
+
+    /**
+     * Returns a number of available appointments for a specific time of a day of a structure.
+     * @param date
+     * @param structure
+     * @return
+     */
+    public TreeMap<LocalTime, Integer> getTimeAvailability(LocalDate date, TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
+        TreeMap<LocalTime, Integer> available = new TreeMap<>();
+        TreeMap<LocalTime, List<UUID>> times = structure.get(date.getDayOfWeek());
+
+        for (LocalTime time : times.keySet()) {
+            List<UUID> appointmentIds = times.get(time);
+            Integer count = available.get(time);
+            if (count == null)
+                count = 0;
+            count = count + appointmentIds.size();
+            available.put(time, count);
         }
         return available;
     }

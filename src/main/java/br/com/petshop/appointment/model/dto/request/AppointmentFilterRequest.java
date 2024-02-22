@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Builder
@@ -18,4 +19,5 @@ public class AppointmentFilterRequest implements Serializable {
     private UUID companyId;
     private UUID productId;
     private UUID userId;
+    private LocalDate date;
 }

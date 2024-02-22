@@ -181,21 +181,61 @@ public class AppointmentController {
     })
     @GetMapping("/day")
     @ResponseStatus(HttpStatus.OK)
-    public TreeMap<LocalTime, List<AppointmentEntity>> getDayAvailability (
+    public TreeMap<LocalTime, Boolean> getDayAvailability (
             Principal authentication,
             @RequestParam(value = "date", required = true) String date,
             @RequestParam(value = "companyId", required = true) UUID companyId,
             @RequestParam(value = "productId", required = true) UUID productId,
             @RequestParam(value = "userId", required = false) UUID userId) {
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateFormatted = LocalDate.parse(date, dateFormatter);
+
         AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
                 .companyId(companyId)
                 .productId(productId)
                 .userId(userId)
+                .date(dateFormatted)
                 .build();
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return businessService.getDayAvailability(authentication, filter);
+    }
+
+    @Operation(summary = "Serviço de recuperação da disponibilidade do dia informado.",
+            description = "Acesso: ALL")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro no sistema.",
+                    content = { @Content(examples = {@ExampleObject(value = "{\n" +
+                            "\"type\": \"about:blank\",\n" +
+                            "\"title\": \"Bad Request\",\n" +
+                            "\"status\": 400,\n" +
+                            "\"detail\": \"Erro ao recuperar disponibilidade de agenda. Tente novamente mais tarde.\",\n" +
+                            "\"instance\": \"/api/v1/pet/appointments?companyId=&productId=&userId=\"\n" +
+                            "}\n" +
+                            "\n")})})
+    })
+    @GetMapping("/schedule")
+    @ResponseStatus(HttpStatus.OK)
+    public TreeMap<LocalTime, List<AppointmentEntity>> schedule (
+            Principal authentication,
+            @RequestParam(value = "date", required = true) String date,
+            @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "productId", required = true) UUID productId,
+            @RequestParam(value = "userId", required = false) UUID userId) {
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dateFormatted = LocalDate.parse(date, dateFormatter);
-        return businessService.getDayAvailability(authentication, dateFormatted, filter);
+
+        AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
+                .companyId(companyId)
+                .productId(productId)
+                .userId(userId)
+                .date(dateFormatted)
+                .build();
+
+        return businessService.schedule(authentication, filter);
     }
 
     @Operation(summary = "Serviço de recuperação das informações da agenda pelo id.",

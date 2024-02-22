@@ -14,22 +14,21 @@ import java.util.UUID;
 @Service
 public class AppointmentScheduleService {
 
-    public static TreeMap<LocalDate, List<UUID>> mapAppointmentsDays(List<AppointmentEntity> appointments) {
-        TreeMap<LocalDate, List<UUID>> mapAppointments = new TreeMap<>();
+    public static TreeMap<LocalDate, List<AppointmentEntity>> mapAppointments(List<AppointmentEntity> appointments) {
+        TreeMap<LocalDate, List<AppointmentEntity>> mapAppointments = new TreeMap<>();
         for(AppointmentEntity app: appointments) {
-            List<UUID> appointmentIds = mapAppointments.get(app.getDate());
-            if (appointmentIds == null)
-                appointmentIds = new ArrayList<>();
-            appointmentIds.add(app.getId());
-            mapAppointments.put(app.getDate(), appointmentIds);
+            List<AppointmentEntity> appointment = mapAppointments.get(app.getDate());
+            if (appointment == null)
+                appointment = new ArrayList<>();
+            appointment.add(app);
+            mapAppointments.put(app.getDate(), appointment);
         }
 
         return mapAppointments;
     }
 
     public TreeMap<LocalDate, Boolean> getMonthView( TreeMap<DayOfWeek, Integer> structureAvailability,
-                                                     List<AppointmentEntity> appointments,
-                                                     TreeMap<LocalDate, List<UUID>> appointmentsMap) {
+                                                     TreeMap<LocalDate, List<AppointmentEntity>> appointmentsMap) {
         TreeMap<LocalDate, Boolean> availableDays = new TreeMap<>();
 
         LocalDate day = LocalDate.now();
@@ -37,21 +36,18 @@ public class AppointmentScheduleService {
         LocalDate finalDay = day.plusDays(30);
 
         while (day.isBefore(finalDay)) {
-            //verificar qual o dia da semana do dia
-            DayOfWeek week = day.getDayOfWeek();
-
-            Integer schedAvailable = structureAvailability.get(week);
+            Integer schedAvailable = structureAvailability.get(day.getDayOfWeek());
 
             if (schedAvailable == null) {
                 //petshop nao atende nesse dia da semana
                 availableDays.put(day, false);
             } else {
-                List<UUID> appointmentsTime = appointmentsMap.get(day);
+                List<AppointmentEntity> appointmentsTime = appointmentsMap.get(day);
                 if (appointmentsTime == null) {
                     //há agendamentos vazios
                     availableDays.put(day, true);
                 } else {
-                    if (schedAvailable - appointments.size() > 0) {
+                    if ((schedAvailable - appointmentsTime.size()) > 0) {
                         //há agendamentos vazios
                         availableDays.put(day, true);
                     } else {
@@ -62,23 +58,45 @@ public class AppointmentScheduleService {
             }
             day = day.plusDays(1);
         }
-
-        System.out.println(availableDays);
-
         return availableDays;
     }
 
-    public static TreeMap<LocalTime, List<AppointmentEntity>> mapAppointments(LocalDate date, List<AppointmentEntity> appointments) {
+    public static TreeMap<LocalTime, List<AppointmentEntity>> mapAppointmentsTime(List<AppointmentEntity> appointments) {
         TreeMap<LocalTime, List<AppointmentEntity>> mapAppointments = new TreeMap<>();
         for(AppointmentEntity app: appointments) {
-            if (app.getDate().equals(date)) {
-                List<AppointmentEntity> appointmentsTime = mapAppointments.get(app.getTime());
-                if (appointmentsTime == null)
-                    appointmentsTime = new ArrayList<>();
-                appointmentsTime.add(app);
-                mapAppointments.put(app.getTime(), appointmentsTime);
+            List<AppointmentEntity> appointment = mapAppointments.get(app.getTime());
+            if (appointment == null)
+                appointment = new ArrayList<>();
+            appointment.add(app);
+            mapAppointments.put(app.getTime(), appointment);
+        }
+
+        return mapAppointments;
+    }
+
+    public TreeMap<LocalTime, Boolean> getDateTimeView(
+            TreeMap<LocalTime, Integer> structureAvailability,
+            TreeMap<LocalTime, List<AppointmentEntity>> appointmentsTimeMap) {
+
+        TreeMap<LocalTime, Boolean> available = new TreeMap<>();
+
+        for (LocalTime time : structureAvailability.keySet()) {
+            Integer timeAvailable = structureAvailability.get(time);
+            List<AppointmentEntity> appointments = appointmentsTimeMap.get(time);
+
+            if (appointments == null) {
+                //há agendamentos vazios
+                available.put(time, true);
+            } else {
+                if ((timeAvailable - appointments.size()) > 0) {
+                    //há agendamentos vazios
+                    available.put(time, true);
+                } else {
+                    //não há vagas no agendamento
+                    available.put(time, false);
+                }
             }
         }
-        return mapAppointments;
+        return available;
     }
 }
