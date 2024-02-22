@@ -8,6 +8,7 @@ import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.product.model.dto.request.ProductUpdateRequest;
+import br.com.petshop.product.model.dto.response.AdditionalResponse;
 import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.product.model.dto.response.ProductTableResponse;
 import br.com.petshop.product.model.entity.ProductEntity;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -145,6 +147,7 @@ public class ProductBusinessService extends AuthenticationCommonService {
                     .map(c -> {
                         ProductTableResponse resp = converter.entityIntoTableResponse(c);
                         resp.setCategory(category.getType());
+                        resp.setAdditionals(getAdditionals(resp.getAdditionalIds()));
                         return resp;
                     })
                     .collect(Collectors.toList());
@@ -164,6 +167,13 @@ public class ProductBusinessService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, Message.PRODUCT_GET_ERROR.get(), ex);
         }
+    }
+
+    private List<AdditionalResponse> getAdditionals(List<UUID> additionalIds) {
+        return additionalIds.stream()
+                .map(a -> converter.entityIntoAdditionalResponse(service.findById(a)))
+                .collect(Collectors.toList());
+
     }
 
     public ProductResponse getById(Principal authentication, UUID productId) {

@@ -2,6 +2,7 @@ package br.com.petshop.product.service;
 
 import br.com.petshop.product.model.dto.request.ProductCreateRequest;
 import br.com.petshop.product.model.dto.request.ProductUpdateRequest;
+import br.com.petshop.product.model.dto.response.AdditionalResponse;
 import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.product.model.dto.response.ProductTableResponse;
 import br.com.petshop.product.model.entity.ProductEntity;
@@ -40,5 +41,9 @@ public class ProductConverterService {
         ProductTableResponse response = mapper.map(entity, ProductTableResponse.class);
         response.setAdditionalIds(entity.getAdditionalIds());
         return response;
+    }
+
+    public AdditionalResponse entityIntoAdditionalResponse(ProductEntity entity) {
+        return mapper.map(entity, AdditionalResponse.class);
     }
 }

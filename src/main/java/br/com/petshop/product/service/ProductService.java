@@ -47,13 +47,13 @@ public class ProductService {
         return repository.save(entity);
     }
 
-    public ProductEntity findById(UUID categoryId) {
-        return repository.findById(categoryId)
+    public ProductEntity findById(UUID productId) {
+        return repository.findById(productId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
-    public ProductEntity findByIdAndActiveIsTrue(UUID categoryId) {
-        return repository.findById(categoryId)
+    public ProductEntity findByIdAndActiveIsTrue(UUID productId) {
+        return repository.findById(productId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 

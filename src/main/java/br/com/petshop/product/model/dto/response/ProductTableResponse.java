@@ -1,6 +1,7 @@
 package br.com.petshop.product.model.dto.response;
 
 import br.com.petshop.category.model.enums.Category;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,8 @@ public class ProductTableResponse implements Serializable {
     private BigDecimal amount;
     private Boolean additional;
     private List<UUID> additionalIds;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<AdditionalResponse> additionals;
     private Boolean active;
 
     public String getCategoryLabel() {
