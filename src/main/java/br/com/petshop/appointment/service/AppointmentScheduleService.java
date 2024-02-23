@@ -99,4 +99,18 @@ public class AppointmentScheduleService {
         }
         return available;
     }
+
+    public TreeMap<LocalTime, List<AppointmentEntity>> getScheduleDateTimeView(
+            TreeMap<LocalTime, List<UUID>> structureTime,
+            TreeMap<LocalTime, List<AppointmentEntity>> appointmentsTimeMap) {
+
+        TreeMap<LocalTime,  List<AppointmentEntity>> times = new TreeMap<>();
+
+        for (LocalTime time : structureTime.keySet()) {
+            List<AppointmentEntity> timeAvailable = appointmentsTimeMap.get(time);
+
+            times.put(time, timeAvailable);
+        }
+        return times;
+    }
 }

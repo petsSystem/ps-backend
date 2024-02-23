@@ -33,7 +33,8 @@ public class ScheduleService {
 
     public ScheduleEntity create(ScheduleEntity entity) {
         Optional<ScheduleEntity> schedule = repository
-                .findByIdAndCategoryId(entity.getUserId(), entity.getCategoryId());
+                .findByCompanyIdAndCategoryIdAndUserId(
+                        entity.getCompanyId(), entity.getCategoryId(), entity.getUserId());
 
         if (schedule.isPresent())
             throw new GenericAlreadyRegisteredException();

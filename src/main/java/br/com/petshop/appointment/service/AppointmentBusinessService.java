@@ -22,7 +22,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -162,15 +161,22 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
 
     public TreeMap<LocalTime, List<AppointmentEntity>> schedule(Principal authentication, AppointmentFilterRequest filter) {
         try {
-            //recupero a estrutura do agendamento
+            //recupero a estrutura do agendamento completo
             TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
                     scheduleService.getStructure(filter.getUserId(), filter.getProductId());
 
-            //recupera agendamentos pelo companyId e (userId ou productId)
+            //recupero os horários da estrutura da agenda com seus respectivos agendamentos
+            TreeMap<LocalTime, List<UUID>> structureTime = structure.get(filter.getDate().getDayOfWeek());
+
+            //recupera agendamentos pelo companyId, productId, userId (opcional) e date (opcional)
             List<AppointmentEntity> appointments = service.findAllByFilter(filter);
 
-            //transformar os agendamentos em Map<Time, List<Agendamento>>
-            return null;//appointmentScheduleService.mapAppointments(appointments);
+            //transformar os agendamentos em Map<Time, Agendamento>
+            TreeMap<LocalTime, List<AppointmentEntity>> appointmentsTimeMap =
+                    appointmentScheduleService.mapAppointmentsTime(appointments);
+
+            //MERGE DE AGENDAMENTOS DE AGENDA (visualização dia)
+            return appointmentScheduleService.getScheduleDateTimeView(structureTime, appointmentsTimeMap);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

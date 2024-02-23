@@ -153,8 +153,6 @@ public class ScheduleController {
         return businessService.activate(authentication, scheduleId, patch);
     }
 
-
-
     @Operation(summary = "Serviço de recuperação das agendas por filtro.",
             description = "Acesso: ALL")
     @ApiResponses(value = {

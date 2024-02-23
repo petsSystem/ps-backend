@@ -25,6 +25,7 @@ public class ProductSpecification {
     }
 
     public static Specification<ProductEntity> categoryIdEquals(UUID categoryId) {
+        if (categoryId == null) return null;
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.equal(root.get("categoryId"), categoryId);
         };
