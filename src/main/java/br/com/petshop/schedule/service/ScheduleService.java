@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos serviços de agendas
+ */
 @Service
 public class ScheduleService {
     private Logger log = LoggerFactory.getLogger(ScheduleService.class);
@@ -31,6 +34,11 @@ public class ScheduleService {
     @Autowired private ScheduleSpecification specification;
     @Autowired private SysUserService userService;
 
+    /**
+     * Método de criação de agenda.
+     * @param entity - entidade de agenda
+     * @return - entidade de agenda
+     */
     public ScheduleEntity create(ScheduleEntity entity) {
         Optional<ScheduleEntity> schedule = repository
                 .findByCompanyIdAndCategoryIdAndUserId(
@@ -45,10 +53,23 @@ public class ScheduleService {
         return repository.save(entity);
     }
 
+    /**
+     * Método de atualização de agenda.
+     * @param entity - entidade de agenda
+     * @return - entidade de agenda
+     */
     public ScheduleEntity update(ScheduleEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método de ativação/desativação de agenda.
+     * @param entity - entidade de agenda
+     * @param patch - dados de ativação/desativação da agenda
+     * @return - entidade de agenda
+     * @throws JsonPatchException
+     * @throws JsonProcessingException
+     */
     public ScheduleEntity activate (ScheduleEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         entity = objectMapper.treeToValue(patched, ScheduleEntity.class);
@@ -56,16 +77,31 @@ public class ScheduleService {
         return repository.save(entity);
     }
 
+    /**
+     * Método que retorna dados de agendas, de acordo com filtro informado.
+     * @param filter - companyId, categoryId, userId, productId
+     * @return - lista de entidades de agenda
+     */
     public List<ScheduleEntity> findAllByFilter(ScheduleFilterRequest filter) {
         Specification<ScheduleEntity> filters = specification.filter(filter);
         return repository.findAll(filters);
     }
 
+    /**
+     * Método que retorna uma agenda, através da informação do id.
+     * @param scheduleId - id de cadastro da agenda
+     * @return - entidade de agenda
+     */
     public ScheduleEntity findById(UUID scheduleId) {
         return repository.findById(scheduleId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método que retorna uma agenda, através da informação do userId.
+     * @param userId - id de cadastro do usuário
+     * @return - entidade de agenda
+     */
     public ScheduleEntity findByUserId(UUID userId) {
         return repository.findByUserId(userId)
                 .orElseThrow(GenericNotFoundException::new);

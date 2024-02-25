@@ -15,6 +15,9 @@ import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 
+/**
+ * Classe entidade que representa uma loja/petshop.
+ */
 @Builder
 @Getter
 @Setter

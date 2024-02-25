@@ -8,6 +8,9 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Validações comuns a todo sistema.
+ */
 public class ValidationCommonService extends AuthenticationCommonService {
 
     public void accessByCompany(Principal authentication, List<UUID> companyIds) {

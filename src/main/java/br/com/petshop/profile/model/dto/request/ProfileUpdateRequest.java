@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Classe dto responsável pela atualização de um perfil do sistema.
+ */
 @Data
 @Builder
 @NoArgsConstructor

@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pela criação de um pet.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,6 +32,7 @@ public class PetCreateRequest implements Serializable {
     private Double weight;
     private String breed;
     private Size size;
+    private String color;
     @Builder.Default
     private Boolean active = true;
 }

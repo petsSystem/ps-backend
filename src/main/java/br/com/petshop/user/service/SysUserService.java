@@ -26,6 +26,9 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos serviços de usuários do sistema web.
+ */
 @Service
 public class SysUserService {
     private Logger log = LoggerFactory.getLogger(SysUserService.class);
@@ -34,6 +37,11 @@ public class SysUserService {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private PasswordEncoder passwordEncoder;
 
+    /**
+     * Método de envio de email com nova senha, no caso de esquecimento de senha.
+     * @param username - cpf do usuário do sistema web.
+     * @return - entidade usuário.
+     */
     public UserEntity forget (String username) {
         UserEntity entity = repository.findByUsernameAndActiveIsTrue(username)
                 .orElseThrow(GenericNotFoundException::new);
@@ -48,6 +56,11 @@ public class SysUserService {
         return entity;
     }
 
+    /**
+     * Método de criação de usuário do sistema web.
+     * @param request - dados de criação do usuário no formato de entidade.
+     * @return - entidade usuário.
+     */
     public UserEntity create(UserEntity request) {
         Optional<UserEntity> entity = repository.findByCpfAndActiveIsTrue(request.getCpf());
 
@@ -70,20 +83,42 @@ public class SysUserService {
         return user;
     }
 
+    /**
+     * Método que gera token.
+     * @return - token.
+     */
     private String generateToken() {
         int number = (int) (100000 + Math.random() * (999999 - 100000 + 1));
         return String.valueOf(number);
     }
 
+    /**
+     * Método de busca de usuário ativo através da informação do id.
+     * @param userId - id do cadastro do usuário.
+     * @return - entidade usuário.
+     */
     public UserEntity findByIdAndActiveIsTrue(UUID userId) {
         return repository.findByIdAndActiveIsTrue(userId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método de atualização de usuário do sistema web.
+     * @param entity - dados de atualização do usuário no formato de entidade.
+     * @return - entidade usuário.
+     */
     public UserEntity updateById(UserEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método de ativação/desativação de usuário do sistema web.
+     * @param entity - entidade usuário.
+     * @param patch - dados de atualização do status do usuário.
+     * @return - entidade usuário.
+     * @throws JsonPatchException
+     * @throws JsonProcessingException
+     */
     public UserEntity activate(UserEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         Boolean activeValue = ((ObjectNode) patched).get("active").asBoolean();
@@ -93,16 +128,33 @@ public class SysUserService {
         return repository.save(entity);
     }
 
+    /**
+     * Método de recuperação de usuários de acordo com filtro informado.
+     * @param companyId - id do cadastro da loja/petshop.
+     * @param pageable - dados de paginação.
+     * @return - lista de entidades usuários.
+     */
     public Page<UserEntity> findAllByFilter(UUID companyId, Pageable pageable) {
         Specification<UserEntity> filters = specification.filter(companyId);
         return repository.findAll(filters, pageable);
     }
 
+    /**
+     * Método de recuperação de usuário, através da informação de id.
+     * @param userId - id do cadastro do usuário.
+     * @return - entidade usuário.
+     */
     public UserEntity findById(UUID userId) {
         return repository.findById(userId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método de troca de senha do usuário logado no sistema web.
+     * @param userId - id do cadastro do usuário.
+     * @param request - dados da senha a ser alterada.
+     * @return - entidade usuário.
+     */
     public UserEntity changePassword(UUID userId, SysUserPasswordRequest request) {
         UserEntity entity = repository.findByIdAndActiveIsTrue(userId)
                 .orElseThrow(GenericNotFoundException::new);
@@ -116,6 +168,14 @@ public class SysUserService {
         return repository.save(entity);
     }
 
+    /**
+     *
+     * @param user - entidade usuário.
+     * @param patch - informação da última loja/petshop acessado pelo usuário do sistema web.
+     * @return - entidade usuário.
+     * @throws JsonPatchException
+     * @throws JsonProcessingException
+     */
     public UserEntity updateCurrentCompany(UserEntity user, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         UserEntity entity = repository.findById(user.getId())
                 .orElseThrow(GenericNotFoundException::new);

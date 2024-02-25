@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de um usuário do sistema.
+ */
 @Builder
 @Getter
 @Setter

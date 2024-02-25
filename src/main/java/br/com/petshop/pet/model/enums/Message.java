@@ -1,5 +1,8 @@
 package br.com.petshop.pet.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     PET_LIST_ERROR("Erro ao recuperar dados do pet. Tente novamente mais tarde."),
     PET_CREATE_ERROR("Erro ao cadastrar pet. Tente novamente mais tarde."),

@@ -19,6 +19,9 @@ import org.hibernate.type.SqlTypes;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Classe entidade que representa um perfil.
+ */
 @Builder
 @Getter
 @Setter

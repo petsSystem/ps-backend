@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório da categoria
+ */
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Integer> {
     Optional<CategoryEntity> findById(UUID categoryId);

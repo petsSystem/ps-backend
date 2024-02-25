@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Classe dto responsável pela atualização de perfil de um usuário do sistema.
+ */
 @Builder
 @Getter
 @Setter

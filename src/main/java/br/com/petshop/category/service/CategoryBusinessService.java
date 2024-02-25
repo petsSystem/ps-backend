@@ -23,14 +23,21 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio da categoria
+ */
 @Service
 public class CategoryBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(CategoryService.class);
     @Autowired private CategoryService service;
-
     @Autowired private CategoryValidateService validate;
     @Autowired private CategoryConverterService converter;
 
+    /**
+     * Método de criação automática de categorias.
+     * É chamado na criação de uma loja/petshop.
+     * @param companyId - id do cadastro da loja/petshop
+     */
     public void createAutomatic(UUID companyId) {
         try {
             //criar todas as categorias inativas para uma nova loja
@@ -51,6 +58,13 @@ public class CategoryBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de atualização de categoria pelo id.
+     * @param authentication - dados do usuário logado
+     * @param categoryId - id do cadastro da categoria
+     * @param request - dados da categoria
+     * @return
+     */
     public CategoryResponse updateById(Principal authentication, UUID categoryId, CategoryUpdateRequest request) {
         try {
             //recupera a categoria ativa pelo id
@@ -80,6 +94,13 @@ public class CategoryBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de ativação/destivação de categoria
+     * @param authentication - dados do usuário logado
+     * @param categoryId - id do cadastro da categoria
+     * @param patch - Método de ativação/destivação de categoria
+     * @return - dados da categoria
+     */
     public CategoryResponse activate (Principal authentication, UUID categoryId, JsonPatch patch) {
         try {
             //recupera a categoria pelo id
@@ -102,6 +123,13 @@ public class CategoryBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna todas as categorias através dos filtros: company e active
+     * @param authentication - dados do usuário logado
+     * @param companyId - id do cadastro da loja/petshop
+     * @param active - atributo que indica se a categoria deverá ser ativa ou inativa
+     * @return - lista de dados da categoria
+     */
     public List<CategoryResponse> getAllByCompanyId(Principal authentication, UUID companyId, Boolean active) {
         try {
             //recupera todas as categorias pelo companyId
@@ -124,6 +152,12 @@ public class CategoryBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que recupera a categoria pelo id
+     * @param authentication - dados do usuário logado
+     * @param categoryId - id do cadastro da categoria
+     * @return - dados da categoria
+     */
     public CategoryResponse getById(Principal authentication, UUID categoryId) {
         try {
             //recupera a categoria

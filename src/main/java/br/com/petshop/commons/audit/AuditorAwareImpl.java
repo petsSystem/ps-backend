@@ -7,8 +7,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
+/**
+ * Classe responsável pela configuração da auditoria do JPA
+ */
 public class AuditorAwareImpl implements AuditorAware<UserEntity> {
 
+    /**
+     * Método que retorna o usuário que está praticando a ação
+     * @return
+     */
     @Override
     public Optional<UserEntity> getCurrentAuditor() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -28,6 +28,9 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de categorias.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/categories")
 @Tag(name = "Category Services")

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório do cliente
+ */
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Integer> {
 

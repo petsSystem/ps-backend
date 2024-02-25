@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos serviços de clientes do sistema web.
+ */
 @Service
 public class CustomerSysService {
     private Logger log = LoggerFactory.getLogger(CustomerSysService.class);
@@ -29,6 +32,11 @@ public class CustomerSysService {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private CustomerSpecification specification;
 
+    /**
+     * Método de criação de cliente.
+     * @param request - entidade cliente
+     * @return - entidade cliente
+     */
     public CustomerEntity create(CustomerEntity request) {
 
         CustomerEntity entity = repository.findByCpfAndActiveIsTrue(request.getCpf()).orElse(null);
@@ -47,15 +55,33 @@ public class CustomerSysService {
         return repository.save(request);
     }
 
+    /**
+     * Método que atualiza dados do cliente no sistema web.
+     * @param entity - entidade cliente
+     * @return - entidade cliente
+     */
     public CustomerEntity updateById(CustomerEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método que recupera um cliente ativo pelo id.
+     * @param id - id de cadastro do cliente
+     * @return - entidade cliente
+     */
     public CustomerEntity findById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método que associa ou favorita um cliente a loja/petshop no sistema web.
+     * @param entity - entidade cliente
+     * @param patch - dados de atualização da associação de loja/petshop
+     * @return - entidade cliente
+     * @throws JsonPatchException
+     * @throws JsonProcessingException
+     */
     public CustomerEntity associateCompanyId (CustomerEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         String companyIdString = ((ObjectNode) patched).get("companyIds").get(0).toString();
@@ -70,6 +96,12 @@ public class CustomerSysService {
         return repository.save(entity);
     }
 
+    /**
+     * Método que retorna dados de clientes de uma determinada loja/petshop.
+     * @param companyId - id de cadastro da loja/petshop
+     * @param pageable - dados de paginação
+     * @return - lista de entidade cliente
+     */
     public Page<CustomerEntity> findAllByCompanyId(UUID companyId, Pageable pageable) {
         Specification<CustomerEntity> filters = specification.filter(companyId);
         return repository.findAll(filters, pageable);

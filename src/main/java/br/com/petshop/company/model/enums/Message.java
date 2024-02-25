@@ -1,5 +1,8 @@
 package br.com.petshop.company.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     COMPANY_CREATE_ERROR ("Erro ao cadastrar loja. Tente novamente mais tarde."),
     COMPANY_ALREADY_REGISTERED_ERROR ("Loja já cadastrada."),

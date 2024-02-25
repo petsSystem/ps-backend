@@ -1,5 +1,8 @@
 package br.com.petshop.user.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     USER_CREATE_ERROR ("Erro ao cadastrar usuário. Tente novamente mais tarde."),
     USER_COMPANY_NOT_ACTIVE_ERROR ("Loja cadastrada está inativa."),

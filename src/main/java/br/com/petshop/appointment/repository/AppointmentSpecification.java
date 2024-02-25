@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Classe de queries filtro do agendamento
+ */
 @Service
 public class AppointmentSpecification {
 

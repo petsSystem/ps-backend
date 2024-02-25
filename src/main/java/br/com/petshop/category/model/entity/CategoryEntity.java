@@ -16,6 +16,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe entidade que representa uma categoria.
+ */
 @Builder
 @Getter
 @Setter

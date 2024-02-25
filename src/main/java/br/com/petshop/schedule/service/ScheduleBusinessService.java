@@ -30,6 +30,9 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio da agenda
+ */
 @Service
 public class ScheduleBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(ScheduleService.class);
@@ -38,6 +41,12 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
     @Autowired private ScheduleValidateService validate;
     @Autowired private ScheduleStructureService structureService;
 
+    /**
+     * Método de criação de agenda.
+     * @param authentication - dados do usuário logado
+     * @param request - dto contendo dados de criação da agenda
+     * @return - dados da agenda
+     */
     public ScheduleResponse create(Principal authentication, ScheduleCreateRequest request) {
         try {
             //converte request em entidade
@@ -70,6 +79,13 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de atualização de agenda.
+     * @param authentication - dados do usuário logado
+     * @param scheduleId - id de cadastro da agenda
+     * @param request - dto contendo dados de atualização da agenda
+     * @return - dados da agenda
+     */
     public ScheduleResponse updateById(Principal authentication, UUID scheduleId, ScheduleUpdateRequest request) {
         try {
             //recupera a agenda ativa pelo id
@@ -105,6 +121,13 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de ativação/desativação de agenda.
+     * @param authentication - dados do usuário logado
+     * @param scheduleId - id de cadastro da agenda
+     * @param patch - dados de ativação/desativação da agenda
+     * @return - dados da agenda
+     */
     public ScheduleResponse activate (Principal authentication, UUID scheduleId, JsonPatch patch) {
         try {
             //recupera o loja pelo id
@@ -130,6 +153,12 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna dados de agendas, de acordo com filtro informado.
+     * @param authentication - dados do usuário logado
+     * @param filter - companyId, categoryId, userId, productId
+     * @return - lista de dados da agenda
+     */
     public List<ScheduleResponse> getByFilter(Principal authentication, ScheduleFilterRequest filter ) {
         try {
             //recupera todas as agendas pelo filtro
@@ -147,6 +176,12 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna uma agenda, através da informação do id.
+     * @param authentication - dados do usuário logado
+     * @param scheduleId - id de cadastro da agenda
+     * @return - dados da agenda
+     */
     public ScheduleResponse getById(Principal authentication, UUID scheduleId) {
         try {
             //busca agenda pelo id
@@ -166,6 +201,12 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna a estrutura de agenda/agendamento de um ou mais usuários do sistema.
+     * @param userId - id de cadastro do usuário
+     * @param productId - id de cadastro do produto/serviço
+     * @return - árvore de data da semana x árvore de horários e lista de ids de agendas
+     */
     public TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> getStructure(UUID userId, UUID productId) {
         try {
             List<Structure> structures = new ArrayList<>();
@@ -190,6 +231,11 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna os dias do mês disponíveis (cálculo feito para 30 dias).
+     * @param structure - estrutura de agendamento
+     * @return - árvore de data x quantidade possível de agendamento
+     */
     public TreeMap<DayOfWeek, Integer> getWeekDayAvailability(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
         try {
             return structureService.getWeekDayAvailability(structure);
@@ -205,6 +251,12 @@ public class ScheduleBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna os horários disponíveis de uma determinada data.
+     * @param date - data do agendamento
+     * @param structure - estrutura de agendamento
+     * @return - árvore de horário x quantidade possível de agendamento
+     */
     public TreeMap<LocalTime, Integer> getTimeAvailability(LocalDate date, TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
         try {
             return structureService.getTimeAvailability(date, structure);

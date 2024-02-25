@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Enum das raças de cachorros e gatos
+ */
 public enum BreedType {
     AFFENPINSCHER("1", "Affenpinscher", "P", "DOG"),
     AFGHAN_HOUND("2", "Afghan Hound", "GG", "DOG"),

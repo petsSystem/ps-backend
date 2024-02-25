@@ -13,6 +13,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de uma loja/petshop.
+ */
 @Builder
 @Getter
 @Setter

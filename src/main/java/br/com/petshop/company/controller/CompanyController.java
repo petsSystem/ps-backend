@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de loja/petshop.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/companies")
 @Tag(name = "Companies Services")

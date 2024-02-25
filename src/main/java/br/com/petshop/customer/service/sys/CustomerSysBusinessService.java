@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio do cliente do sistema web.
+ */
 @Service
 public class CustomerSysBusinessService extends AuthenticationCommonService {
 
@@ -38,6 +41,11 @@ public class CustomerSysBusinessService extends AuthenticationCommonService {
     @Autowired private MailNotificationService mailService;
     @Autowired private CustomerSysConverterService converter;
 
+    /**
+     * Método de criação de cliente do sistema web.
+     * @param request - dto com dados de criação de cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse create(CustomerSysCreateRequest request) {
         try {
             //converte request em entidade
@@ -66,6 +74,13 @@ public class CustomerSysBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que atualiza dados do cliente no sistema web.
+     * @param authentication - dados do usuário logado
+     * @param customerId - id do cadastro do cliente
+     * @param request - dto com dados de atualização do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse update(Principal authentication, UUID customerId, CustomerSysUpdateRequest request) {
         try {
             //recupera cliente pelo id
@@ -92,6 +107,13 @@ public class CustomerSysBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que associa um cliente a loja/petshop no sistema web.
+     * @param authentication - dados do usuário logado
+     * @param customerId - id de cadastro da loja/petshop
+     * @param patch - dados de associação do cliente a loja/petshop
+     * @return - dados do cliente
+     */
     public CustomerResponse associateCompanyId(Principal authentication, UUID customerId, JsonPatch patch) {
         try {
             //recupera o cliente pelo id
@@ -114,6 +136,13 @@ public class CustomerSysBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna dados de clientes de uma determinada loja/petshop.
+     * @param authentication - dados do usuário logado
+     * @param companyId - id de cadastro da loja/petshop
+     * @param pageable - dados de paginação
+     * @return - lista dos dados do cliente
+     */
     public Page<CustomerTableResponse> get(Principal authentication, UUID companyId, Pageable pageable) {
         try {
             //recupera todos os clientes por companyID
@@ -143,6 +172,12 @@ public class CustomerSysBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna um cliente do sistema web, através da informação do seu id.
+     * @param authentication - dados do usuário logado
+     * @param id - id do cadastro do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse getById(Principal authentication, UUID id) {
         try {
             CustomerEntity entity = service.findById(id);

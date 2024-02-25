@@ -9,6 +9,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Classe de configuração de envio de email.
+ */
 @PropertySource(value={"classpath:application.properties"})
 public class MailConfiguration {
 

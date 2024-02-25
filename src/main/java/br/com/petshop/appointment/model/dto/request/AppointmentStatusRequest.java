@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pela atualização do status de um agendamento.
+ */
 @Builder
 @Getter
 @Setter

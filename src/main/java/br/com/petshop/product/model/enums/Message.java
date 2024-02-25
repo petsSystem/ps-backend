@@ -1,5 +1,8 @@
 package br.com.petshop.product.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     PRODUCT_CREATE_ERROR ("Erro ao cadastrar produto/serviço. Tente novamente mais tarde."),
     PRODUCT_FORBIDDEN_ERROR ("Acesso negado."),

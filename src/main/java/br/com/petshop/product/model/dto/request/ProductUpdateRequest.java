@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pela atualização de um produto/serviço do petshop.
+ */
 @Builder
 @Getter
 @Setter

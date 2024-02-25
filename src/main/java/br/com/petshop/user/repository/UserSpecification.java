@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Classe de queries filtro do usuário do sistema.
+ */
 @Service
 public class UserSpecification {
 

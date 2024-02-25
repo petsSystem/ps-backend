@@ -23,6 +23,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Classe que representa os campos necessários para inclusão da auditoria nas entidades criadas.
+ */
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

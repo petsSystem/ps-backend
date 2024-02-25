@@ -31,10 +31,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de agendamento.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/appointments")
 @Tag(name = "Appointment Services")

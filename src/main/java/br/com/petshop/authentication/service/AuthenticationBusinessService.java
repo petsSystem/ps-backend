@@ -17,6 +17,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+* Classe responsável pelas regras de negócio da autenticação
+ */
 @Service
 public class AuthenticationBusinessService {
 
@@ -25,6 +28,11 @@ public class AuthenticationBusinessService {
     @Autowired private SysUserBusinessService userBusiness;
     @Autowired private CustomerAppBusinessService customerBusiness;
 
+    /**
+     * Método que efetua login
+     * @param request
+     * @return
+     */
     public AuthenticationResponse login(AuthenticationRequest request) {
         try {
             return service.login(request);
@@ -40,6 +48,11 @@ public class AuthenticationBusinessService {
         }
     }
 
+    /**
+     * Método que envia email de esquecimento de senha
+     * @param request
+     * @param type
+     */
     public void forget (AuthenticationForget request, AuthType type) {
         if (type == AuthType.SYS)
             userBusiness.forget(request.username());
@@ -47,6 +60,11 @@ public class AuthenticationBusinessService {
             customerBusiness.forget(request.username());
     }
 
+    /**
+     * Método de criação de cliente do aplicativo
+     * @param request
+     * @return
+     */
     public CustomerResponse create(CustomerAppCreateRequest request) {
         return customerBusiness.create(request);
     }

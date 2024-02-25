@@ -1,5 +1,8 @@
 package br.com.petshop.authentication.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
 
     AUTH_USER_PASSWORD_ERROR("Usuário ou senha estão incorretos."),

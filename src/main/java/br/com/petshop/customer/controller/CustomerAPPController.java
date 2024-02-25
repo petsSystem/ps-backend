@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
+/**
+ * Classe responsável pelos endpoints de clientes do aplicativo.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/app/customers")
 @Tag(name = "Serviços para Clientes")

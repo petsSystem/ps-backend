@@ -8,6 +8,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Classe dto responsável pelo retorno dos labels de cada perfil existente no sistema.
+ */
 @Builder
 @Getter
 @Setter

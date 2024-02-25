@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório do pet
+ */
 @Repository
 public interface PetRepository extends JpaRepository<PetEntity, Integer> {
     Optional<PetEntity> findByIdAndActiveIsTrue(UUID petId);

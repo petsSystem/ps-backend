@@ -4,7 +4,6 @@ import br.com.petshop.schedule.model.dto.request.ScheduleCreateRequest;
 import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
 import br.com.petshop.schedule.model.dto.request.ScheduleUpdateRequest;
 import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
-import br.com.petshop.schedule.model.dto.response.ScheduleTableResponse;
 import br.com.petshop.schedule.service.ScheduleBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +31,9 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de agenda.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/schedules")
 @Tag(name = "Schedule Services")

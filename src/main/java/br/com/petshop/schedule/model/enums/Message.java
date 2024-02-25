@@ -1,5 +1,8 @@
 package br.com.petshop.schedule.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     SCHEDULE_CREATE_ERROR ("Erro ao cadastrar agenda. Tente novamente mais tarde."),
     SCHEDULE_ALREADY_REGISTERED_ERROR ("Agenda já cadastrada."),

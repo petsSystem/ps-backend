@@ -20,6 +20,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe entidade que representa um pet.
+ */
 @Builder
 @Getter
 @Setter
@@ -45,5 +48,6 @@ public class PetEntity extends AuditorBaseEntity implements Serializable {
     private String breed;
     @Enumerated(EnumType.STRING)
     private Size size;
+    private String color;
     private Boolean active;
 }

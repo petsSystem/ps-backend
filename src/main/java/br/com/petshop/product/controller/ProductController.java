@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de produtos/serviços.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/products")
 @Tag(name = "Product Services")

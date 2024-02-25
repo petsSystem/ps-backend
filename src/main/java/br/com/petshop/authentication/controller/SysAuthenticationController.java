@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Classe responsável pelos endpoints de autenticação do sistema web.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/sys/auth")
 @Tag(name = "Authentication Services for System")

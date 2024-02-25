@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 
+/**
+ * Objeto de configuração de dias de atendimento na agenda.
+ */
 @Builder
 @Getter
 @Setter

@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+/**
+ * Classe responsável pelos serviços de notificação do sistema.
+ */
 @Service
 public class MailNotificationService {
 

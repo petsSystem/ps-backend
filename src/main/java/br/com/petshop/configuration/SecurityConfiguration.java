@@ -26,6 +26,9 @@ import java.util.List;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+/**
+ * Classe de configuração de segurança do sistema.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {

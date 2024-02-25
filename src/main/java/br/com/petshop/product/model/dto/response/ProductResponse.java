@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de um produto/serviço.
+ */
 @Builder
 @Getter
 @Setter

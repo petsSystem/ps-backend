@@ -1,5 +1,8 @@
 package br.com.petshop.category.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     CATEGORY_CREATE_ERROR ("Erro ao cadastrar categoria. Tente novamente mais tarde."),
     CATEGORY_ACTIVATE_ERROR ("Erro ao ativar/desativar categoria. Tente novamente mais tarde."),

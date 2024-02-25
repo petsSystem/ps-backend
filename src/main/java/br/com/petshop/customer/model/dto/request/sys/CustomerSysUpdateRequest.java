@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * Classe dto responsável pela atualização de um cliente pelo sistema web.
+ */
 @Data
 @Builder
 @NoArgsConstructor

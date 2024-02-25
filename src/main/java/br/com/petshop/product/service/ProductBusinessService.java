@@ -13,6 +13,9 @@ import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.product.model.dto.response.ProductTableResponse;
 import br.com.petshop.product.model.entity.ProductEntity;
 import br.com.petshop.product.model.enums.Message;
+import br.com.petshop.schedule.model.dto.request.ScheduleFilterRequest;
+import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
+import br.com.petshop.schedule.service.ScheduleBusinessService;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio do produto/serviço
+ */
 @Service
 public class ProductBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(ProductService.class);
@@ -41,7 +47,14 @@ public class ProductBusinessService extends AuthenticationCommonService {
     @Autowired private ProductService service;
     @Autowired private CategoryBusinessService categoryBusinessService;
     @Autowired private ProductConverterService converter;
+    @Autowired private ScheduleBusinessService scheduleBusinessService;
 
+    /**
+     * Método de criação de produto/serviço.
+     * @param authentication - dados do usuário logado
+     * @param request - dto contendo dados de criação do produto/serviço
+     * @return - dados do produto/serviço
+     */
     public ProductResponse create(Principal authentication, ProductCreateRequest request) {
         try {
             //valida acesso a loja
@@ -71,6 +84,13 @@ public class ProductBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de atualização de produto/serviço, através de id informado.
+     * @param authentication - dados do usuário logado
+     * @param productId - id do cadastro do produto/serviço
+     * @param request - dto contendo dados de atualização do produto/serviço
+     * @return - dados do produto/serviço
+     */
     public ProductResponse updateById(Principal authentication, UUID productId, ProductUpdateRequest request) {
         try {
             //recupera o produto ativo pelo id
@@ -104,6 +124,13 @@ public class ProductBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de ativação/desativação de produto/serviço.
+     * @param authentication - dados do usuário logado
+     * @param productId - id do cadastro do produto/serviço
+     * @param patch - dados de ativação/desativação do produto/serviço
+     * @return - dados do produto/serviço
+     */
     public ProductResponse activate (Principal authentication, UUID productId, JsonPatch patch) {
         try {
             //recupera o produto pelo id
@@ -133,21 +160,37 @@ public class ProductBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que recupera dados de produto/serviço, através de filtro informado.
+     * @param authentication - dados do usuário logado
+     * @param paging - dados de paginação
+     * @param companyId - id do cadastro da loja/petshop
+     * @param categoryId - id do cadastro da categoria
+     * @param additional - filtro de pesquisa.
+     *                   Se true = buscará todos os produtos/serviços adicionais
+     *                   Se false = buscará todos os produtos/serviços principais
+     *                   Se null (não informado) = retornará todos os produtos/serviços
+     * @return - dados do produto/serviço
+     */
     public Page<ProductTableResponse> getAll(Principal authentication, Pageable paging, UUID companyId, UUID categoryId, Boolean additional) {
         try {
             //recupera todos os produtos pelo companyId
             Page<ProductEntity> entities = service.findAllByCompanyId(companyId, categoryId, additional, paging);
 
+            //checo se há agenda para todos os produtos
             List<CategoryResponse> categories = null;
 
             if (categoryId == null) {
                 //recupera todas as categorias pelo companyId
                 categories = categoryBusinessService
                         .getAllByCompanyId(null, companyId, true);
-            } else {
-                //recupera todas a categoria pelo categoryId
+            } else { //fluxo é de agendamento
+                //recupera a categoria pelo categoryId
                 categories = List.of(categoryBusinessService
                         .getById(authentication, categoryId));
+
+                //checo se há agendas para o produto.
+                entities = checkSchedule(authentication, companyId, categoryId, entities);
             }
 
             //separo cada categoria em um map, sendo o id da categoria a chave
@@ -181,6 +224,11 @@ public class ProductBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que recupera lista de adicioais de determinado produto.
+     * @param additionalIds - id do cadastro do produto/serviço como adicional de outro produto/serviço
+     * @return - lista dos dados do produto/serviço
+     */
     private List<AdditionalResponse> getAdditionals(List<UUID> additionalIds) {
         return additionalIds.stream()
                 .map(a -> converter.entityIntoAdditionalResponse(service.findById(a)))
@@ -188,6 +236,42 @@ public class ProductBusinessService extends AuthenticationCommonService {
 
     }
 
+    /**
+     * Método que verifica se há agenda para um determinado produto/serviço.
+     * Esse método será utilizado para o fluxo de agendamneto.
+     * @param authentication - dados do usuário logado
+     * @param companyId - id do cadastro da loja/petshop
+     * @param categoryId - id do cadastro da categoria
+     * @param entities - lista dos dados do produto/serviço
+     * @return - lista dos dados do produto/serviço
+     */
+    private Page<ProductEntity> checkSchedule(Principal authentication, UUID companyId,
+                                              UUID categoryId, Page<ProductEntity> entities) {
+        List<ProductEntity> entitiesFiltered = new ArrayList<>();
+
+        ScheduleFilterRequest filter = ScheduleFilterRequest.builder()
+                .companyId(companyId)
+                .categoryId(categoryId)
+                .build();
+
+        entities.forEach(e -> {
+            filter.setProductId(e.getId());
+            List<ScheduleResponse> schedules = scheduleBusinessService
+                    .getByFilter(authentication, filter);
+
+            if (!schedules.isEmpty())
+                entitiesFiltered.add(e);
+        });
+
+        return new PageImpl<>(entitiesFiltered);
+    }
+
+    /**
+     * Método que retorna dados de um produto/serviço, através da informação do id.
+     * @param authentication - dados do usuário logado
+     * @param productId - id do cadastro do produto/serviço
+     * @return - dados do produto/serviço
+     */
     public ProductResponse getById(Principal authentication, UUID productId) {
         try {
             //recupera o produto

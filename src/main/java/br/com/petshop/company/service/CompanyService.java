@@ -23,12 +23,20 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelos serviços de lojas/petshops
+ */
 @Service
 public class CompanyService {
     private Logger log = LoggerFactory.getLogger(CompanyService.class);
     @Autowired private CompanyRepository repository;
     @Autowired private ObjectMapper objectMapper;
 
+    /**
+     * Método de criação de loja/petshop.
+     * @param entity - entidade loja/petshop
+     * @return - entidade loja/petshop
+     */
     public CompanyEntity create(CompanyEntity entity) {
         Optional<CompanyEntity> company = repository.findByCnpj(entity.getCnpj());
         if (company.isPresent())
@@ -37,15 +45,23 @@ public class CompanyService {
         return repository.save(entity);
     }
 
-    public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {
-        return repository.findById(companyId)
-                .orElseThrow(GenericNotFoundException::new);
-    }
-
+    /**
+     * Método de atualização de loja/petshop.
+     * @param entity - entidade loja/petshop
+     * @return - entidade loja/petshop
+     */
     public CompanyEntity updateById(CompanyEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método de ativação/destivação de loja/petshop.
+     * @param entity - entidade loja/petshop
+     * @param patch - dados de ativação/destivação de loja/petshop
+     * @return - entidade loja/petshop
+     * @throws JsonPatchException
+     * @throws JsonProcessingException
+     */
     public CompanyEntity activate (CompanyEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         entity = objectMapper.treeToValue(patched, CompanyEntity.class);
@@ -53,11 +69,32 @@ public class CompanyService {
         return repository.save(entity);
     }
 
+    /**
+     * Método que recupera uma loja/petshop ativa pelo id.
+     * @param companyId - id de cadastro da loja/petshop
+     * @return - entidade loja/petshop
+     */
+    public CompanyEntity findByIdAndActiveIsTrue(UUID companyId) {
+        return repository.findById(companyId)
+                .orElseThrow(GenericNotFoundException::new);
+    }
+
+    /**
+     * Método que recupera todas as loja/petshop.
+     * @param paging - dados de paginação
+     * @return - lista de entidade loja/petshop
+     */
     public Page<CompanyEntity> findAll (Pageable paging) {
             return repository.findAll(paging);
     }
 
-    public Page<CompanyEntity> findByCompanyIds(List<UUID> companyIds) {
+    /**
+     * Método que recupera todas as loja/petshop através de uma lista de ids informado.
+     * @param companyIds - ids de cadastro da loja/petshop
+     * @param paging - dados de paginação
+     * @return - lista de entidade loja/petshop
+     */
+    public Page<CompanyEntity> findByCompanyIds(List<UUID> companyIds, Pageable paging) {
         List<CompanyEntity> companies = companyIds.stream()
                 .map(c -> {
                     Optional<CompanyEntity> entity = repository.findByIdAndActiveIsTrue(c);
@@ -71,6 +108,11 @@ public class CompanyService {
         return new PageImpl<>(companies);
     }
 
+    /**
+     * Método que recupera uma loja/petshop pelo id.
+     * @param companyId - id de cadastro da loja/petshop
+     * @return - entidade loja/petshop
+     */
     public CompanyEntity findById(UUID companyId) {
         return repository.findById(companyId)
                 .orElseThrow(GenericNotFoundException::new);

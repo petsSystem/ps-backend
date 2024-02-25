@@ -12,6 +12,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pela criação de agendamento.
+ */
 @Builder
 @Getter
 @Setter

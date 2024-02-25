@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+/**
+ * Classe de configuração de objeto de mapeamento dentro do sistema.
+ */
 @Configuration
 public class ObjectMapperConfiguration {
 

@@ -14,6 +14,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Classe responsável pelas conversões de objetos do agendamento
+ */
 @Service
 public class AppointmentConverterService {
 
@@ -21,6 +24,11 @@ public class AppointmentConverterService {
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
+    /**
+     * Método que converte dto (createRequest) em entidade
+     * @param request - dto com dados de criação
+     * @return - entidade
+     */
     public AppointmentEntity createRequestIntoEntity(AppointmentCreateRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
@@ -32,6 +40,11 @@ public class AppointmentConverterService {
         return entity;
     }
 
+    /**
+     * Método que converte dto (updateRequest) em entidade
+     * @param request - dto com dados de atualização
+     * @return - entidade
+     */
     public AppointmentEntity updateRequestIntoEntity(AppointmentUpdateRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         AppointmentEntity entity = mapper.map(request, AppointmentEntity.class);
@@ -44,6 +57,12 @@ public class AppointmentConverterService {
         return entity;
     }
 
+    /**
+     * Método que faz merge de duas entidades
+     * @param request - entidade com dados de atualização
+     * @param entity - entidade atualmente salva em banco
+     * @return - entidade
+     */
     public AppointmentEntity updateRequestIntoEntity(AppointmentEntity request, AppointmentEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
@@ -51,8 +70,13 @@ public class AppointmentConverterService {
         return entity;
     }
 
+    /**
+     * Método que converte entidade em dto (response)
+     * @param entity - entidade
+     * @return - dto de response
+     */
     public AppointmentResponse entityIntoResponse(AppointmentEntity entity) {
-        AppointmentResponse appointment =  mapper.map(entity, AppointmentResponse.class);
+        ;AppointmentResponse appointment =  mapper.map(entity, AppointmentResponse.class);
 
         String date = entity.getDate().format(dateFormatter);
         date = date.replaceAll("-", "/");

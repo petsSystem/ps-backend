@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Classe dto responsável pelo envio de email com nova senha, no caso de esquecimento da mesma.
+ */
 @Data
 @Builder
 @NoArgsConstructor

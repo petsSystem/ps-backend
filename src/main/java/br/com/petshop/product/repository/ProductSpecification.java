@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Classe de queries filtro do produto/serviço
+ */
 @Service
 public class ProductSpecification {
 

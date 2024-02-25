@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de um pet.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,5 +33,6 @@ public class PetResponse implements Serializable {
     private String weight;
     private String breed;
     private Size size;
+    private String color;
     private Boolean active;
 }

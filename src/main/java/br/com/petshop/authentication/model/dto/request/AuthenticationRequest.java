@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * Classe dto responsável pelo login do usuário.
+ */
 @Data
 @Builder
 @NoArgsConstructor

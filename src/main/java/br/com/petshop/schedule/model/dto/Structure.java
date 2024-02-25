@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.List;
 
+/**
+ * Classe dto responsável pela estrutura de agendas mergeadas ou individuais.
+ */
 @Builder
 @Getter
 @Setter

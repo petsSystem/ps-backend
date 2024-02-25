@@ -7,13 +7,16 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 
+/**
+ * Classe responsável pelas regras de validação de usuário do sistema web.
+ */
 @Service
 public class SysUserValidationService extends ValidationCommonService {
 
     /**
-     * Users cannot activate or deactivate themselves.
-     * @param authentication
-     * @param entity
+     * Regra que impossibilida o usuário habilitar ou desabilitar o seu próprio usuário.
+     * @param authentication - dados do usuário logado.
+     * @param entity - entidade de usuário
      */
     public void activate(Principal authentication, UserEntity entity) {
         UserEntity user = getSysAuthUser(authentication);

@@ -4,6 +4,9 @@ package br.com.petshop.configuration;
 //import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Classe de configuração de geoloc postgis do postgresql.
+ */
 @Configuration
 public class PostgisConfiguration {
 

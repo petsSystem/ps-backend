@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório do produto/serviço
+ */
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
     Optional<ProductEntity> findById(UUID categoryId);

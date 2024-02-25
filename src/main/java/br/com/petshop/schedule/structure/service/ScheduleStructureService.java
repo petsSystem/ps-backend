@@ -1,7 +1,5 @@
 package br.com.petshop.schedule.structure.service;
 
-import br.com.petshop.appointment.service.appTeste.objtest;
-import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.model.Day;
 import br.com.petshop.product.model.dto.response.ProductResponse;
 import br.com.petshop.product.service.ProductBusinessService;
@@ -33,6 +31,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Classe de serviços para gerenciamento de estrutura de agendas x agendamentos
+ */
 @Service
 public class ScheduleStructureService {
     @Autowired private ScheduleStructureRepository repository;
@@ -41,9 +42,9 @@ public class ScheduleStructureService {
     @Autowired private ScheduleStructureConverterService converter;
 
     /**
-     * Create a structure to an individual schedule
-     * @param authentication
-     * @param entity
+     * Salva uma estrutura de agendas x agendamentos para uma única agenda informadda.
+     * @param authentication - dados do usuário logado
+     * @param entity - entidade de agenda
      */
     public void updateIndividualStructure (Principal authentication, ScheduleEntity entity) {
 
@@ -71,9 +72,9 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Create a structure for a productId (which means that the result is a merge of a lot of schedules)
-     * @param authentication
-     * @param entity
+     * Método que atualiza a estrutura de agenda x agendamentos de um id de produto/serviço.
+     * @param authentication - dados do usuário logado
+     * @param entity - entidade de agenda
      */
     public void updateStructure(Principal authentication, ScheduleEntity entity) {
 
@@ -96,10 +97,10 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Return all the products of a schedule
-     * @param authentication
-     * @param entity
-     * @return
+     * Método que retorna os produtos de uma agenda.
+     * @param authentication - dados do usuário logado
+     * @param entity - entidade de agenda
+     * @return - lista de entidade de produto/serviço
      */
     private List<ProductResponse> getAllProducts(Principal authentication, ScheduleEntity entity) {
         List<ProductResponse> products = new ArrayList<>();
@@ -113,10 +114,10 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Return all schedules for a productId
-     * @param companyId
-     * @param productId
-     * @return
+     * Método que retorna todas as agendas de um id de produto/serviço.
+     * @param companyId - id de cadastro de uma loja/petshop
+     * @param productId - id de cadastro de um produto/serviço
+     * @return - lista de entidades de estrutura de agendas x agendamentos
      */
     private List<ScheduleEntity> getAllSchedulesByProductId(UUID companyId, UUID productId) {
         ScheduleFilterRequest filter = ScheduleFilterRequest.builder()
@@ -127,10 +128,10 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Create a schedule structure for one schedule or a lot schedules by productId
-     * @param intervalMinutes
-     * @param schedules
-     * @return
+     * Método que cria uma estrutura de ou mais agendas para um id de produto/serviço.
+     * @param intervalMinutes - intervalo em minutos do produto/serviço
+     * @param schedules - lista de entidades de estrutura de agendas x agendamentos
+     * @return - árvore dia da semana x (árvore horário x lista de ids de agendamentos)
      */
     private TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> createScheduleStructure(Integer intervalMinutes, List<ScheduleEntity> schedules) {
 
@@ -160,11 +161,12 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Return all Times for weekday to a schedule. The structure include the id of a schedule into the time.
-     * @param dow
-     * @param scheduleId
-     * @param intervalMinutes
-     * @return
+     * Método que recupera todos os horários dos dias da semana para uma agenda.
+     * A estrutura inclui o id de uma agenda no horário.
+     * @param dow - entidade dia que contém o dia da semana, horário inicial e final de trabalho
+     * @param scheduleId - id de cadastro da agenda
+     * @param intervalMinutes - intervalo em minutos do produto/serviço
+     * @return - árvore de horário x lista de ids de agendamentos
      */
     public TreeMap<LocalTime, List<UUID>> setScheduleTime(Day dow, UUID scheduleId, Integer intervalMinutes) {
         TreeMap<LocalTime, List<UUID>> scheduleTime = new TreeMap<>();
@@ -179,10 +181,10 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Save a structure of schedules with the same productId.
-     * @param productId
-     * @param mapSchedule
-     * @return
+     * Salve uma estrutura de agendamentos com o mesmo productId.
+     * @param productId - id de cadastro do produto/serviço
+     * @param mapSchedule - árvore dia da semana x (árvore horário x lista de ids de agendamentos)
+     * @return - entidade de estrutura de agendas x agendamentos
      */
     private ScheduleStructureEntity save(UUID productId,  TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> mapSchedule) {
         ScheduleStructureEntity structure = findByProductId(productId);
@@ -199,9 +201,9 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Find structure for a productId
-     * @param productId
-     * @return
+     * Método que recupera uma entidade de estrutura através da infomração do id do produto/serviço.
+     * @param productId - id de cadastro do produto/serviço
+     * @return - entidade de estrutura de agendas x agendamentos
      */
     public ScheduleStructureEntity findByProductId(UUID productId) {
         Optional<ScheduleStructureEntity> entity = repository.findByProductId(productId);
@@ -212,9 +214,10 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Returns a number of available appointments for a specific day of week of a structure.
-     * @param structure
-     * @return
+     * Método que retorna um número de agendamentos disponíveis para um dia específico da semana
+     * de uma estrutura.
+     * @param structure - árvore dia da semana x (árvore horário x lista de ids de agendamentos)
+     * @return - árvore de dia da semana x quantidade de horários disponíveis
      */
     public TreeMap<DayOfWeek, Integer> getWeekDayAvailability(TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
         TreeMap<DayOfWeek, Integer> available = new TreeMap<>();
@@ -231,10 +234,11 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Returns a number of available appointments for a specific time of a day of a structure.
-     * @param date
-     * @param structure
-     * @return
+     * Método que retorna um número de agendamentos disponíveis para um horário específico do
+     * dia de uma estrutura.
+     * @param date - data selecionada para agendamento
+     * @param structure - árvore dia da semana x (árvore horário x lista de ids de agendamentos)
+     * @return - árvore de horário x quantidade de vagas disponíveis
      */
     public TreeMap<LocalTime, Integer> getTimeAvailability(LocalDate date, TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure) {
         TreeMap<LocalTime, Integer> available = new TreeMap<>();
@@ -252,9 +256,10 @@ public class ScheduleStructureService {
     }
 
     /**
-     * Returns a structure map.
-     * @param structures
-     * @return
+     * Método que transforma uma lista de estrutura de agendas x agendamentos em um map de
+     * dia da semana x (árvore horário x lista de ids de agendamentos)
+     * @param structures - lista de estrutura de agenda x agendamento
+     * @return - árvore dia da semana x (árvore horário x lista de ids de agendamentos)
      * @throws JsonProcessingException
      */
     public TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> getStructureMap(List<Structure> structures) throws JsonProcessingException {

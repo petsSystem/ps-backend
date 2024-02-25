@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório do perfil do usuário do sistema.
+ */
 @Repository
 public interface ProfileRepository extends JpaRepository<ProfileEntity, Integer> {
     Optional<ProfileEntity> findByName(String name);

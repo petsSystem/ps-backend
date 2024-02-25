@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório da loja/petshop
+ */
 @Repository
 public interface CompanyRepository extends JpaRepository<CompanyEntity, Integer> {
     Optional<CompanyEntity> findById(UUID companyId);

@@ -7,6 +7,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import java.security.Principal;
 
+/**
+ * Classe utilizada por todo sistema para retornar dados do usuário principal.
+ */
 public abstract class AuthenticationCommonService {
 
     public CustomerEntity getAppAuthUser(Principal authentication) {

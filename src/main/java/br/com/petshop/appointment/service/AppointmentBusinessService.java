@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelas regras de negócio do agendamento
+ */
 @Service
 public class AppointmentBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(AppointmentService.class);
@@ -33,6 +36,12 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
     @Autowired private ScheduleBusinessService scheduleService;
     @Autowired private AppointmentScheduleService appointmentScheduleService;
 
+    /**
+     * Método de criação de agendamento
+     * @param authentication - dados do usuário logado
+     * @param request - dto contendo dados de criação do agendamento
+     * @return - dados do agendamento
+     */
     public AppointmentResponse create(Principal authentication, AppointmentCreateRequest request) {
         try {
             //converte request em entidade
@@ -51,6 +60,13 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de atualização de agendamento
+     * @param authentication - dados do usuário logado
+     * @param appointmentId - id do cadastro do agendamento
+     * @param request - dto contendo dados de atualização do agendamento
+     * @return - dados do agendamento
+     */
     public AppointmentResponse updateById(Principal authentication, UUID appointmentId, AppointmentUpdateRequest request) {
         try {
             //recupera o agendamento pelo id
@@ -77,6 +93,12 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de atualização de status de agendamento
+     * @param authentication - dados do usuário logado
+     * @param request - dto com dados de atualização do status do agendamento
+     * @return - dados do agendamento
+     */
     public AppointmentResponse setStatus(Principal authentication, AppointmentStatusRequest request) {
         try {
             //recupera appointment pelo id
@@ -99,6 +121,12 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de retorno de disponibilidade de agendamento (mensal)
+     * @param authentication - dados do usuário logado
+     * @param filter - companyId, productId, userId, date
+     * @return - árvore de data x disponibilidade (true, false)
+     */
     public TreeMap<LocalDate, Boolean> getMonthAvailability(Principal authentication, AppointmentFilterRequest filter) {
         try {
             //recupero a estrutura do agendamento
@@ -129,6 +157,12 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de retorno de disponibilidade de agendamento (dia)
+     * @param authentication - dados do usuário logado
+     * @param filter - companyId, productId, userId, date
+     * @return - árvore de horário x disponibilidade (true, false)
+     */
     public TreeMap<LocalTime, Boolean> getDayAvailability(Principal authentication, AppointmentFilterRequest filter) {
         try {
             //recupero a estrutura do agendamento completo
@@ -159,6 +193,12 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de retorno de disponibilidade de agendamento (dia)
+     * @param authentication - dados do usuário logado
+     * @param filter - companyId, productId, userId, date
+     * @return - árvore de horário x lista de agendamentos
+     */
     public TreeMap<LocalTime, List<AppointmentEntity>> schedule(Principal authentication, AppointmentFilterRequest filter) {
         try {
             //recupero a estrutura do agendamento completo
@@ -189,6 +229,12 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de retorno de agendamento por id
+     * @param authentication - dados do usuário logado
+     * @param appointmentId - id do cadastro do agendamento
+     * @return - dados do agendamento
+     */
     public AppointmentResponse getById(Principal authentication, UUID appointmentId) {
         try {
             AppointmentEntity entity = service.findById(appointmentId);

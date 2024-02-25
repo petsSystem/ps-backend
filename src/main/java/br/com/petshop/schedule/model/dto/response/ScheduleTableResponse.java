@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de uma agenda.
+ */
 @Builder
 @Getter
 @Setter

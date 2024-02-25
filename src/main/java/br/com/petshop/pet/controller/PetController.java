@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de pets.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/pets")
 @Tag(name = "Pets Services")

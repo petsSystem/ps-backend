@@ -26,6 +26,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelas regras de negócio do cliente do aplicativo mobile.
+ */
 @Service
 public class CustomerAppBusinessService extends AuthenticationCommonService {
 
@@ -34,6 +37,11 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
     @Autowired private MailNotificationService mailService;
     @Autowired private CustomerAppConverterService converter;
 
+    /**
+     * Método de criação de cliente de aplicativo mobile.
+     * @param request - dto com dados de criação de cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse create(CustomerAppCreateRequest request) {
         try {
             //converte request em entidade
@@ -59,6 +67,11 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
                     HttpStatus.BAD_REQUEST, Message.CUSTOMER_CREATE_ERROR.get(), ex);
         }
     }
+
+    /**
+     * Método que envia email com nova senha, caso cliente do aplicativo mobile esqueça a senha.
+     * @param cpf - dado do cpf do cliente
+     */
     public void forget(String cpf) {
         try {
             CustomerEntity entity = service.findByCpfAndActiveIsTrue(cpf);
@@ -78,6 +91,12 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que atualiza os dados do cliente no aplicativo mobile.
+     * @param authentication - dados do usuário logado
+     * @param request - dto com dados de atualização do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse update(Principal authentication, CustomerAppUpdateRequest request) {
         try {
             //recupera cliente pelo id
@@ -105,6 +124,12 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de troca de senha do cliente no aplicativo mobile.
+     * @param authentication - dados do usuário logado
+     * @param request - dto com dados de alteração de senha do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse changePassword(Principal authentication, CustomerChangePasswordRequest request) {
         try {
             //recupera cliente pelo id
@@ -132,6 +157,11 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que retorna os dados do usuário que se loga na aplicação mobile.
+     * @param authentication - dados do usuário logado
+     * @return - dados do cliente
+     */
     public CustomerResponse me(Principal authentication) {
         try {
             //recupera cliente pelo id
@@ -152,6 +182,12 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que favorita loja/petshop no aplicativo mobile.
+     * @param authentication - dados do usuário logado
+     * @param patch - dados de atualização do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse favorite(Principal authentication, JsonPatch patch) {
         try {
             //recupera cliente pelo id
@@ -175,6 +211,12 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que desfavorita loja/petshop no aplicativo mobile.
+     * @param authentication - dados do usuário logado
+     * @param patch - dados de atualização do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse unfavorite(Principal authentication, JsonPatch patch) {
         try {
             //recupera cliente pelo id
@@ -198,6 +240,12 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de validação de token enviado via email, para validação do email do cliente do aplicativo.
+     * @param authentication - dados do usuário logado
+     * @param request - dto com dados de validação do email do cliente
+     * @return - dados do cliente
+     */
     public CustomerResponse emailValidate(Principal authentication, EmailValidateRequest request) {
         try {
             //recupera cliente pelo cpf
@@ -225,6 +273,10 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de reenvio de token via email para validação do email no aplicativo mobile.
+     * @param authentication - dados do usuário logado
+     */
     public void resendEmailValidate(Principal authentication) {
         try {
             //recupera cliente pelo cpf
@@ -245,6 +297,11 @@ public class CustomerAppBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de desativação de cliente do aplicativo mobile. (exclusão lógica)
+     * @param authentication - dados do usuário logado
+     * @param patch - dados de atualização do cliente
+     */
     public void deactivate(Principal authentication, JsonPatch patch) {
         try {
             //recupera cliente pelo cpf

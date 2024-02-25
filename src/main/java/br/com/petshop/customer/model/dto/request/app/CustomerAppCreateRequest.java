@@ -1,21 +1,18 @@
 package br.com.petshop.customer.model.dto.request.app;
 
+import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.customer.model.enums.AppStatus;
 import br.com.petshop.customer.model.enums.Origin;
-import br.com.petshop.authentication.model.enums.Role;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
+/**
+ * Classe dto responsável pela criação de um cliente pelo aplicativo.
+ */
 @Data
 @Builder
 @NoArgsConstructor

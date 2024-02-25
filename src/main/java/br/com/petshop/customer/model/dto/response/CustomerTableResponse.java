@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno de dados resumidos de um cliente para apresentação em tela/lista.
+ */
 @Data
 @Builder
 @NoArgsConstructor

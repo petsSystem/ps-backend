@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio da loja/petshop
+ */
 @Service
 public class CompanyBusinessService extends AuthenticationCommonService {
     private Logger log = LoggerFactory.getLogger(CompanyService.class);
@@ -36,6 +39,12 @@ public class CompanyBusinessService extends AuthenticationCommonService {
     @Autowired private CompanyValidationService validate;
     @Autowired private CategoryBusinessService categoryBusinessService;
 
+    /**
+     * Método de criação de loja/petshop.
+     * @param authentication - dados do usuário logado
+     * @param request - dados de criação da loja/petshop
+     * @return - dados da loja/petshop
+     */
     public CompanyResponse create(Principal authentication, CompanyCreateRequest request) {
         try {
             //converte request em entidade
@@ -61,6 +70,13 @@ public class CompanyBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de atualização de loja/petshop pelo id.
+     * @param authentication - dados do usuário logado
+     * @param companyId - id do cadastro da loja/petshop
+     * @param request - dados de atualização da loja/petshop
+     * @return - dados da loja/petshop
+     */
     public CompanyResponse updateById(Principal authentication, UUID companyId, CompanyUpdateRequest request) {
         try {
             //recupera a loja ativa pelo id
@@ -90,6 +106,13 @@ public class CompanyBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método de ativação/desativação de loja/petshop.
+     * @param authentication - dados do usuário logado
+     * @param companyId - id do cadastro da loja/petshop
+     * @param patch - dados de ativação/desativação da loja/petshop
+     * @return - dados da loja/petshop
+     */
     public CompanyResponse activate (Principal authentication, UUID companyId, JsonPatch patch) {
         try {
             //recupera o loja pelo id
@@ -112,13 +135,19 @@ public class CompanyBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que recupera todas as loja/petshop.
+     * @param authentication - dados do usuário logado
+     * @param paging - dados de paginação
+     * @return - lista dos dados da loja/petshop
+     */
     public Page<CompanyResponse> get(Principal authentication, Pageable paging) {
         try {
             //recupera todas as companies pelo tipo de acesso
             Page<CompanyEntity> entities;
             switch (getSysRole(authentication)) {
                 case ADMIN -> entities = service.findAll(paging);
-                default -> entities = service.findByCompanyIds(getSysAuthUser(authentication).getCompanyIds());
+                default -> entities = service.findByCompanyIds(getSysAuthUser(authentication).getCompanyIds(), paging);
             }
 
             //converte entidade para a resposta
@@ -144,6 +173,12 @@ public class CompanyBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que recupera todas as loja/petshop pelo id.
+     * @param authentication - dados do usuário logado
+     * @param companyId - id do cadastro da loja/petshop
+     * @return - dados da loja/petshop
+     */
     public CompanyResponse getById(Principal authentication, UUID companyId) {
         try {
             //valida acesso a loja
@@ -170,6 +205,13 @@ public class CompanyBusinessService extends AuthenticationCommonService {
         }
     }
 
+    /**
+     * Método que recupera a loja/petshop ativa através do currentCompanyId. Caso este parâmetro não
+     * seja informado, retornará a primeira loja/peshop ativo da lista de companyIds informado.
+     * @param currentCompanyId - id da última loja/petshop acessado pelo usuário
+     * @param companyIds - lista de ids das lojas/petshops associados ao usuário
+     * @return - dados da loja/petshop
+     */
     public CompanyResponse findActiveCompany(UUID currentCompanyId, List<UUID> companyIds) {
         try {
             CompanyEntity entity = null;

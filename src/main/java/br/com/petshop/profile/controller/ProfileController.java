@@ -31,6 +31,9 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos endpoints de perfis do sistema.
+ */
 @RestController
 @RequestMapping("/api/v1/pet/profiles")
 @Tag(name = "Profile Services")

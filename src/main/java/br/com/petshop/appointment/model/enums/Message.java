@@ -1,5 +1,8 @@
 package br.com.petshop.appointment.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     APPOINTMENT_CREATE_ERROR ("Erro ao cadastrar agendamento. Tente novamente mais tarde."),
     APPOINTMENT_NOT_FOUND_ERROR ("Agendamento não encontrado"),

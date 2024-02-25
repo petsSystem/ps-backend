@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos serviços de pets
+ */
 @Service
 public class PetService {
 
@@ -27,24 +30,52 @@ public class PetService {
         return repository.save(request);
     }
 
+    /**
+     * Método de criação de pet
+     * @param petId - id de cadastro do pet
+     * @return - entidade de pet
+     */
     public PetEntity findByIdAndActiveIsTrue(UUID petId) {
         return repository.findByIdAndActiveIsTrue(petId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método de atualização de pet.
+     * @param entity - entidade de pet
+     * @return - entidade de pet
+     */
     public PetEntity updateById(PetEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método que recupera os pets de um cliente informado.
+     * @param customerId - id de cadastro do cliente
+     * @return - lista de entidades de pet
+     */
     public List<PetEntity> getByCustomerId(UUID customerId) {
         return repository.findByCustomerIdAndActiveIsTrue(customerId);
     }
 
+    /**
+     * Métoddo que recupera os dados do pet através da informação do id.
+     * @param petId - id de cadastro do pet
+     * @return - entidade de pet
+     */
     public PetEntity getById(UUID petId) {
         return repository.findByIdAndActiveIsTrue(petId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método que desativa um pet (exclusão lógica).
+     * @param entity - entidade de pet
+     * @param patch - dados de desativação do pet
+     * @return - entidade de pet
+     * @throws JsonPatchException
+     * @throws JsonProcessingException
+     */
     public PetEntity deactivate (PetEntity entity, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
         entity = objectMapper.treeToValue(patched, PetEntity.class);

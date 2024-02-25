@@ -11,6 +11,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos horários de agendamento, que farão parte da estrutura da agenda.
+ */
 @Builder
 @Getter
 @Setter

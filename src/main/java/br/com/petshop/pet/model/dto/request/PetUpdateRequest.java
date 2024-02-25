@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * Classe dto responsável pela atualização de um pet.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,4 +30,5 @@ public class PetUpdateRequest implements Serializable {
     private Double weight;
     private String breed;
     private Size size;
+    private String color;
 }

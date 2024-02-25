@@ -11,6 +11,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Classe dto responsável pelo retorno das permissões dos perfis do sistema.
+ */
 @Builder
 @Getter
 @Setter

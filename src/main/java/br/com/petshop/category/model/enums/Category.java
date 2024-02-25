@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.util.stream.Stream;
 
+/**
+ * Enum das tipos de categorias existentes no sistema.
+ */
 @Getter
 public enum Category {
     PETCARE("Petshop", "Cuidados para o pet"),

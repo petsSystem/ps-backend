@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * Classe dto responsável pela troca de senha de um usuário do sistema.
+ */
 @Data
 @Builder
 @NoArgsConstructor

@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio do perfil do usuário do sistema web.
+ */
 @Service
 public class ProfileBusinessService {
     private Logger log = LoggerFactory.getLogger(ProfileBusinessService.class);
@@ -31,6 +34,12 @@ public class ProfileBusinessService {
     @Autowired private ProfileConverterService converter;
     @Autowired private ProfileValidationService validate;
 
+    /**
+     * Método de criação de perfil de usuário do sistema web.
+     * @param authentication - dados do usuário logado
+     * @param request - dto contendo dados de criação de perfil
+     * @return - dados de perfil
+     */
     public ProfileResponse create (Principal authentication, ProfileCreateRequest request) {
         try {
             ProfileEntity entityRequest = converter.createRequestIntoEntity(request);
@@ -50,6 +59,13 @@ public class ProfileBusinessService {
         }
     }
 
+    /**
+     * Método de alteração de perfil de usuário do sistema web, através da informação do id.
+     * @param authentication - dados do usuário logado
+     * @param profileId - id de cadastro do perfil
+     * @param request - dto contendo dados de criação de perfil
+     * @return - dados de perfil
+     */
     public ProfileResponse updateById(Principal authentication, UUID profileId, ProfileUpdateRequest request) {
         try {
             ProfileEntity entity = service.findById(profileId);
@@ -72,6 +88,12 @@ public class ProfileBusinessService {
         }
     }
 
+    /**
+     * Método que retorna dados de perfis de usuários do sistema web.
+     * @param authentication - dados do usuário logado
+     * @param pageable - dados de paginação
+     * @return - lista dos dados de perfil
+     */
     public Page<ProfileResponse> get(Principal authentication, Pageable pageable) {
         try {
             Page<ProfileEntity> entities = service.getAll(pageable);
@@ -89,9 +111,21 @@ public class ProfileBusinessService {
         }
     }
 
+    /**
+     * Método que retorna dados de perfil de usuário do sistema web, através da informação do id.
+     * @param authentication - dados do usuário logado
+     * @param profileId - id de cadastro do perfil
+     * @return - dados de perfil
+     */
     public ProfileResponse getById(Principal authentication, UUID profileId) {
         return getById(profileId);
     }
+
+    /**
+     * Método que retorna dados de perfil de usuário do sistema web, através da informação do id.
+     * @param profileId - id de cadastro do perfil
+     * @return - dados de perfil
+     */
     public ProfileResponse getById(UUID profileId) {
         try {
             ProfileEntity entity = service.findById(profileId);
@@ -109,6 +143,11 @@ public class ProfileBusinessService {
         }
     }
 
+    /**
+     * Método que retorna dados de perfil de usuário do sistema web, através da informação do id.
+     * @param authentication - dados do usuário logado
+     * @return - dados de perfil
+     */
     public List<ProfileLabelResponse> getLabels(Principal authentication) {
         try {
 
@@ -127,6 +166,11 @@ public class ProfileBusinessService {
         }
     }
 
+    /**
+     * Método que retorna dados de perfil de usuário do sistema web, através da informação de ids.
+     * @param profileIds - ids de cadastro do perfil
+     * @return - dados de perfil
+     */
     public List<ProfileResponse> getByIds(List<UUID> profileIds) {
         try {
             return profileIds.stream()
@@ -140,6 +184,11 @@ public class ProfileBusinessService {
         }
     }
 
+    /**
+     * Método que retorna a regra de usuário de maior valor (caso exista mais de uma).
+     * @param profileIds - id de cadastro do perfil
+     * @return - dados de role
+     */
     public Role getCommonRole(List<UUID> profileIds) {
         try {
             List<Role> roles = profileIds.stream()

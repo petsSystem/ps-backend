@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe responsável pelos serviços de agendamentos
+ */
 @Service
 public class AppointmentService {
     private Logger log = LoggerFactory.getLogger(AppointmentService.class);
@@ -24,19 +27,40 @@ public class AppointmentService {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private AppointmentSpecification specification;
 
+    /**
+     * Método que cria um agendamento
+     * @param entity - entidade de agendamento
+     * @return - entidade de agendamento
+     */
     public AppointmentEntity create(AppointmentEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método que atualiza um agendamento
+     * @param entity - entidade de agendamento
+     * @return - entidade de agendamento
+     */
     public AppointmentEntity updateById(AppointmentEntity entity) {
         return repository.save(entity);
     }
 
+    /**
+     * Método que recupera um agendamento dado seu id
+     * @param appointmentId - id de cadastro de agendamento
+     * @return - entidade de agendamento
+     */
     public AppointmentEntity findById(UUID appointmentId) {
         return repository.findById(appointmentId)
                 .orElseThrow(GenericNotFoundException::new);
     }
 
+    /**
+     * Método que seta um status no agendamento
+     * @param entity - entidade de agendamento
+     * @param request - dto que contém dados de atualização de status do agendamento
+     * @return - entidade de agendamento
+     */
     public AppointmentEntity setStatus(AppointmentEntity entity, AppointmentStatusRequest request) {
         entity.setStatus(request.getStatus());
 
@@ -48,34 +72,13 @@ public class AppointmentService {
         return repository.save(entity);
     }
 
+    /**
+     * Método que filtra agendamentos
+     * @param filter -
+     * @return - lista de entidades de agendamento
+     */
     public List<AppointmentEntity> findAllByFilter(AppointmentFilterRequest filter) {
         Specification<AppointmentEntity> filters = specification.filter(filter);
         return repository.findAll(filters);
     }
-
-    public List<AppointmentEntity> findByScheduleId(UUID scheduleId) {
-        return repository.findBySchedule(scheduleId);
-    }
-
-
-//    public AppointmentEntity activate (UUID scheduleId, JsonPatch patch) throws JsonPatchException, JsonProcessingException {
-//        AppointmentEntity entity = findById(scheduleId);
-//
-//        entity = applyPatch(patch, entity);
-//
-//        return repository.save(entity);
-//    }
-//
-
-//
-//    private AppointmentEntity applyPatch(JsonPatch patch, AppointmentEntity entity) throws JsonPatchException, JsonProcessingException {
-//        JsonNode patched = patch.apply(objectMapper.convertValue(entity, JsonNode.class));
-//        return objectMapper.treeToValue(patched, AppointmentEntity.class);
-//    }
-//
-
-//
-//    public List<AppointmentEntity> findAllByProductId(UUID productId) {
-//        return repository.findAllByProductId(productId);
-//    }
 }

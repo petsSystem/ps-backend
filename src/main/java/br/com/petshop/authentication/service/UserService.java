@@ -9,10 +9,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * Classe responsável pelas funcionalidades da autenticação
+ */
 @Service
 public class UserService {
     @Autowired private CustomerRepository customerRepository;
     @Autowired private UserRepository systemUserRepository;
+
+    /**
+     * Método que retorna o objeto UserDetails a partir de um username
+     * @return
+     */
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override

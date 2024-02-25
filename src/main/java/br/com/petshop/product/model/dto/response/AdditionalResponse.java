@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de um produto/serviço adicional.
+ */
 @Builder
 @Getter
 @Setter

@@ -9,12 +9,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+/**
+ * Classe responsável pelas regras do login
+ */
 @Service
 public class AuthenticationService {
 
     @Autowired private JwtService jwtService;
     @Autowired private AuthenticationManager authenticationManager;
 
+    /**
+     * Método que efetua login
+     * @param request
+     * @return
+     */
     public AuthenticationResponse login(AuthenticationRequest request) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));

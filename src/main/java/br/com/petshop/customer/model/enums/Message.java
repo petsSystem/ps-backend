@@ -1,5 +1,8 @@
 package br.com.petshop.customer.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     CUSTOMER_ALREADY_REGISTERED_ERROR ("Cliente já cadastrado no sistema."),
     CUSTOMER_CREATE_ERROR ("Erro ao cadastrar cliente. Tente novamente mais tarde."),

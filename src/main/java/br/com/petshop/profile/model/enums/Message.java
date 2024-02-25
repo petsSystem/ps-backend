@@ -1,5 +1,8 @@
 package br.com.petshop.profile.model.enums;
 
+/**
+ * Enum das mensagens de retorno de erros
+ */
 public enum Message {
     PROFILE_CREATE_ERROR("Erro ao cadastrar perfil. Tente novamente mais tarde."),
     PROFILE_ALREADY_REGISTERED_ERROR("Perfil já cadastrado."),

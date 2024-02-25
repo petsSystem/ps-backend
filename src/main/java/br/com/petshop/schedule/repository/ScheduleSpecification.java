@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Classe de queries filtro da agenda
+ */
 @Service
 public class ScheduleSpecification {
 

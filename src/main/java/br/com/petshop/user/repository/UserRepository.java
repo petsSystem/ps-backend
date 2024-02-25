@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Classe repositório do usuário do sistema.
+ */
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 

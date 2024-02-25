@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo filtro de agendamento.
+ */
 @Builder
 @Getter
 @Setter

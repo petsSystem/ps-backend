@@ -8,6 +8,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Objeto de endereço.
+ */
 @Builder
 @Getter
 @Setter

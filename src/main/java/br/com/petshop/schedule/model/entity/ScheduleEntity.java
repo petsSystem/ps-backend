@@ -18,6 +18,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe entidade que representa uma agenda.
+ */
 @Builder
 @Getter
 @Setter

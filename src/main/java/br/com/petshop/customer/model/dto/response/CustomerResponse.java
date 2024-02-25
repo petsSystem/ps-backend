@@ -13,6 +13,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de um cliente.
+ */
 @Data
 @Builder
 @NoArgsConstructor

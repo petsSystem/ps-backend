@@ -1,4 +1,4 @@
-package br.com.petshop.company.model.entity;
+package br.com.petshop.company.repository;
 
 import br.com.petshop.user.model.entity.UserEntity;
 import jakarta.persistence.criteria.Expression;
@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Classe de queries filtro da loja/petshop
+ */
 @Service
 public class CompanySpecification {
 

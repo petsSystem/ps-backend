@@ -21,13 +21,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Classe responsável pelas regras de negócio do pet
+ */
 @Service
 public class PetBusinessService {
 
-    private Logger log = LoggerFactory.getLogger(PetBusinessService.class);
+    private final Logger log = LoggerFactory.getLogger(PetBusinessService.class);
     @Autowired private PetService service;
     @Autowired private PetConverterService converter;
 
+    /**
+     * Método que recupera uma lista de raças de cachorros
+     * @param authentication - dados do usuário logado
+     * @return - lista de raças de cachorros
+     */
     public List<String> getDogsList(Principal authentication) {
         try {
             return BreedType.dogValues();
@@ -39,6 +47,11 @@ public class PetBusinessService {
         }
     }
 
+    /**
+     * Método que recupera uma lista de raças de gatos
+     * @param authentication - dados do usuário logado
+     * @return - lista de raças de gatos
+     */
     public List<String> getCatsList(Principal authentication) {
         try {
             return BreedType.catValues();
@@ -50,6 +63,12 @@ public class PetBusinessService {
         }
     }
 
+    /**
+     * Método de criação de pet.
+     * @param authentication - dados do usuário logado
+     * @param request - dto contendo dados de criação do pet
+     * @return - dados do pet
+     */
     public PetResponse create(Principal authentication, PetCreateRequest request) {
         try {
             //converte request em entidade
@@ -68,6 +87,13 @@ public class PetBusinessService {
         }
     }
 
+    /**
+     * Método de atualização de pet.
+     * @param authentication - dados do usuário logado
+     * @param petId - id do cadastro do pet
+     * @param request - dto contendo dados de atualização do pet
+     * @return - dados do pet
+     */
     public PetResponse update(Principal authentication, UUID petId, PetUpdateRequest request) {
         try {
             //recupera do pet ativo pelo id
@@ -94,6 +120,12 @@ public class PetBusinessService {
         }
     }
 
+    /**
+     * Método que recupera os pets de um cliente informado.
+     * @param authentication - dados do usuário logado
+     * @param customerId - id do cadastro do cliente/tutor
+     * @return - lista de dados de pets
+     */
     public Set<PetResponse> getByCustomerId(Principal authentication, UUID customerId) {
         try {
             //recupera todos os pets pelo customerId
@@ -111,6 +143,12 @@ public class PetBusinessService {
         }
     }
 
+    /**
+     * Métoddo que recupera os dados do pet através da informação do id.
+     * @param authentication - dados do usuário logado
+     * @param petId - id do cadastro do pet
+     * @return - dados do pet
+     */
     public PetResponse getById(Principal authentication, UUID petId) {
         try {
             //recupera o pet pelo id
@@ -130,6 +168,13 @@ public class PetBusinessService {
         }
     }
 
+    /**
+     * Método que desativa um pet (exclusão lógica).
+     * @param authentication - dados do usuário logado
+     * @param petId - id do cadastro do pet
+     * @param patch - informações da atualização
+     * @return - dados do pet
+     */
     public PetResponse deactivate (Principal authentication, UUID petId, JsonPatch patch) {
         try {
             //recupera o pet pelo id

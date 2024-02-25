@@ -11,6 +11,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pela criação de um usuário do sistema.
+ */
 @Builder
 @Getter
 @Setter

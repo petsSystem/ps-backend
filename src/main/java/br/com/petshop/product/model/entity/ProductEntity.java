@@ -17,6 +17,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe entidade que representa um produto/serviço.
+ */
 @Builder
 @Getter
 @Setter

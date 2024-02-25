@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe dto responsável pelo retorno dos dados de agendamento.
+ */
 @Builder
 @Getter
 @Setter

@@ -24,6 +24,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Classe entidade que representa um agendamento.
+ */
 @Builder
 @Getter
 @Setter

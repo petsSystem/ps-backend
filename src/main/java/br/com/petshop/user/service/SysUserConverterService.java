@@ -14,12 +14,19 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Classe responsável pelas conversões de objetos do usuário do sistema web.
+ */
 @Service
 public class SysUserConverterService {
 
-    @Autowired
-    private ModelMapper mapper;
+    @Autowired private ModelMapper mapper;
 
+    /**
+     * Método que converte dto (createRequest) em entidade
+     * @param request - dto com dados de criação
+     * @return - entidade
+     */
     public UserEntity createRequestIntoEntity(SysUserCreateRequest request) {
         request.setCpf(request.getCpf().replaceAll("[^0-9]", ""));
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -30,10 +37,21 @@ public class SysUserConverterService {
         return entity;
     }
 
+    /**
+     * Método que converte dto (updateRequest) em entidade
+     * @param request - dto com dados de atualização
+     * @return - entidade
+     */
     public UserEntity updateRequestIntoEntity(SysUserUpdateRequest request) {
         return mapper.map(request, UserEntity.class);
     }
 
+    /**
+     * Método que faz merge de duas entidades
+     * @param request - entidade com dados de atualização
+     * @param entity - entidade atualmente salva em banco
+     * @return - entidade
+     */
     public UserEntity updateRequestIntoEntity(UserEntity request, UserEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
@@ -42,28 +60,59 @@ public class SysUserConverterService {
         return entity;
     }
 
+    /**
+     * Método que converte dto (updateRequest) em entidade
+     * @param request - dto com dados de atualização
+     * @return - entidade
+     */
     public UserEntity updateProfileRequestIntoEntity(SysUserUpdateProfileRequest request) {
         return mapper.map(request, UserEntity.class);
     }
 
+    /**
+     * Método que faz merge de duas entidades
+     * @param request - entidade com dados de atualização
+     * @param entity - entidade atualmente salva em banco
+     * @return - entidade
+     */
     public UserEntity updateProfileRequestIntoEntity(UserEntity request, UserEntity entity) {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
         return entity;
     }
 
+    /**
+     * Método que converte entidade em dto (response)
+     * @param entity - entidade
+     * @return - dto de response
+     */
     public SysUserResponse entityIntoResponse(UserEntity entity) {
         return mapper.map(entity, SysUserResponse.class);
     }
 
+    /**
+     * Método que converte entidade em dto (response)
+     * @param entity - entidade
+     * @return - dto de response
+     */
     public SysUserTableResponse entityIntoTableResponse(UserEntity entity) {
         return mapper.map(entity, SysUserTableResponse.class);
     }
 
+    /**
+     * Método que converte entidade em dto (response)
+     * @param entity - entidade
+     * @return - dto de response
+     */
     public SysUserProfileResponse entityIntoProfileResponse(UserEntity entity) {
         return mapper.map(entity, SysUserProfileResponse.class);
     }
 
+    /**
+     * Método que converte entidade em dto (response)
+     * @param entity - entidade
+     * @return - dto de response
+     */
     public SysUserMeResponse entityIntoMeResponse(UserEntity entity) {
         return mapper.map(entity, SysUserMeResponse.class);
     }
