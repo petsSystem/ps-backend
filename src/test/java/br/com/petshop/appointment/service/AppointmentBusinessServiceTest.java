@@ -10,6 +10,7 @@ import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequestMock;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponseMock;
+import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.entity.AppointmentEntityMock;
 import br.com.petshop.appointment.model.map.ScheduleMap;
@@ -135,8 +136,8 @@ class AppointmentBusinessServiceTest {
         when(scheduleService.getStructure(any(), any())).thenReturn(weekdayMap);
         when(appointmentScheduleService.getScheduleDateTimeView(any(), any())).thenReturn(hourAppointmentsMap);
 
-        TreeMap<LocalTime, List<AppointmentEntity>> result = appointmentBusinessService.schedule(authentication, new AppointmentFilterRequest(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now()));
-        Assertions.assertEquals(hourAppointmentsMap, result);
+        List<AppointmentTableResponse> result = appointmentBusinessService.schedule(authentication, new AppointmentFilterRequest(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now()));
+        Assertions.assertEquals(0, result.size());
     }
 
     @Test

@@ -1,13 +1,27 @@
 package br.com.petshop.appointment.service;
 
+import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
+import br.com.petshop.customer.model.dto.response.CustomerResponse;
+import br.com.petshop.customer.service.sys.CustomerSysBusinessService;
+import br.com.petshop.pet.model.dto.response.PetResponse;
+import br.com.petshop.pet.service.PetBusinessService;
+import br.com.petshop.product.model.dto.response.ProductResponse;
+import br.com.petshop.product.service.ProductBusinessService;
+import br.com.petshop.user.model.dto.response.SysUserResponse;
+import br.com.petshop.user.service.SysUserBusinessService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -16,6 +30,11 @@ import java.util.UUID;
  */
 @Service
 public class AppointmentScheduleService {
+
+    @Autowired private PetBusinessService petService;
+    @Autowired private CustomerSysBusinessService customerService;
+    @Autowired private SysUserBusinessService userService;
+    @Autowired private ProductBusinessService productService;
 
     /**
      * Transforma uma lista de entidade de agendamento em um map de agendamento, sendo a data a key.
@@ -143,5 +162,61 @@ public class AppointmentScheduleService {
             times.put(time, timeAvailable);
         }
         return times;
+    }
+
+    /**
+     * Método que converte uma árvore de horário x lista de agendamento em uma lista
+     * de objeto do tipo AppointmentTableResponse
+     * @param times - árvore de horário x lista de agendamentos
+     * @return - lista de agendamentos para listagem
+     */
+    public List<AppointmentTableResponse> mapToList(Principal authentication, TreeMap<LocalTime, List<AppointmentEntity>> times) {
+        List<AppointmentTableResponse> appointments = new ArrayList<>();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (LocalTime time : times.keySet()) {
+            List<AppointmentEntity> appointmentList = times.get(time);
+
+            if (Objects.nonNull(appointmentList)) {
+                for (AppointmentEntity appointment : appointmentList) {
+
+                    PetResponse pet = petService.getById(authentication, appointment.getPetId());
+                    CustomerResponse customer = customerService.getById(authentication, appointment.getCustomerId());
+                    SysUserResponse user = userService.getById(authentication, appointment.getUserId());
+                    ProductResponse product = productService.getById(authentication, appointment.getProductId());
+
+                    BigDecimal totalAmount = product.getAmount();
+
+                    List<String> additionalsName = new ArrayList<>();
+                    for (UUID additional : appointment.getAdditionalIds()) {
+                        ProductResponse additionals = productService.getById(authentication, additional);
+                        totalAmount = totalAmount.add(additionals.getAmount());
+                        additionalsName.add(additionals.getName());
+                    }
+
+                    AppointmentTableResponse table = AppointmentTableResponse.builder()
+                            .id(appointment.getId())
+                            .petName(pet.getName())
+                            .customerName(customer.getName())
+                            .scheduleId(appointment.getScheduleId())
+                            .userName(user.getName())
+                            .productName(product.getName())
+                            .additionals(additionalsName)
+                            .date(appointment.getDate().format(dateFormatter))
+                            .time(appointment.getTime().format(timeFormatter))
+                            .paymentStatus(appointment.getPaymentStatus())
+                            .paymentType(appointment.getPaymentType())
+                            .status(appointment.getStatus())
+                            .comments(appointment.getComments())
+                            .amount(totalAmount)
+                            .build();
+
+                    appointments.add(table);
+                }
+            }
+        }
+        return appointments;
     }
 }

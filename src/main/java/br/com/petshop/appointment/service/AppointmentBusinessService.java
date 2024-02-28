@@ -5,6 +5,7 @@ import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
+import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.enums.Message;
 import br.com.petshop.commons.exception.GenericNotFoundException;
@@ -199,7 +200,7 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
      * @param filter - companyId, productId, userId, date
      * @return - árvore de horário x lista de agendamentos
      */
-    public TreeMap<LocalTime, List<AppointmentEntity>> schedule(Principal authentication, AppointmentFilterRequest filter) {
+    public List<AppointmentTableResponse> schedule(Principal authentication, AppointmentFilterRequest filter) {
         try {
             //recupero a estrutura do agendamento completo
             TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
@@ -216,7 +217,9 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
                     appointmentScheduleService.mapAppointmentsTime(appointments);
 
             //MERGE DE AGENDAMENTOS DE AGENDA (visualização dia)
-            return appointmentScheduleService.getScheduleDateTimeView(structureTime, appointmentsTimeMap);
+            TreeMap<LocalTime, List<AppointmentEntity>> map = appointmentScheduleService.getScheduleDateTimeView(structureTime, appointmentsTimeMap);
+
+            return appointmentScheduleService.mapToList(authentication, map);
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

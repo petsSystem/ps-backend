@@ -5,6 +5,7 @@ import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
+import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.service.AppointmentBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -220,22 +222,22 @@ public class AppointmentController {
     })
     @GetMapping("/schedule")
     @ResponseStatus(HttpStatus.OK)
-    public TreeMap<LocalTime, List<AppointmentEntity>> schedule (
+    public List<AppointmentTableResponse> schedule (
             Principal authentication,
-            @RequestParam(value = "date", required = true) String date,
             @RequestParam(value = "companyId", required = true) UUID companyId,
-            @RequestParam(value = "productId", required = true) UUID productId,
+            @RequestParam(value = "date", required = false) String date,
+            @RequestParam(value = "productId", required = false) UUID productId,
             @RequestParam(value = "userId", required = false) UUID userId) {
-
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dateFormatted = LocalDate.parse(date, dateFormatter);
 
         AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
                 .companyId(companyId)
                 .productId(productId)
                 .userId(userId)
-                .date(dateFormatted)
                 .build();
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (Objects.nonNull(date))
+            filter.setDate(LocalDate.parse(date, dateFormatter));
 
         return businessService.schedule(authentication, filter);
     }
