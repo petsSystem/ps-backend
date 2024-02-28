@@ -27,10 +27,10 @@ public class PetResponse implements Serializable {
     private Gender gender;
     private Specie specie;
     private String birthDate;
-    private String neutered;
+    private Boolean neutered;
     private Temper temper;
     private Coat coat;
-    private String weight;
+    private Double weight;
     private String breed;
     private Size size;
     private String color;

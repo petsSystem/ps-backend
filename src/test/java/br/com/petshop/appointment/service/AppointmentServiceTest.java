@@ -6,8 +6,6 @@ import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequestMock;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.entity.AppointmentEntityMock;
-import br.com.petshop.appointment.model.enums.PaymentStatus;
-import br.com.petshop.appointment.model.enums.PaymentType;
 import br.com.petshop.appointment.model.enums.Status;
 import br.com.petshop.appointment.repository.AppointmentRepository;
 import br.com.petshop.appointment.repository.AppointmentSpecification;
@@ -18,19 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Month;
 import java.util.List;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class AppointmentServiceTest {
     @Mock AppointmentRepository repository;

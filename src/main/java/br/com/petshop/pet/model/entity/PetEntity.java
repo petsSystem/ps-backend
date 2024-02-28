@@ -39,7 +39,7 @@ public class PetEntity extends AuditorBaseEntity implements Serializable {
     private Specie specie;
     @Column(name = "birth_date")
     private String birthDate;
-    private String neutered;
+    private Boolean neutered;
     @Enumerated(EnumType.STRING)
     private Temper temper;
     @Enumerated(EnumType.STRING)

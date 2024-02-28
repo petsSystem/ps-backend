@@ -10,9 +10,6 @@ import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponseMock;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.entity.AppointmentEntityMock;
-import br.com.petshop.appointment.model.enums.PaymentStatus;
-import br.com.petshop.appointment.model.enums.PaymentType;
-import br.com.petshop.appointment.model.enums.Status;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +19,8 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Month;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 class AppointmentConverterServiceTest {
     @Mock ModelMapper mapper;
