@@ -1,5 +1,6 @@
 package br.com.petshop.product.model.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +21,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCreateRequest implements Serializable {
+    @NotNull
     private UUID companyId;
+    @NotNull
     private UUID categoryId;
+    @NotNull
     private String name;
     private Integer intervalMinutes;
     private BigDecimal amount;

@@ -2,6 +2,7 @@ package br.com.petshop.profile.model.dto.request;
 
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.profile.model.dto.Permission;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileCreateRequest implements Serializable {
+    @NotNull
     private String name;
     private Role role;
     private List<Permission> permissions;

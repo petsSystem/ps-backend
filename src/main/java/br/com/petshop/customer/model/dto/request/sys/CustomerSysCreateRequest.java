@@ -4,6 +4,7 @@ import br.com.petshop.customer.model.enums.AppStatus;
 import br.com.petshop.customer.model.enums.Origin;
 import br.com.petshop.authentication.model.enums.Role;
 import br.com.petshop.commons.model.Address;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +21,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerSysCreateRequest implements Serializable {
+    @NotNull
     private String name;
+    @NotNull
     private String cpf;
+    @NotNull
     private String email;
     private String phone;
     private String birthDate;

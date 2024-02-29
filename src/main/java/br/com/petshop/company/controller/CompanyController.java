@@ -42,7 +42,6 @@ public class CompanyController {
 
     @Autowired private CompanyBusinessService businessService;
 
-    //ACESSO: ADMIN e OWNER
     @Operation(summary = "Serviço de inclusão de loja no sistema.",
             description = "Acesso: 'ADMIN', 'OWNER'")
     @ApiResponses(value = {

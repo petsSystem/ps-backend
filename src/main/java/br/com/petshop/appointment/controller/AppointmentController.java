@@ -130,7 +130,7 @@ public class AppointmentController {
                             "}\n" +
                             "\n")})})
     })
-    @PatchMapping("/password")
+    @PatchMapping("/status")
     @ResponseStatus(HttpStatus.OK)
     public AppointmentResponse setStatus (
             Principal authentication,

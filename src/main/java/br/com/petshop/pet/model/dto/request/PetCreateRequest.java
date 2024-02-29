@@ -5,6 +5,7 @@ import br.com.petshop.pet.model.enums.Gender;
 import br.com.petshop.pet.model.enums.Size;
 import br.com.petshop.pet.model.enums.Specie;
 import br.com.petshop.pet.model.enums.Temper;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PetCreateRequest implements Serializable {
+    @NotNull
     private UUID customerId;
+    @NotNull
     private String name;
     private Gender gender;
     private Specie specie;

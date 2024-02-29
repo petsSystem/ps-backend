@@ -1,6 +1,7 @@
 package br.com.petshop.customer.model.dto.request.app;
 
 import br.com.petshop.commons.model.Address;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerAppUpdateRequest implements Serializable {
+    @NotNull
     private String name;
+    @NotNull
     private String email;
     private String phone;
     private String birthDate;

@@ -1,6 +1,7 @@
 package br.com.petshop.company.model.dto.request;
 
 import br.com.petshop.commons.model.Address;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyCreateRequest implements Serializable {
+    @NotNull
     private String name;
+    @NotNull
     private String cnpj;
     private String phone;
     private Address address;

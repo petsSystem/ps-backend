@@ -2,6 +2,7 @@ package br.com.petshop.appointment.model.dto.request;
 
 import br.com.petshop.appointment.model.enums.PaymentStatus;
 import br.com.petshop.appointment.model.enums.Status;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,15 +22,23 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppointmentCreateRequest implements Serializable {
+    @NotNull
     private UUID companyId;
+    @NotNull
     private UUID petId;
+    @NotNull
     private UUID customerId;
+    @NotNull
     private UUID scheduleId;
+    @NotNull
     private UUID userId;
     private String userName;
+    @NotNull
     private UUID productId;
     private List<UUID> additionalIds;
+    @NotNull
     private String date;
+    @NotNull
     private String time;
 
     @Builder.Default
