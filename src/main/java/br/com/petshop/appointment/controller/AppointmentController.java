@@ -6,7 +6,6 @@ import br.com.petshop.appointment.model.dto.request.AppointmentStatusRequest;
 import br.com.petshop.appointment.model.dto.request.AppointmentUpdateRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentResponse;
 import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
-import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.service.AppointmentBusinessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -114,7 +113,7 @@ public class AppointmentController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao alterar status do agendamento agenda. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao alterar status do agendamento. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/pet/appointments/{appointmentId}\"\n" +
                             "}\n" +
                             "\n")})}),
@@ -148,7 +147,7 @@ public class AppointmentController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar disponibilidade de agenda. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar disponibilidade de agendamento. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/pet/appointments?companyId=&productId=&userId=\"\n" +
                             "}\n" +
                             "\n")})})
@@ -178,7 +177,7 @@ public class AppointmentController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar disponibilidade de agenda. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar disponibilidade de agendamento. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/pet/appointments?companyId=&productId=&userId=\"\n" +
                             "}\n" +
                             "\n")})})
@@ -215,7 +214,7 @@ public class AppointmentController {
                             "\"type\": \"about:blank\",\n" +
                             "\"title\": \"Bad Request\",\n" +
                             "\"status\": 400,\n" +
-                            "\"detail\": \"Erro ao recuperar disponibilidade de agenda. Tente novamente mais tarde.\",\n" +
+                            "\"detail\": \"Erro ao recuperar disponibilidade de agendamento. Tente novamente mais tarde.\",\n" +
                             "\"instance\": \"/api/v1/pet/appointments?companyId=&productId=&userId=\"\n" +
                             "}\n" +
                             "\n")})})

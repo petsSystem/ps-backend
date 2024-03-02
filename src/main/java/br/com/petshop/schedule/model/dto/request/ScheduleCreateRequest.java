@@ -1,6 +1,7 @@
 package br.com.petshop.schedule.model.dto.request;
 
 import br.com.petshop.commons.model.Day;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +21,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleCreateRequest implements Serializable {
+    @NotNull
     private UUID companyId;
+    @NotNull
     private UUID categoryId;
+    @NotNull
     private UUID userId;
+    @NotNull
     private List<UUID> productIds;
     private List<Day> days;
     @Builder.Default

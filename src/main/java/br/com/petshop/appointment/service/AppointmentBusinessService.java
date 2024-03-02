@@ -152,9 +152,9 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.APPOINTMENT_GET_AVAILABILITY_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_GET_AVAILABILITY_ERROR.get(), ex);
         }
     }
 
@@ -188,9 +188,9 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.APPOINTMENT_GET_AVAILABILITY_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_GET_AVAILABILITY_ERROR.get(), ex);
         }
     }
 
@@ -226,9 +226,9 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, Message.APPOINTMENT_NOT_FOUND_ERROR.get(), ex);
         } catch (Exception ex) {
-            log.error(Message.APPOINTMENT_STATUS_ERROR.get() + " Error: " + ex.getMessage());
+            log.error(Message.APPOINTMENT_GET_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_STATUS_ERROR.get(), ex);
+                    HttpStatus.BAD_REQUEST, Message.APPOINTMENT_GET_ERROR.get(), ex);
         }
     }
 
