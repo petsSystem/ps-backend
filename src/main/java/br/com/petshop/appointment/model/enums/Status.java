@@ -4,7 +4,6 @@ package br.com.petshop.appointment.model.enums;
  * Enum do status do agendamento
  */
 public enum Status {
-    CREATED,
     SCHEDULED,
     CONFIRMED,
     CANCELLED_BY_CLIENT,
