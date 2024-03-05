@@ -10,6 +10,8 @@ import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.appointment.model.enums.Message;
 import br.com.petshop.commons.exception.GenericNotFoundException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
+import br.com.petshop.product.model.dto.response.ProductResponse;
+import br.com.petshop.product.model.dto.response.ProductTableResponse;
 import br.com.petshop.schedule.service.ScheduleBusinessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import java.security.Principal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -202,24 +205,35 @@ public class AppointmentBusinessService extends AuthenticationCommonService {
      */
     public List<AppointmentTableResponse> schedule(Principal authentication, AppointmentFilterRequest filter) {
         try {
-            //recupero a estrutura do agendamento completo
-            TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
-                    scheduleService.getStructure(filter.getUserId(), filter.getProductId());
+            List<AppointmentTableResponse> appointmentTableResponses = new ArrayList<>();
+            List<ProductTableResponse> products = appointmentScheduleService.findProducts(authentication, filter);
+            for (ProductTableResponse product : products) {
+                //recupero a estrutura do agendamento completo
+                TreeMap<DayOfWeek, TreeMap<LocalTime, List<UUID>>> structure =
+                        scheduleService.getStructure(filter.getUserId(), product.getId());
 
-            //recupero os horários da estrutura da agenda com seus respectivos agendamentos
-            TreeMap<LocalTime, List<UUID>> structureTime = structure.get(filter.getDate().getDayOfWeek());
+                //recupero os horários da estrutura da agenda com seus respectivos agendamentos
+                TreeMap<LocalTime, List<UUID>> structureTime = structure.get(filter.getDate().getDayOfWeek());
 
-            //recupera agendamentos pelo companyId, productId, userId (opcional) e date (opcional)
-            List<AppointmentEntity> appointments = service.findAllByFilter(filter);
+                if (structureTime == null)
+                    continue;
 
-            //transformar os agendamentos em Map<Time, Agendamento>
-            TreeMap<LocalTime, List<AppointmentEntity>> appointmentsTimeMap =
-                    appointmentScheduleService.mapAppointmentsTime(appointments);
+                //recupera agendamentos pelo companyId, productId, userId (opcional) e date (opcional)
+                filter.setProductId(product.getId());
+                filter.setCategoryId(product.getCategoryId());
+                List<AppointmentEntity> appointments = service.findAllByFilter(filter);
 
-            //MERGE DE AGENDAMENTOS DE AGENDA (visualização dia)
-            TreeMap<LocalTime, List<AppointmentEntity>> map = appointmentScheduleService.getScheduleDateTimeView(structureTime, appointmentsTimeMap);
+                //transformar os agendamentos em Map<Time, Agendamento>
+                TreeMap<LocalTime, List<AppointmentEntity>> appointmentsTimeMap =
+                        appointmentScheduleService.mapAppointmentsTime(appointments);
 
-            return appointmentScheduleService.mapToList(authentication, map);
+                //MERGE DE AGENDAMENTOS DE AGENDA (visualização dia)
+                TreeMap<LocalTime, List<AppointmentEntity>> map = appointmentScheduleService.getScheduleDateTimeView(structureTime, appointmentsTimeMap);
+
+                List<AppointmentTableResponse> responses = appointmentScheduleService.mapToList(authentication, map, product);
+                appointmentTableResponses.addAll(responses);
+            }
+            return appointmentTableResponses;
 
         } catch (GenericNotFoundException ex) {
             log.error(Message.APPOINTMENT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());

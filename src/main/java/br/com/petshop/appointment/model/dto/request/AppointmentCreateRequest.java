@@ -25,6 +25,8 @@ public class AppointmentCreateRequest implements Serializable {
     @NotNull
     private UUID companyId;
     @NotNull
+    private UUID categoryId;
+    @NotNull
     private UUID petId;
     @NotNull
     private UUID customerId;

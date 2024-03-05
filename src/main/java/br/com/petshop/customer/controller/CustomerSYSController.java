@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,7 +82,7 @@ public class CustomerSYSController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponse create(
-            @RequestBody CustomerSysCreateRequest request) {
+            @RequestBody @Valid CustomerSysCreateRequest request) {
         return businessService.create(request);
     }
 

@@ -68,7 +68,7 @@ class AppointmentServiceTest {
     @Test
     void testSetStatus() {
         when(repository.save(entity)).thenReturn(entity);
-        statusRequest.setStatus(Status.CANCELLED);
+        statusRequest.setStatus(Status.CANCELLED_BY_CLIENT);
         AppointmentEntity result = appointmentService.setStatus(entity, statusRequest);
         Assertions.assertEquals(entity, result);
     }

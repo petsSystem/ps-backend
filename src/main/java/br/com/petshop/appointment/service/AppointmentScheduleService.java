@@ -1,5 +1,6 @@
 package br.com.petshop.appointment.service;
 
+import br.com.petshop.appointment.model.dto.request.AppointmentFilterRequest;
 import br.com.petshop.appointment.model.dto.response.AppointmentTableResponse;
 import br.com.petshop.appointment.model.entity.AppointmentEntity;
 import br.com.petshop.customer.model.dto.response.CustomerResponse;
@@ -7,6 +8,7 @@ import br.com.petshop.customer.service.sys.CustomerSysBusinessService;
 import br.com.petshop.pet.model.dto.response.PetResponse;
 import br.com.petshop.pet.service.PetBusinessService;
 import br.com.petshop.product.model.dto.response.ProductResponse;
+import br.com.petshop.product.model.dto.response.ProductTableResponse;
 import br.com.petshop.product.service.ProductBusinessService;
 import br.com.petshop.user.model.dto.response.SysUserResponse;
 import br.com.petshop.user.service.SysUserBusinessService;
@@ -170,7 +172,7 @@ public class AppointmentScheduleService {
      * @param times - árvore de horário x lista de agendamentos
      * @return - lista de agendamentos para listagem
      */
-    public List<AppointmentTableResponse> mapToList(Principal authentication, TreeMap<LocalTime, List<AppointmentEntity>> times) {
+    public List<AppointmentTableResponse> mapToList(Principal authentication, TreeMap<LocalTime, List<AppointmentEntity>> times, ProductTableResponse product) {
         List<AppointmentTableResponse> appointments = new ArrayList<>();
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -185,9 +187,11 @@ public class AppointmentScheduleService {
                     PetResponse pet = petService.getById(authentication, appointment.getPetId());
                     CustomerResponse customer = customerService.getById(authentication, appointment.getCustomerId());
                     SysUserResponse user = userService.getById(authentication, appointment.getUserId());
-                    ProductResponse product = productService.getById(authentication, appointment.getProductId());
+//                    ProductResponse product = productService.getById(authentication, appointment.getProductId());
 
                     BigDecimal totalAmount = product.getAmount();
+
+                    //adicinar category
 
                     List<String> additionalsName = new ArrayList<>();
                     for (UUID additional : appointment.getAdditionalIds()) {
@@ -198,6 +202,7 @@ public class AppointmentScheduleService {
 
                     AppointmentTableResponse table = AppointmentTableResponse.builder()
                             .id(appointment.getId())
+                            .category(product.getCategory())
                             .petName(pet.getName())
                             .customerName(customer.getName())
                             .scheduleId(appointment.getScheduleId())
@@ -211,6 +216,7 @@ public class AppointmentScheduleService {
                             .status(appointment.getStatus())
                             .comments(appointment.getComments())
                             .amount(totalAmount)
+                            .active(appointment.getActive())
                             .build();
 
                     appointments.add(table);
@@ -218,5 +224,13 @@ public class AppointmentScheduleService {
             }
         }
         return appointments;
+    }
+
+    public List<ProductTableResponse> findProducts(Principal authentication, AppointmentFilterRequest filter) {
+        if (filter.getProductId() != null) {
+            ProductTableResponse response = productService.findById(authentication, filter.getProductId());
+            return List.of(response);
+        }
+        return productService.getAll(authentication, filter.getCompanyId(), filter.getCategoryId(), false);
     }
 }

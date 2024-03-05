@@ -177,39 +177,7 @@ public class ProductBusinessService extends AuthenticationCommonService {
             //recupera todos os produtos pelo companyId
             Page<ProductEntity> entities = service.findAllByCompanyId(companyId, categoryId, additional, paging);
 
-            //checo se há agenda para todos os produtos
-            List<CategoryResponse> categories = null;
-
-            if (categoryId == null) {
-                //recupera todas as categorias pelo companyId
-                categories = categoryBusinessService
-                        .getAllByCompanyId(null, companyId, true);
-            } else { //fluxo é de agendamento
-                //recupera a categoria pelo categoryId
-                categories = List.of(categoryBusinessService
-                        .getById(authentication, categoryId));
-
-                //checo se há agendas para o produto.
-                entities = checkSchedule(authentication, companyId, categoryId, entities);
-            }
-
-            //separo cada categoria em um map, sendo o id da categoria a chave
-            Map<UUID, CategoryResponse> mapCategories = categories.stream()
-                    .collect(Collectors.toMap(CategoryResponse::getId, Function.identity()));
-
-            //converto a entidade em resposta e seto o tipo de categoria na resposta
-            List<ProductTableResponse> response = entities.stream()
-                    .map(c -> {
-                        ProductTableResponse resp = converter.entityIntoTableResponse(c);
-                        resp.setCategory(mapCategories.get(c.getCategoryId()).getType());
-                        resp.setAdditionals(getAdditionals(resp.getAdditionalIds()));
-                        return resp;
-                    })
-                    .collect(Collectors.toList());
-
-            //ordena por status + nome
-            Collections.sort(response, Comparator.comparing(ProductTableResponse::getActive).reversed()
-                    .thenComparing(ProductTableResponse::getName));
+            List<ProductTableResponse> response = getAllCommons(authentication, entities, companyId, categoryId);
 
             return new PageImpl<>(response);
 
@@ -225,6 +193,73 @@ public class ProductBusinessService extends AuthenticationCommonService {
     }
 
     /**
+     * Método que recupera dados de produto/serviço, através de filtro informado.
+     * @param authentication - dados do usuário logado
+     * @param companyId - id do cadastro da loja/petshop
+     * @param categoryId - id do cadastro da categoria
+     * @param additional - filtro de pesquisa.
+     *                   Se true = buscará todos os produtos/serviços adicionais
+     *                   Se false = buscará todos os produtos/serviços principais
+     *                   Se null (não informado) = retornará todos os produtos/serviços
+     * @return - dados do produto/serviço
+     */
+    public List<ProductTableResponse> getAll(Principal authentication, UUID companyId, UUID categoryId, Boolean additional) {
+        try {
+            //recupera todos os produtos pelo filtro
+            List<ProductEntity> entities = service.findAll(companyId, categoryId, additional);
+
+            return getAllCommons(authentication, new PageImpl<>(entities), companyId, categoryId);
+
+        } catch (GenericForbiddenException ex) {
+            log.error( Message.PRODUCT_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.PRODUCT_FORBIDDEN_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.PRODUCT_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.PRODUCT_GET_ERROR.get(), ex);
+        }
+    }
+
+    private List<ProductTableResponse> getAllCommons(Principal authentication, Page<ProductEntity> entities, UUID companyId, UUID categoryId) {
+        //checo se há agenda para todos os produtos
+        List<CategoryResponse> categories = null;
+
+        if (categoryId == null) {
+            //recupera todas as categorias pelo companyId
+            categories = categoryBusinessService
+                    .getAllByCompanyId(null, companyId, true);
+        } else { //fluxo é de agendamento
+            //recupera a categoria pelo categoryId
+            categories = List.of(categoryBusinessService
+                    .getById(authentication, categoryId));
+
+            //checo se há agendas para o produto.
+            entities = checkSchedule(authentication, companyId, categoryId, entities);
+        }
+
+        //separo cada categoria em um map, sendo o id da categoria a chave
+        Map<UUID, CategoryResponse> mapCategories = categories.stream()
+                .collect(Collectors.toMap(CategoryResponse::getId, Function.identity()));
+
+        //converto a entidade em resposta e seto o tipo de categoria na resposta
+        List<ProductTableResponse> response = entities.stream()
+                .map(c -> {
+                    ProductTableResponse resp = converter.entityIntoTableResponse(c);
+                    resp.setCategory(mapCategories.get(c.getCategoryId()).getType());
+                    resp.setAdditionals(getAdditionals(resp.getAdditionalIds()));
+                    return resp;
+                })
+                .collect(Collectors.toList());
+
+        //ordena por status + nome
+        Collections.sort(response, Comparator.comparing(ProductTableResponse::getActive).reversed()
+                .thenComparing(ProductTableResponse::getName));
+
+        return response;
+    }
+
+    /**
      * Método que recupera lista de adicioais de determinado produto.
      * @param additionalIds - id do cadastro do produto/serviço como adicional de outro produto/serviço
      * @return - lista dos dados do produto/serviço
@@ -233,7 +268,6 @@ public class ProductBusinessService extends AuthenticationCommonService {
         return additionalIds.stream()
                 .map(a -> converter.entityIntoAdditionalResponse(service.findById(a)))
                 .collect(Collectors.toList());
-
     }
 
     /**
@@ -282,6 +316,43 @@ public class ProductBusinessService extends AuthenticationCommonService {
 
             //converte entidade para a resposta
             return converter.entityIntoResponse(entity);
+
+        } catch (GenericForbiddenException ex) {
+            log.error( Message.PRODUCT_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, Message.PRODUCT_FORBIDDEN_ERROR.get(), ex);
+        } catch (GenericNotFoundException ex) {
+            log.error(Message.PRODUCT_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, Message.PRODUCT_NOT_FOUND_ERROR.get(), ex);
+        } catch (Exception ex) {
+            log.error(Message.PRODUCT_GET_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, Message.PRODUCT_GET_ERROR.get(), ex);
+        }
+    }
+
+    /**
+     * Método que retorna dados de um produto/serviço, através da informação do id.
+     * @param productId - id do cadastro do produto/serviço
+     * @return - dados do produto/serviço
+     */
+    public ProductTableResponse findById(Principal authentication, UUID productId) {
+        try {
+            //recupera o produto
+            ProductEntity entity = service.findById(productId);
+
+            //valida acesso a loja
+            validate.accessByCompany(authentication, entity.getCompanyId());
+
+            CategoryResponse category = categoryBusinessService
+                    .getById(authentication, entity.getCategoryId());
+
+            //converte entidade para a resposta
+            ProductTableResponse response = converter.entityIntoTableResponse(entity);
+            response.setCategory(category.getType());
+
+            return response;
 
         } catch (GenericForbiddenException ex) {
             log.error( Message.PRODUCT_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());

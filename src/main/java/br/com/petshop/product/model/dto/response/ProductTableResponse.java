@@ -24,6 +24,7 @@ import java.util.UUID;
 public class ProductTableResponse implements Serializable {
     private UUID id;
     private String name;
+    private UUID categoryId;
     private Category category;
     private String categoryLabel;
     private BigDecimal amount;

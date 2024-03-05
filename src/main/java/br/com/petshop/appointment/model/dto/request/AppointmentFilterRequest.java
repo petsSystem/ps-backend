@@ -20,6 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AppointmentFilterRequest implements Serializable {
     private UUID companyId;
+    private UUID categoryId;
     private UUID productId;
     private UUID userId;
     private LocalDate date;

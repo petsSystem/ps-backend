@@ -17,7 +17,6 @@ import java.util.UUID;
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Integer> {
     Optional<AppointmentEntity> findById(UUID appointmentId);
     List<AppointmentEntity> findAll(Specification<AppointmentEntity> filter);
-
     @Query(value = "SELECT * FROM appointment WHERE schedule_id = :scheduleId AND date > CURRENT_DATE", nativeQuery = true)
     List<AppointmentEntity> findBySchedule(UUID scheduleId);
 }

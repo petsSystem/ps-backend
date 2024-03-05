@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,7 +73,7 @@ public class ScheduleController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'OWNER', 'MANAGER')")
     public ScheduleResponse create(
             Principal authentication,
-            @RequestBody ScheduleCreateRequest request) {
+            @RequestBody @Valid ScheduleCreateRequest request) {
         return businessService.create(authentication, request);
     }
 

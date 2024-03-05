@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,7 +65,7 @@ public class AppointmentController {
     @ResponseStatus(HttpStatus.CREATED)
     public AppointmentResponse create(
             Principal authentication,
-            @RequestBody AppointmentCreateRequest request) {
+            @RequestBody @Valid AppointmentCreateRequest request) {
         return businessService.create(authentication, request);
     }
 
@@ -224,12 +225,14 @@ public class AppointmentController {
     public List<AppointmentTableResponse> schedule (
             Principal authentication,
             @RequestParam(value = "companyId", required = true) UUID companyId,
+            @RequestParam(value = "categoryId", required = false) UUID categoryId,
             @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "productId", required = false) UUID productId,
             @RequestParam(value = "userId", required = false) UUID userId) {
 
         AppointmentFilterRequest filter = AppointmentFilterRequest.builder()
                 .companyId(companyId)
+                .categoryId(categoryId)
                 .productId(productId)
                 .userId(userId)
                 .build();

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -102,5 +103,20 @@ public class ProductService {
     public Page<ProductEntity> findAllByCompanyId(UUID companyId, UUID categoryId, Boolean additional, Pageable paging) {
         Specification<ProductEntity> filters = specification.filter(companyId, categoryId, additional);
         return repository.findAll(filters, paging);
+    }
+
+    /**
+     * Método que recupera dados de produto/serviço, através de filtro informado.
+     * @param companyId - id de cadastro da loja/petshop
+     * @param categoryId - id de cadastro da categoria
+     * @param additional - filtro de pesquisa.
+     *                   Se true = buscará todos os produtos/serviços adicionais
+     *                   Se false = buscará todos os produtos/serviços principais
+     *                   Se null (não informado) = retornará todos os produtos/serviços
+     * @return - lista de entidades de produto/serviço
+     */
+    public List<ProductEntity> findAll(UUID companyId, UUID categoryId, Boolean additional) {
+        Specification<ProductEntity> filters = specification.filter(companyId, categoryId, additional);
+        return repository.findAll(filters);
     }
 }

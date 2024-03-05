@@ -25,6 +25,7 @@ import java.util.UUID;
 public class AppointmentResponse implements Serializable {
     private UUID id;
     private UUID companyId;
+    private UUID categoryId;
     private UUID petId;
     private UUID customerId;
     private UUID scheduleId;

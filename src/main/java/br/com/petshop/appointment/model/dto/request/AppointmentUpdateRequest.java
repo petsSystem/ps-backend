@@ -23,6 +23,7 @@ public class AppointmentUpdateRequest implements Serializable {
     private UUID scheduleId;
     private UUID userId;
     private String userName;
+    private UUID categoryId;
     private UUID productId;
     private List<UUID> additionalIds;
     private String date;

@@ -27,6 +27,7 @@ public class ProductCreateRequest implements Serializable {
     private UUID categoryId;
     @NotNull
     private String name;
+    @NotNull
     private Integer intervalMinutes;
     private BigDecimal amount;
     private Boolean additional;

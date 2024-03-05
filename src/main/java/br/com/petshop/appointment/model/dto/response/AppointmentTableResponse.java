@@ -3,6 +3,7 @@ package br.com.petshop.appointment.model.dto.response;
 import br.com.petshop.appointment.model.enums.PaymentStatus;
 import br.com.petshop.appointment.model.enums.PaymentType;
 import br.com.petshop.appointment.model.enums.Status;
+import br.com.petshop.category.model.enums.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AppointmentTableResponse implements Serializable {
     private UUID id;
+    private Category category;
 //    private UUID companyId;
 //    private UUID petId;
     private String petName;

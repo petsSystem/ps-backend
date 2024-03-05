@@ -41,6 +41,8 @@ public class AppointmentEntity extends AuditorBaseEntity implements Serializable
     private UUID petId;
     @Column(name = "customer_id")
     private UUID customerId;
+    @Column(name = "category_id")
+    private UUID categoryId;
     @Column(name = "schedule_id")
     private UUID scheduleId;
     @Column(name = "user_id")

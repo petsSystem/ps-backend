@@ -64,7 +64,8 @@ public class AppointmentService {
     public AppointmentEntity setStatus(AppointmentEntity entity, AppointmentStatusRequest request) {
         entity.setStatus(request.getStatus());
 
-        if (request.getStatus() == Status.CANCELLED) {
+        if (request.getStatus() == Status.CANCELLED_BY_CLIENT ||
+                request.getStatus() == Status.CANCELLED_BY_PETSHOP) {
             entity.setComments(request.getComments());
             entity.setActive(false);
         }
