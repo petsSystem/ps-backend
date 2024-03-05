@@ -126,7 +126,7 @@ class AppointmentBusinessServiceTest {
         when(scheduleService.getTimeAvailability(any(), any())).thenReturn(timeAvailability);
         when(appointmentScheduleService.getDateTimeView(any(), any())).thenReturn(dayAvailability);
 
-        TreeMap<LocalTime, Boolean> result = appointmentBusinessService.getDayAvailability(null, new AppointmentFilterRequest(null, null, null, LocalDate.of(2024, Month.FEBRUARY, 24)));
+        TreeMap<LocalTime, Boolean> result = appointmentBusinessService.getDayAvailability(null, new AppointmentFilterRequest(null, null, null, null, LocalDate.of(2024, Month.FEBRUARY, 24)));
         Assertions.assertEquals(dayAvailability, result);
     }
 
@@ -136,7 +136,7 @@ class AppointmentBusinessServiceTest {
         when(scheduleService.getStructure(any(), any())).thenReturn(weekdayMap);
         when(appointmentScheduleService.getScheduleDateTimeView(any(), any())).thenReturn(hourAppointmentsMap);
 
-        List<AppointmentTableResponse> result = appointmentBusinessService.schedule(authentication, new AppointmentFilterRequest(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now()));
+        List<AppointmentTableResponse> result = appointmentBusinessService.schedule(authentication, new AppointmentFilterRequest(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now()));
         Assertions.assertEquals(0, result.size());
     }
 
