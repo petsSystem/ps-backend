@@ -26,7 +26,7 @@ public class AppointmentEntityMock {
                 .time(LocalTime.now())
                 .paymentStatus(PaymentStatus.PENDING)
                 .paymentType(null)
-                .status(Status.CREATED)
+                .status(Status.SCHEDULED)
                 .comments("Comentário sobre o agendamento.")
                 .amount(new BigDecimal(50))
                 .active(true)

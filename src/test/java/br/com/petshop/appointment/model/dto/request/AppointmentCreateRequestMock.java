@@ -20,7 +20,7 @@ public class AppointmentCreateRequestMock {
                 .date("24-03-2024")
                 .time("11:00")
                 .paymentStatus(PaymentStatus.PENDING)
-                .status(Status.CREATED)
+                .status(Status.SCHEDULED)
                 .active(true)
                 .build();
     }

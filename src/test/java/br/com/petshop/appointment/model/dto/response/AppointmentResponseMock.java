@@ -22,7 +22,7 @@ public class AppointmentResponseMock {
                 .date("24-03-2024")
                 .time("11:00")
                 .paymentStatus(PaymentStatus.PENDING)
-                .status(Status.CREATED)
+                .status(Status.SCHEDULED)
                 .comments("Comentários sobre o agendamento.")
                 .amount(new BigDecimal(50))
                 .active(true)

@@ -8,7 +8,7 @@ public class AppointmentStatusRequestMock {
     public static AppointmentStatusRequest get() {
         return AppointmentStatusRequest.builder()
                 .appointmentId(UUID.randomUUID())
-                .status(Status.CREATED)
+                .status(Status.SCHEDULED)
                 .comments("Comentários sobre o agendamento.")
                 .build();
     }

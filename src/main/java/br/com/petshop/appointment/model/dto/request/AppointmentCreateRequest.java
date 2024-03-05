@@ -46,7 +46,7 @@ public class AppointmentCreateRequest implements Serializable {
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
     @Builder.Default
-    private Status status = Status.CREATED;
+    private Status status = Status.SCHEDULED;
     @Builder.Default
     private Boolean active = true;
 }
