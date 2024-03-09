@@ -31,6 +31,7 @@ public class AppointmentTableResponse implements Serializable {
     private String petName;
 //    private UUID customerId;
     private String customerName;
+    private String phone;
     private UUID scheduleId;
 //    private UUID userId;
     private String userName;

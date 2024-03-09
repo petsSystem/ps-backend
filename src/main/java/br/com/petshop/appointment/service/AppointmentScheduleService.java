@@ -205,6 +205,7 @@ public class AppointmentScheduleService {
                             .category(product.getCategory())
                             .petName(pet.getName())
                             .customerName(customer.getName())
+                            .phone(customer.getPhone())
                             .scheduleId(appointment.getScheduleId())
                             .userName(user.getName())
                             .productName(product.getName())
