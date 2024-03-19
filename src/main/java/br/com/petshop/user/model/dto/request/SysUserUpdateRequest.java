@@ -1,6 +1,7 @@
 package br.com.petshop.user.model.dto.request;
 
 import br.com.petshop.commons.model.Address;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,9 +29,11 @@ public class SysUserUpdateRequest implements Serializable {
     @NotNull
     private String phone;
     @NotNull
+    @NotEmpty
     private List<UUID> profileIds;
     @NotNull
     private List<UUID> companyIds;
+    @NotEmpty
     @NotNull
     private Address address;
 }
