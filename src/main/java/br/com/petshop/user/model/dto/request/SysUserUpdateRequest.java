@@ -1,6 +1,7 @@
 package br.com.petshop.user.model.dto.request;
 
 import br.com.petshop.commons.model.Address;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,10 +21,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SysUserUpdateRequest implements Serializable {
+    @NotNull
     private String name;
+    @NotNull
     private String email;
+    @NotNull
     private String phone;
+    @NotNull
     private List<UUID> profileIds;
+    @NotNull
     private List<UUID> companyIds;
+    @NotNull
     private Address address;
 }
