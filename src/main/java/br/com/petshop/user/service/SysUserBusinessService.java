@@ -422,11 +422,7 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             //converte a entidade na resposta final
             return converter.entityIntoResponse(entity);
 
-        } catch (GenericNotFoundException ex) {
-            log.error(Message.USER_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_NOT_FOUND_ERROR.get(), ex);
-        } catch (GenericIncorrectPasswordException ex) {
+        } catch (GenericNotFoundException | GenericIncorrectPasswordException ex) {
             log.error(Message.USER_OLD_PASSWORD_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, Message.USER_OLD_PASSWORD_ERROR.get(), ex);

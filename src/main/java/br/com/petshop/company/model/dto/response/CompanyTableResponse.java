@@ -1,5 +1,6 @@
 package br.com.petshop.company.model.dto.response;
 
+import br.com.petshop.commons.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,5 +23,6 @@ public class CompanyTableResponse implements Serializable {
     private String name;
     private String cnpj;
     private String phone;
+    private Address address;
     private Boolean active;
 }

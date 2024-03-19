@@ -22,6 +22,7 @@ import java.util.UUID;
 public class ScheduleResponse implements Serializable {
     private UUID id;
     private UUID companyId;
+    private UUID categoryId;
     private UUID userId;
     private String name;
     private List<UUID> productIds;
