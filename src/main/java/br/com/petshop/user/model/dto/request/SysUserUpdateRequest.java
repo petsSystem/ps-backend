@@ -33,7 +33,6 @@ public class SysUserUpdateRequest implements Serializable {
     private List<UUID> profileIds;
     @NotNull
     private List<UUID> companyIds;
-    @NotEmpty
     @NotNull
     private Address address;
 }
