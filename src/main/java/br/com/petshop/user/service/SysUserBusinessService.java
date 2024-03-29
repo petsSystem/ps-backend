@@ -5,6 +5,7 @@ import br.com.petshop.commons.exception.GenericAlreadyRegisteredException;
 import br.com.petshop.commons.exception.GenericForbiddenException;
 import br.com.petshop.commons.exception.GenericIncorrectPasswordException;
 import br.com.petshop.commons.exception.GenericNotFoundException;
+import br.com.petshop.commons.exception.GenericParamMissingException;
 import br.com.petshop.commons.service.AuthenticationCommonService;
 import br.com.petshop.company.model.dto.response.CompanyResponse;
 import br.com.petshop.company.service.CompanyBusinessService;
@@ -94,7 +95,7 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             validate.accessByCompany(authentication, request.getCompanyIds());
 
             if (request.getProfileIds() == null || request.getProfileIds().isEmpty())
-                throw new RuntimeException();
+                throw new GenericParamMissingException();
 
             //converte request em entidade
             UserEntity entity = converter.createRequestIntoEntity(request);
@@ -123,7 +124,11 @@ public class SysUserBusinessService extends AuthenticationCommonService {
         } catch (GenericNotFoundException ex) {
             log.error(Message.USER_COMPANY_NOT_FOUND_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, Message.USER_COMPANY_NOT_FOUND_ERROR.get(), ex);
+                HttpStatus.NOT_FOUND, Message.USER_COMPANY_NOT_FOUND_ERROR.get(), ex);
+        } catch (GenericParamMissingException ex) {
+            log.error(Message.USER_PROFILE_PARAM_MISSING_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, Message.USER_PROFILE_PARAM_MISSING_ERROR.get(), ex);
         } catch (Exception ex) {
             log.error(Message.USER_CREATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
@@ -144,7 +149,7 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             UserEntity entity = service.findByIdAndActiveIsTrue(userId);
 
             if (request.getProfileIds() == null || request.getProfileIds().isEmpty())
-                throw new RuntimeException();
+                throw new GenericParamMissingException();
 
             //valida acesso do usuário e loja
             validate.accessByUser(authentication, entity);
@@ -167,6 +172,10 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             log.error(Message.USER_FORBIDDEN_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, Message.USER_FORBIDDEN_ERROR.get(), ex);
+        } catch (GenericParamMissingException ex) {
+            log.error(Message.USER_PROFILE_PARAM_MISSING_ERROR.get() + " Error: " + ex.getMessage());
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, Message.USER_PROFILE_PARAM_MISSING_ERROR.get(), ex);
         } catch (Exception ex) {
             log.error(Message.USER_UPDATE_ERROR.get() + " Error: " + ex.getMessage());
             throw new ResponseStatusException(

@@ -7,6 +7,7 @@ public enum Message {
     USER_CREATE_ERROR ("Erro ao cadastrar usuário. Tente novamente mais tarde."),
     USER_COMPANY_NOT_ACTIVE_ERROR ("Loja cadastrada está inativa."),
     USER_COMPANY_NOT_FOUND_ERROR ("Loja não encontrada."),
+    USER_PROFILE_PARAM_MISSING_ERROR ("Favor informar o perfil do usuário."),
     USER_ALREADY_REGISTERED_ERROR ("Usuário já cadastrado no sistema."),
     USER_ACTIVATE_ERROR ("Erro ao ativar/desativar usuário. Tente novamente mais tarde."),
     USER_NOT_FOUND_ERROR ("Usuário não encontrado."),
