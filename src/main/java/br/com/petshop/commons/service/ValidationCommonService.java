@@ -40,9 +40,4 @@ public class ValidationCommonService extends AuthenticationCommonService {
         if (user.getRole() == Role.USER && (!user.getId().equals(entity.getId())))
             throw new GenericForbiddenException();
     }
-
-    public void checkProfile(UserEntity entity) {
-        if (entity.getProfileIds() == null || entity.getProfileIds().isEmpty())
-            throw new RuntimeException();
-    }
 }
