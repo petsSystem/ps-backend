@@ -51,6 +51,7 @@ public class ScheduleConverterService {
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         mapper.map(request, entity);
         entity.setDays(request.getDays());
+        entity.setProductIds(request.getProductIds());
         return entity;
     }
 
