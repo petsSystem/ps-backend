@@ -96,6 +96,9 @@ public class SysUserBusinessService extends AuthenticationCommonService {
             //converte request em entidade
             UserEntity entity = converter.createRequestIntoEntity(request);
 
+            //check if profile is informed
+            validate.checkProfile(entity);
+
             //verifica a role comum de todos os perfis salvos
             Role role = profileService.getCommonRole(entity.getProfileIds());
             entity.setRole(role);
@@ -139,6 +142,9 @@ public class SysUserBusinessService extends AuthenticationCommonService {
         try {
             //recupera o usuario ativo pelo id
             UserEntity entity = service.findByIdAndActiveIsTrue(userId);
+
+            //check if profile is informed
+            validate.checkProfile(entity);
 
             //valida acesso do usuário e loja
             validate.accessByUser(authentication, entity);
