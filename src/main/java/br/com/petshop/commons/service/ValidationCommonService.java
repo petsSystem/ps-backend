@@ -30,14 +30,14 @@ public class ValidationCommonService extends AuthenticationCommonService {
     public void accessByUser(Principal authentication, UserEntity entity) {
         UserEntity user = getSysAuthUser(authentication);
 
+        if (entity.getProfileIds() == null || entity.getProfileIds().isEmpty())
+            throw new RuntimeException();
+
         if (user.getRole() == Role.ADMIN) return;
 
         accessByCompany(authentication, entity.getCompanyIds());
 
         if (user.getRole() == Role.USER && (!user.getId().equals(entity.getId())))
             throw new GenericForbiddenException();
-
-        if (entity.getProfileIds() == null || entity.getProfileIds().isEmpty())
-            throw new RuntimeException();
     }
 }
