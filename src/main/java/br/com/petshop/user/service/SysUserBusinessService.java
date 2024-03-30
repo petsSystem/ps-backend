@@ -67,6 +67,7 @@ public class SysUserBusinessService extends AuthenticationCommonService {
      */
     public void forget (String username) {
         try {
+            username = username.replaceAll("[^0-9]", "");
             //chama serviço de esquecimento de senha
             UserEntity entity = service.forget(username);
 
