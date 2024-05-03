@@ -32,7 +32,7 @@ public class SysAuthenticationController {
     @GetMapping("/hello")
     @ResponseStatus(HttpStatus.OK)
     public String hello() {
-        return "hello!";
+        return "hello one!";
     }
 
     @Operation(summary = "Serviço de autenticação no sistema PetHound.")
