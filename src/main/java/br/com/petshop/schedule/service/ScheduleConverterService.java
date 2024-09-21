@@ -1,9 +1,12 @@
 package br.com.petshop.schedule.service;
 
+import br.com.petshop.commons.model.Day;
 import br.com.petshop.schedule.model.dto.request.ScheduleCreateRequest;
 import br.com.petshop.schedule.model.dto.request.ScheduleUpdateRequest;
 import br.com.petshop.schedule.model.dto.response.ScheduleResponse;
 import br.com.petshop.schedule.model.entity.ScheduleEntity;
+import java.util.List;
+import java.util.UUID;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -36,7 +39,11 @@ public class ScheduleConverterService {
      * @return - entidade
      */
     public ScheduleEntity updateRequestIntoEntity(ScheduleUpdateRequest request) {
-        ScheduleEntity entity = mapper.map(request, ScheduleEntity.class);
+        //TODO trocar o model mapper pelo mapStruct
+        ScheduleEntity entity = new ScheduleEntity();//mapper.map(request, ScheduleEntity.class);
+        entity.setCompanyId(request.getCompanyId());
+        entity.setCategoryId(request.getCategoryId());
+        entity.setProductIds(request.getProductIds());
         entity.setDays(request.getDays());
         return entity;
     }
